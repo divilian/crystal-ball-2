@@ -252,7 +252,7 @@ need to do is identify possible evildoers on our security cameras. Given what
 we can observe about them, can we tell good guys from bad guys?
 
 Here's some training data:
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
     beard  height  demeanor lightsaber  type
        no   short  menacing      green  Sith
       yes  medium      calm      green  Jedi
@@ -275,7 +275,7 @@ column is our label: this person is known to be a \texttt{Jedi} (good guy) or
 a \texttt{Sith} (bad guy).
 
 A test point that we might want to evaluate looks like this:
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
     beard  height  demeanor lightsaber  type
       yes   short  menacing        red   ?? 
 \end{Verbatim}
@@ -414,7 +414,7 @@ Sith: sound the alarm."
 How can we automate this in Python? Let's assume that our data is in a Pandas
 DataFrame, as shown above. Now imagine writing this function:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 def predict(beard, height, demeanor, lightsaber):
     ...
 \end{Verbatim}
@@ -467,7 +467,7 @@ $P(\textrm{no}|\textrm{Sith})$\footnote{Recall that ``\texttt{yes}" and
 These are all straightforward to compute with Pandas. First, we read the file
 into a DataFrame (called ``\texttt{w}" for ``warriors"):
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 import numpy as np
 import pandas as pd
 w = pd.read_csv("warriors.csv")
@@ -477,7 +477,7 @@ I find it convenient to create a dictionary, called something like
 ``\texttt{probs}" to store all the probabilities. To compute the priors, all
 we have to do is figure out what fraction of the rows go with each label:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 probs = {}
 probs['Jedi'] = len(w[w.type=='Jedi'])/len(w)
 probs['Sith'] = len(w[w.type=='Sith'])/len(w)
@@ -488,7 +488,7 @@ For the conditionals like ``$P(\textrm{calm}|\textrm{Sith})$", we ask:
 fraction also have \texttt{calm} labels? That boils down to this:
 
 \footnotesize
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 probs['calm|Sith'] = (len(w[(w.type=='Sith') & (w.demeanor=='calm')]) /
     len(w[(w.type=='Sith')]))
 \end{Verbatim}
@@ -505,7 +505,7 @@ Now for the actual \texttt{predict()} function. All we have to do is multiply
 everything out per the above equations and see which of the two numerators is
 greater.
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 def predict(beard, height, demeanor, lightsaber):
     jediness = (probs[beard+"|Jedi"] *
                 probs[height+"|Jedi"] *
@@ -528,7 +528,7 @@ function at all. We've already computed all the \texttt{probs}, and once we've
 done that, the DataFrame and the data itself ceases to matter. We run the
 function just by passing it the values derived from our spycam:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 >>> predict("yes","tall","calm","blue")
 'Jedi'
 
@@ -565,7 +565,7 @@ So let's enhance our \texttt{predict()} function to return a list of
 .5 to 1, meaning ``only 50\% confident in our prediction" all the way to
 ``absolutely 100\% confident in our prediction." To wit:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 def predict(beard, height, demeanor, lightsaber):
     ...
     if jediness > sithness:
@@ -576,7 +576,7 @@ def predict(beard, height, demeanor, lightsaber):
 
 Taking it for a spin:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 >>> predict("no","tall","menacing","red")
 ['Sith', 0.9760957241941071]
 
@@ -603,7 +603,7 @@ way to do all the calculations:
 \line(1,0){400}
 \end{center}
 \footnotesize
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 df = pd.read_csv("...")
 
 probs = {}
@@ -634,7 +634,7 @@ of taking exactly four parameters named ``\texttt{beard}",
 ``\texttt{demeanor}", \textit{etc.}, it will take a \textit{list} of
 parameter values, so that it can be called like this:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 predict(['yes','tall','menacing','blue'])
 \end{Verbatim}
 
@@ -644,7 +644,7 @@ Here's one implementation of the function:
 \line(1,0){400}
 \end{center}
 \footnotesize
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 def predict(values):
     scores = []
     top_prob = 0
@@ -679,7 +679,7 @@ As we know, we can't test a classifier's performance on the data it's trained
 on and expect to get anything accurate. So we'll need to split our data into a
 training set and a test set. This can be done easily in Pandas with:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 complete_data_set = pd.read_csv("warriors.csv")
 train = complete_data_set.sample(frac=.7)
 test = complete_data_set.drop(train.index)
@@ -698,7 +698,7 @@ to compute our accuracy. All we need to do is iterate through the
 \texttt{test} set, passing each row to \texttt{predict()} and seeing whether
 we get the correct answer:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 num_correct = 0
 for i in range(len(test)):
     row = test.iloc[i]
@@ -713,7 +713,7 @@ print("We got " + str(num_correct/len(test)*100) +
 We get a different answer every time we run our program, since it will choose
 a different training/test split in each case.
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 We got 82.63% correct on the test data.
 \end{Verbatim}
 
@@ -745,7 +745,7 @@ the estimated value of its \textbf{probability density} and use that.
 Suppose we had a numeric \texttt{height} feature (measured in inches) instead
 of a categorical one. Our data might look like this:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
     beard  height  demeanor lightsaber  type
        no    62.5  menacing      green  Sith
       yes    68.3      calm      green  Jedi
@@ -763,7 +763,7 @@ Our Gaussian Naive Bayes assumption will be that \textit{for each class, the
 \texttt{Jedi} rows, and calculate their \texttt{height}s' mean and standard
 deviation, we get:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 >>> warriors[warriors.type=='Jedi'].height.mean()
 64.0571428571429
 
@@ -773,7 +773,7 @@ deviation, we get:
 
 Performing the same calculation for the \texttt{Sith} rows gives us:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 >>> warriors[warriors.type=='Sith'].height.mean()
 68.3902173913043
 
@@ -790,7 +790,7 @@ inches. We'll need to know the value of the density at $x$=69 for both our
 estimated Jedi and estimated Sith distributions. Using the SciPy library, we
 can get ``frozen" density functions for each distribution:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 import scipy.stats
 jedi_height = scipy.stats.norm(64.0571428571429, 9.661931704216865)
 sith_height = scipy.stats.norm(68.3902173913043, 9.319673312968604)
@@ -799,7 +799,7 @@ sith_height = scipy.stats.norm(68.3902173913043, 9.319673312968604)
 and then, to calculate the densities, we just call \texttt{.pdf()} on those
 objects:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 >>> jedi_height.pdf(69)
 0.036230663486274517
 
@@ -832,7 +832,7 @@ Let's add this feature to our classifier. First, the not-so-generally-coded
 version, which had lines like this:
 
 \footnotesize
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 probs['tall|Sith'] = (len(w[(w.type=='Sith') & (w.demeanor=='tall')]) /
     len(w[(w.type=='Sith')]))
 \end{Verbatim}
@@ -841,7 +841,7 @@ probs['tall|Sith'] = (len(w[(w.type=='Sith') & (w.demeanor=='tall')]) /
 Since \texttt{height} is now numeric, we need to replace all those
 height-related lines with code like this:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 sith_heights = w[w.type == 'Sith'].height
 sith_height = scipy.stats.norm(sith_heights.mean(),sith_heights.std())
 jedi_heights = w[w.type == 'Jedi'].height
@@ -854,7 +854,7 @@ jedi_height = scipy.stats.norm(jedi_heights.mean(),jedi_heights.std())
 \begin{center}
 \line(1,0){400}
 \end{center}
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 def predict(beard, height, demeanor, lightsaber):
     jediness = (probs[beard+"|Jedi"] *
                 probs[demeanor+"|Jedi"] *
@@ -887,7 +887,7 @@ code, we need to intelligently distinguish between numeric and categorical
 columns. This can be done via the \texttt{.dtype} accessor on a DataFrame
 column:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 >>> print(w.lightsaber.dtype)
 dtype('O')
 
@@ -908,7 +908,7 @@ Our generic implementation begins with:
 \line(1,0){400}
 \end{center}
 \footnotesize
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 probs = {}
 densities = {}
 target = df.columns[-1]
@@ -934,7 +934,7 @@ We now populate \texttt{densities} (and \texttt{probs}):
 \line(1,0){400}
 \end{center}
 \footnotesize
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 for label in df[target].drop_duplicates():
     rows_with_this_label = df[df[target] == label]
     probs[label] = len(rows_with_this_label)/len(df)
@@ -963,7 +963,7 @@ but we'll choose to pass a key/value pair string here (like
 \begin{center}
 \line(1,0){400}
 \end{center}
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 def predict(values):
     scores = []
     top_prob = 0
@@ -991,7 +991,7 @@ def predict(values):
 \normalsize
 
 And we call it like this:
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 >>> predict(['yes','height=65','menacing','blue'])
 ['Jedi', 0.85863336769968801]
 
@@ -1001,7 +1001,7 @@ And we call it like this:
 
 How's this thing do?
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 We got 82.33% correct on the test data.
 \end{Verbatim}
 

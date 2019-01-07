@@ -77,7 +77,7 @@ You can \textit{add} a \texttt{date} to a \texttt{timedelta} to get another
 granular than days, it is lost in these operations:
 
 \small
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 >>> datetime.date.today() == datetime.date.today() + finger
 True
 
@@ -170,7 +170,7 @@ passing (1) a string representing a date, time, or datetime, and (2) a
 formatting string telling the method how to interpret it. This is best seen
 through an example:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 my_string = "2/20/2018 14:00"
 start_of_class = datetime.datetime.strptime(my_string, "%m/%d/%Y %H:%M")
 
@@ -225,7 +225,7 @@ a \texttt{date}, \texttt{time}, or \texttt{datetime} \textit{object}, spit it
 out as a string of characters. This isn't used nearly as often, but it
 occasionally is, and it's useful to know as a translation mechanism.
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 >>> print(start_of_class.strftime("%A, %B the %dth at %I%p."))
 Tuesday, February the 20th at 02PM.
 \end{Verbatim}
@@ -234,7 +234,7 @@ One common error: note that you call \texttt{.strptime()} directly on the
 \textit{class} (\texttt{date}, \texttt{time}, or \texttt{datetime}), passing
 two arguments:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 an_object = datetime.datetime.strptime(my_birthday_string, "%m/%d/%Y %H:%M")
 \end{Verbatim}
 
@@ -242,7 +242,7 @@ but you call \texttt{.strftime()} on the object in question
 (a \texttt{date}, \texttt{time}, or \texttt{datetime}), passing
 one argument:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 a_string = my_birthday_object.strftime("%m/%d/%Y %H:%M")
 \end{Verbatim}
 

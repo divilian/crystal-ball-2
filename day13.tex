@@ -114,7 +114,7 @@ the scikit-learn package's helpful ``\texttt{LabelBinarizer.fit\_transform}
 function:
 
 \small
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 from sklearn.preprocessing import LabelBinarizer
 lb = LabelBinarizer()
 lightsaber = lb.fit_transform(df.lightsaber)
@@ -124,7 +124,7 @@ lightsaber = lb.fit_transform(df.lightsaber)
 Careful: although this function takes a Series, it returns a NumPy array:
 
 \small
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 >>> print(df.lightsaber.head())
 0      red
 1     blue
@@ -148,7 +148,7 @@ Let's use the scikit-learn library to compare 3-NN with Naive Bayes. First, we
 load the data and split it randomly into training and test sets:
 
 \small
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 w = pd.read_csv("warriors.csv")
 train = w.sample(frac=.7)
 test = w.drop(train.index)
@@ -158,7 +158,7 @@ test = w.drop(train.index)
 Next, we one-hot encode the features (all of which are categorical):
 
 \small
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 def one_hot_this_puppy(df):
     lb = LabelBinarizer()
     lightsaber = lb.fit_transform(df.lightsaber)
@@ -175,7 +175,7 @@ test_features = one_hot_this_puppy(test)
 We'll call scikit-learn's Naive Bayes implementation:
 
 \small
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 from sklearn.naive_bayes import MultinomialNB
 naive_bayes = MultinomialNB()
 naive_bayes.fit(train_features,train.type.as_matrix())
@@ -186,7 +186,7 @@ nb_predictions = naive_bayes.predict(test_features)
 and its KNN implementation:
 
 \small
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 from sklearn.neighbors import KNeighborsClassifier
 knn = KNeighborsClassifier(n_neighbors=3)
 knn.fit(train_features, train.type.as_matrix())
@@ -197,7 +197,7 @@ knn_predictions = knn.predict(test_features)
 Finally, print the results:
 
 \small
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 >>> print("Naive Bayes got {:.2f}% correct.".format(
     sum(nb_predictions == test.type)/len(test)*100))
 >>> print("kNN(3) got {:.2f}% correct.".format(
@@ -215,7 +215,7 @@ It's also illustrative to examine \textit{which} points Naive Bayes called
 correctly but 3-NN missed, and vice versa.
 
 \footnotesize
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 nb_right = []
 knn_right = []
 for i in range(len(nb_predictions)):
@@ -235,7 +235,7 @@ knn_right_examples = test.iloc[knn_right]
 
 \scriptsize
 \begin{multicols}{2}
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 Naive Bayes got these right:
     beard  height  demeanor lightsaber  type
 7      no  medium      calm      green  Jedi
@@ -251,7 +251,7 @@ Naive Bayes got these right:
 909    no   short  menacing      green  Jedi
 \end{Verbatim}
 \columnbreak
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 kNN got these right:
     beard  height  demeanor lightsaber  type
 1      no   short      calm       blue  Sith
@@ -301,7 +301,7 @@ the training set chosen.
 
 Here's some code to try all (odd) values of $k$ between 1 and 301:
 \small
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 corrects_train = []
 corrects_test = []
 for k in np.arange(1,301,2):
@@ -381,7 +381,7 @@ to me in order for me to make any \textit{different} decisions. Let's say my
 original 714 training points had:
 
 \begin{center}
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
         Jedi    Sith
 red       17      85
 blue     283      28

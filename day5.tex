@@ -29,7 +29,7 @@ textual representation of an arbitrarily nested Python object. This object can
 be a list or a dictionary, and have embedded lists and dictionaries to any
 arbitrary level of nesting. Here's an example:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 [{"prefix": "DATA", "num": 219, "creds": 3, "instructor": "Davies",
 "meetings": [{"time": {"day": "TR", "time": "2pm"}, "location": {"bldg":
 "Trinkle", "room": "B6"}}], "roster": [{"first": "Lady", "last": "Gaga",
@@ -84,7 +84,7 @@ $\bullet$ a dictionary, with key/value pairs:
 This kind of structure is called \textbf{hierarchical} data. This is in
 contrast to so-called \textbf{flat} data, like a CSV:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 Prefix,Num,Instructor,Creds,Bldg,Room,Day,Time
 DATA,219,Davies,3,Trinkle,B6,TR,2pm
 ENGL,286,Rigsby,3,Combs,112,MWF,11am
@@ -151,7 +151,7 @@ squared deviations of the line from the actual data points). It will not
 surprise you that it's easy to do this in Python as well, to wit:
 
 \line(1,0){400}
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 # Create some random x points and some crazy, noisy y function based on them.
 x = np.random.uniform(0,100,100)
 x.sort()
@@ -258,7 +258,7 @@ in Python:
 \vspace{.8in}
 \pagebreak
 \line(1,0){400}
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 import statsmodels.nonparametric.smoothers_lowess
 
 lowess = statsmodels.nonparametric.smoothers_lowess.lowess(y,x,frac=1/3)

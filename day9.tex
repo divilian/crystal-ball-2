@@ -97,7 +97,7 @@ separating the conceptual data from the storage implementation.
 communication path over which you can talk SQL. In Python, this is pretty
 easy:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 import sqlite3
 
 con = sqlite3.connect('my_local_file')
@@ -122,7 +122,7 @@ you can do in SQL is much more restricted, and hence the language is easier to
 learn.
 
 Here's the general paradigm:
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 query_results = cur.execute("YOUR SQL STATEMENT GOES HERE")
 results_list = query_results.fetchall():
 \end{Verbatim}
@@ -141,7 +141,7 @@ result at a time, that you can use in a loop.
 
 How do we know what tables exist in the database? We can run this command:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 query_results = cur.execute("SELECT name FROM sqlite_master WHERE type='table'")
 print(query_results.fetchall())
 \end{Verbatim}
@@ -155,7 +155,7 @@ Once we've got the names of the tables, we often won't even need the
 want to read an entire table into a DataFrame. \textit{If the data is small
 enough to load into memory}, we can do this with a one-liner:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 df = pd.read_sql("select * from table_name", con)
 \end{Verbatim}
 
@@ -183,7 +183,7 @@ returning the entire result, use \texttt{count(*)}, \texttt{max()},
 \texttt{min()}, \textit{etc.}:
 
 \footnotesize
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 select count(*) from table_name
 select max(col1) from table_name
 \end{Verbatim}
@@ -193,7 +193,7 @@ select max(col1) from table_name
 operation) tack on a ``limit" expression:
 
 \footnotesize
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 select * from table_name limit 10
 \end{Verbatim}
 \normalsize
@@ -202,7 +202,7 @@ select * from table_name limit 10
 comma-separated list of column names:
 
 \footnotesize
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 select col1 from table_name
 select col1,col2,col3 from table_name limit 10
 \end{Verbatim}
@@ -211,7 +211,7 @@ select col1,col2,col3 from table_name limit 10
 \item To get only certain rows, add a ``where clause" after the table name:
 
 \footnotesize
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 select * from table_name where col1==val1
 select col2 from table_name where col1==val1 and col2>val2
 select col1,col2 from table_name where col1==val1 and not col2>val2 limit 10
@@ -225,7 +225,7 @@ and \texttt{not}, and parentheses for grouping.)
 querying membership in a set:
 
 \scriptsize
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 select * from table_name where col1 in (val1,val2)
 select col1,col2 from table_name where col1==val1 and not col2 in (val1,val2,val3) limit 10
 \end{Verbatim}
@@ -235,7 +235,7 @@ select col1,col2 from table_name where col1==val1 and not col2 in (val1,val2,val
 functionality) use the word \texttt{distinct} before the column names:
 
 \scriptsize
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 select distinct * from table_name
 select col1,col2 from table_name where not col1 in (val1,val2,val3) or col2!=val4 limit 5
 \end{Verbatim}
@@ -243,14 +243,14 @@ select col1,col2 from table_name where not col1 in (val1,val2,val3) or col2!=val
 
 The \texttt{distinct} option is useful in conjunction with \texttt{count()}:
 \scriptsize
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 select count(distinct col1) from table_name
 \end{Verbatim}
 \normalsize
 
 \item You can have SQLite do sorting with ``\texttt{order by}":
 \scriptsize
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 select * from table_name order by col1
 select distinct col1,col2 from table_name where col3==val1 order by col2,col1 desc limit 5
 \end{Verbatim}
@@ -262,7 +262,7 @@ with the \texttt{desc} keyword.
 \item SQL supports a ``group by" operation very much like Pandas does:
 
 \scriptsize
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 select col1,count(*) from table_name group by col1
 select col1,max(col2) from table_name where col3==val1 group by col2 order by col1 desc limit 5
 \end{Verbatim}
@@ -271,7 +271,7 @@ select col1,max(col2) from table_name where col3==val1 group by col2 order by co
 \item Finally, to do a merge/join operation, use the \texttt{join} keyword:
 
 \scriptsize
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 select * from table_1 join table_2 on col1==col2
 select col1,col2 from table_1 join table_2 on table_1.x==table_2.q where col3>val1 limit 5
 \end{Verbatim}

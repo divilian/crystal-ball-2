@@ -55,7 +55,7 @@ arrays according to several statistical distributions. Suppose you wanted to
 create a data set with two \textit{uncorrelated} variables. You'd just
 generate two arrays, one at a time:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 heights = np.random.normal(65, 8, 100)
 sat_scores = np.random.normal(1400, 350, 100)
 \end{Verbatim}
@@ -69,7 +69,7 @@ If two variables are \textit{completely} correlated, then one is simply a
 direct (linear) function of the other. That's easy to accomplish by creating
 only \textit{one} randomly, and then using it to compute the other:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 weights_lbs = np.random.normal(150, 30, 100)
 weights_kg = weights_lbs / 2.2
 \end{Verbatim}
@@ -86,7 +86,7 @@ noise}. ``Noise" is a somewhat misleading word that's used in a variety of
 statistical situations: here it means ``other (linearly additive) influences
 that affect the second variable besides just the value of the first." To wit:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 sat_scores = np.random.normal(1400, 350, 100)
 gpas = sat_scores * (2.5 / 1400) + np.random.normal(0, 1, 100)
 \end{Verbatim}
@@ -99,7 +99,7 @@ Notice that the second component of \texttt{gpas} is a normally distributed
 NumPy provides a way to generate a categorical data set with certain
 frequencies, through its \texttt{np.random.choice()} function:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 np.random.choice(['Steelers','Redskins','Giants'])
 'Redskins'
 \end{Verbatim}
@@ -117,7 +117,7 @@ must sum to 1, and NumPy dumbly will not normalize it for you.)
 \end{compactitem}
 
 A more complicated example:
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 np.random.choice(['Steelers','Redskins','Giants'], size=10, p=[.3,.6,.1])
 ['Redskins' 'Redskins' 'Giants' 'Redskins' 'Redskins' 'Steelers' 'Redskins'
  'Steelers' 'Redskins' 'Giants']
@@ -140,7 +140,7 @@ list or dictionary with embedded contents.}
 Here's an example file in JSON format:
 
 \small
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 {"name": "Luke Skywalker", "rank": "Jedi", "lightsaber color": "blue",
 "episodes": ["IV", "V", "VI", "VII", "VIII"], "relations": {"Leia": "sister",
 "Han": "friend", "Artoo": "servant", "Rey": "student"}}
@@ -157,7 +157,7 @@ treat in the ordinary way.
 In Python, we have the \texttt{json} package, which you can import like any
 other:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
     import json
 \end{Verbatim}
 
@@ -179,7 +179,7 @@ So, for instance, to load a file \texttt{info.json} into a Python object
 called ``\textit{my\_stuff}":
 
 \small
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
     with open('info.json','r') as f:
         my_stuff = json.load(f)
 \end{Verbatim}
@@ -188,7 +188,7 @@ called ``\textit{my\_stuff}":
 We could parse and access the Luke Skywalker file just like this:
 
 \small
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
     with open('luke.json','r') as f:
         luke = json.load(f)
     print(luke['lightsaber color'])

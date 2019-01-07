@@ -151,7 +151,7 @@ known association:
 \line(1,0){400}
 \end{center}
 \footnotesize
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 import pandas as pd
 import numpy as np
 
@@ -207,7 +207,7 @@ Okay, let's analyze. First, just for giggles, let's shuffle the data frame's
 rows so they're in a random order (not strictly necessary, but just on
 principle):
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 transactions = transactions.sample(frac=1)
 \end{Verbatim}
 
@@ -215,7 +215,7 @@ and now let \texttt{mlxtend} do its work:
 \begin{center}
 \line(1,0){400}
 \end{center}
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 from mlxtend.frequent_patterns import apriori
 from mlxtend.frequent_patterns import association_rules
 
@@ -247,7 +247,7 @@ Let's print out the ten itemsets with the greatest support:
 \begin{center}
 \line(1,0){400}
 \end{center}
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 >>> itemsets.sort_values('support',ascending=False).head(10)
    support                itemsets
   0.816000                  [eggs]
@@ -275,7 +275,7 @@ association rules involving those item sets:
 \line(1,0){400}
 \end{center}
 \small
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 >>> rules = association_rules(itemsets)
 >>> rules.sort_values('confidence',ascending=False).head(10)
 

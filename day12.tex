@@ -116,7 +116,7 @@ names with similar names: \texttt{requests.get()}, \texttt{requests.post()},
 \texttt{.get()} command. It can actually be used to retrieve \textit{any}
 Web-accessible page on the network:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 import requests
 class_home_page = requests.get("http://cs.umw.edu/~stephen/data219")
 print(class_home_page.content)
@@ -135,7 +135,7 @@ Wars API) is a neat little database that returns JSON data. Let's ask it for
 ``person with ID 13":
 
 \small
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 >>> response = requests.get("https://swapi.co/api/people/13")
 >>> print(json.load(response.content))
 {'name': 'Chewbacca', 'height': '228', 'mass': '112', 'hair_color': 'brown',
@@ -157,7 +157,7 @@ get a Python dictionary with all Chewie's info. Note that some of the data
 consists of \textit{other REST URLs}, a sign of a well-written API.
 
 \small
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 >>> chewie = json.load(response.content)
 >>> print(json.loads(requests.get(chewie['homeworld']).content))
 {'climate': 'tropical',
@@ -252,7 +252,7 @@ this is super important.)
 To authenticate with OAuth, we'll use Python's \texttt{requests\_oauthlib}
 package as follows:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 from requests_oauthlib import OAuth1
 cons_key = "MlUmay5kA1vGWKokmmFofgRLX"
 cons_secret = "2FFYCyI2rhUIEltkepeNhVcZvYufXJukCJMqE1s3ALKoLYm7LD"
@@ -275,7 +275,7 @@ triggering some operation, passing parameters, and getting a return value. The
 syntax is a bit different though. In Python, you're used to making a function
 call like this:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 get_user_timeline('katyperry',4)
 \end{Verbatim}
 
@@ -283,7 +283,7 @@ to indicate something like ``get the latest four tweets from user
 \texttt{@katyperry}." The corresponding syntax in URL Land is like this:
 
 \footnotesize
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=katyperry&count=4
 \end{Verbatim}
 \normalsize
@@ -292,7 +292,7 @@ Note that parameters are ``passed" as key/value pairs, with no spaces, after a
 ``\texttt{?}", and separated by ``\texttt{\&}" signs. The following code:
 
 \footnotesize
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 four_from_katy = json.loads(requests.get(
     "https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=katyperry&count=4",
             auth=oauth).content)
@@ -303,7 +303,7 @@ for tweet in four_from_katy:
 
 produces this result (today):
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 You’re not going to miss this dance @effiepassero. #americanidol
 @CadeFoehner Keep that feather, keep catching those dreams. #americanidol
 HONEY!  #americanidol
@@ -318,7 +318,7 @@ and requires a ``\texttt{q}" parameter with your query string. I could search
 for Star Wars toys with:
 
 \small
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 toys = json.loads(requests.get(
     "https://api.twitter.com/1.1/search/tweets.json?q=star+wars+toys&count=5",
             auth=oauth).content)
@@ -327,7 +327,7 @@ toys = json.loads(requests.get(
 
 This endpoint returns a dictionary of information:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 >>> print(list(toys.keys()))
 ['statuses', 'search_metadata']
 \end{Verbatim}
@@ -336,7 +336,7 @@ Looks like the tweets themselves (``\texttt{statuses}") are in the
 \texttt{statuses} key, so:
 
 \small
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 >>> for tweet in toys['statuses']:
         print(tweet['text'])
 The #StarWars portfolio of #toys is about to get bigger. #Hasbro announced
@@ -354,7 +354,7 @@ https://t.co/ArxT9kPjZt https://t.co/lcLbp7pwjG
 If you have weird characters other than spaces, I suggest the \texttt{parse()}
 method from the \texttt{urllib} library to make things kosher:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 import urllib.parse
 >>> print(urllib.parse.quote_plus("http://cs.umw.edu/star wars toys! 20% off"))
 'http%3A%2F%2Fcs.umw.edu%2Fstar+wars+toys%21+20%25+off'

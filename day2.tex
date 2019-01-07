@@ -1,39 +1,5 @@
-\documentclass[12pt]{article}
 
-\addtolength{\textwidth}{.8in}
-\addtolength{\hoffset}{-.4in}
-\addtolength{\textheight}{1in}
-\addtolength{\voffset}{-1in}
-
-\usepackage{wasysym}
-\usepackage{multicol}
-\usepackage{amsfonts}
-\usepackage{graphicx}
-\usepackage{hyperref}
-\usepackage{enumerate}
-\usepackage{parskip}
-\usepackage{paralist}
-\usepackage{upquote} % to convert funny quotes to straight quotes
-\setlength{\parindent}{15pt}
-\pagestyle{empty}
-
-\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
-
-\begin{document}
-
-\begin{center}
-\begin{Large}
-DATA 219 Notes -- Jan. 23, 2018
-\end{Large}
-\end{center}
-\vspace{.3in}
-
-\section{Administuff}
-
-\begin{compactitem}
-\item Data Mavens first meeting of the year \textbf{tomorrow} @5pm in Woodard
-202. Come join us -- we're cool!
-\end{compactitem}
+\chapter{Correlation, NumPy}
 
 \section{``Are these things correlated?"}
 
@@ -51,14 +17,14 @@ Here are my preferred quick-and-dirty ways.
 A quick and dirty way to tell whether two variables in a contingency table
 affect each other is to run a $\chi ^2$ test:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
     >>> import scipy.stats
     >>> scipy.stats.chi2_contingency(my_contingency_table)
 \end{Verbatim}
 
 For example:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
     >>> side_saber = pd.crosstab(characters.side, columns=characters.saber)
     >>> side_saber
     saber  blue  green  red
@@ -90,14 +56,14 @@ do a t-test if the notches look funny; see \texttt{scipy.stats.ttest\_ind} and
 Besides visually inspecting scatterplots to spot correlations, the Pearson's
 correlation coefficient can give you a quick-and-dirty answer:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
     >>> import scipy.stats.stats
     >>> scipy.stats.stats.pearsonr(my_var1, my_var2)
 \end{Verbatim}
 
 For instance:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
     >>> scipy.stats.stats.pearsonr(men_ht,men_sat)
     (-0.080877008297474018, 0.29443331215713264)
 \end{Verbatim}
@@ -128,13 +94,13 @@ they in turn use NumPy.
 
 The standard NumPy import is:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 import numpy as np
 \end{Verbatim}
 
 after which you can make \textit{ndarray}s in a variety of ways:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 a = np.array(['larry','curly','moe'])    # 1-d array ("vector")
 b = np.array([[1,2,3],[8,9,10])          # 2-d array ("matrix")
 c = np.zeros(25)                         # 1-d array of all zeros
@@ -159,14 +125,14 @@ broadcasting operations so you can avoid writing and executing loops. For
 example, if you want to add the elements of two arrays together, instead of
 doing something like this:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 for i in range(len(m)):
     q[i] = m[i] + n[i]
 \end{Verbatim}
 
 you just write this:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 q = m + n
 \end{Verbatim}
 
@@ -184,14 +150,14 @@ In addition to operators, NumPy also provides a number of functions (called
 ``\textit{ufuncs}" or ``universal functions") that work in a similar way.
 Instead of:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 for i in range(len(f)):
     g[i] = math.sqrt(f[i])
 \end{Verbatim}
 
 you just write this:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 g = np.sqrt(f)
 \end{Verbatim}
 
@@ -208,7 +174,7 @@ the NumPy documentation and avoid it.}
 NumPy \textit{ndarray}s have a \texttt{.reshape()} function that lets you
 coerce a multi-dimensional array to different dimensions:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 thing = np.array([[1,2,3],[4,5,6],[7,8,9],[10,11,12]])
 print(thing)
 [[ 1  2  3]
@@ -231,7 +197,7 @@ print(thing)
 You can also perform a matrix \textbf{transpose} operation using \texttt{.T}
 (no bananas, note):
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 print(thing.T)
 [[ 1  5  9]
  [ 2  6 10]
@@ -248,7 +214,7 @@ you must explicitly call ``\texttt{.copy()}" on the array.
 
 To illustrate the possible weirdness:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 x = np.array([4,9,8,3,2])
 y = x[2:4]
 print(y)
@@ -267,7 +233,7 @@ generation. NumPy provides a super good library for this, all of which is in
 the namespace \texttt{np.random}. Just about every distribution you can think
 of is present, including:
 
-\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 print(np.random.normal(10,3,5))
 [ 13.14637747   8.0170962   14.69793015   5.28517005   7.71561529]
 
