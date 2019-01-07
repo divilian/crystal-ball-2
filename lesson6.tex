@@ -1,19 +1,3 @@
-\documentclass[12pt]{article}
-
-\addtolength{\textwidth}{.8in}
-\addtolength{\hoffset}{-.4in}
-\addtolength{\textheight}{1in}
-\addtolength{\voffset}{-1in}
-
-\usepackage{amsmath}
-\usepackage{graphicx}
-\usepackage{upquote} % to convert funny quotes to straight quotes
-\usepackage{amsfonts}
-\usepackage{paralist}
-\setlength{\parindent}{15pt}
-
-\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
-
 % Plan for class:
 
 % 1. LOESS w/ students at board doing best-fit lines for each of 10 data
@@ -48,15 +32,9 @@
 %
 % Exercise on last page.
 
-\begin{document}
+\chapter{Data fusion, ``tidy'' data}
 
-\begin{center}
-\begin{Large}
-DATA 219 Notes -- Feb. 13, 2018
-\end{Large}
-\end{center}
-
-\section{Merge operations (and data fusion)}
+\section{Merge operations}
 
 As we've learned, the \textit{lingua franca} of the data science world is the
 rectangular table perfectly reflected by a CSV file: it has (heterogeneous)
@@ -94,39 +72,43 @@ are from different data sets entirely.
 The basic idea is that in order to meaningfully merge two DataFrames, one (or
 more) columns in the first table must be logically linked to one (or more)
 columns in the second. ``Logically linked'' usually means ``having the same
-values in them.'' For example, consider these two DataFrames from a data source
-like IMDB:
+values in them.'' 
 
-\pagebreak
+\label{originalDFs}
+\begin{figure}[ht]
+\centering
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-                        actors:
-actor           film                   salary (millions)
---------------------------------------------------------
-Downey Jr.      The Avengers           50
-Johansson       The Avengers           20
-DiCaprio        Inception              59
-Hanks           Forrest Gump           70
-Bullock         Gravity                77
-Downey Jr.      Iron Man 3             51
-Hanks           Saving Private Ryan    40
-...
-
-                        movies:
-title           director               year
--------------------------------------------
-Inception       Nolan                  2010
-The Avengers    Whedon                 2012
-Forrest Gump    Zemeckis               1994
-Gravity         Cuaron                 2013
-Star Wars       Lucas                  1977
-...
+                                  actors:
+          actor           film                   salary (millions)
+          --------------------------------------------------------
+          Downey Jr.      The Avengers           50
+          Johansson       The Avengers           20
+          DiCaprio        Inception              59
+          Hanks           Forrest Gump           70
+          Bullock         Gravity                77
+          Downey Jr.      Iron Man 3             51
+          Hanks           Saving Private Ryan    40
+          ...
+          
+                                  movies:
+          title           director               year
+          -------------------------------------------
+          Inception       Nolan                  2010
+          The Avengers    Whedon                 2012
+          Forrest Gump    Zemeckis               1994
+          Gravity         Cuaron                 2013
+          Star Wars       Lucas                  1977
+          ...
 \end{Verbatim}
-\normalsize
+\caption{Two DataFrames from an IMDB-like source.}
+\label{fig:imdb}
+\end{figure}
  
-There are clearly questions we'd like to ask which involve both DataFrames
-together, rather than each in isolation. For instance, ``have actor salaries
-been going up over time?'' or ``how often have various actors worked with
-specific directors?''
+For example, consider Figure~\ref{fig:imdb}, which contain two DataFrames from
+a data source like IMDB. There are clearly questions we'd like to ask which
+involve both DataFrames together, rather than each in isolation. For instance,
+``have actor salaries been going up over time?'' or ``how often have various
+actors worked with specific directors?''
 
 Merging here is simple: we simply identify \textit{the common column} which
 unites rows from the two tables. Clearly, it's the film title: we know that
@@ -139,12 +121,12 @@ table its \textbf{primary key} (PK), and we call the \texttt{film} column of
 the \texttt{actors} table a \textbf{foreign key} (FK). The primary key /
 foreign key relationship is supposed to suggest that for every row in the
 \texttt{actors} table, its \texttt{film} value \textit{will} appear in one row
-of the \texttt{movies} table (namely, in that row's \texttt{title} column.)
+of the \texttt{movies} table (namely, in that row's \texttt{title} column).
 
 To ``join'' these two DataFrames all in one fell swoop, we execute a command
 like this:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 actors_movies = pd.merge(actors,movies,left_on="film",right_on="title")
 \end{Verbatim}
 
@@ -156,18 +138,24 @@ merging column in the first DataFrame) and ``\texttt{right\_on}'' (for the
 second). If these two columns had the same name, we could just specify a
 single argument called ``\texttt{on}'' for the two.
 
-\vspace{.2in}
-Here's what \texttt{actors\_movies} will look like:
+The \texttt{actors\_movies} will look like Figure~\ref{fig:merge}. (The
+sequence of the rows is not in general reliable, and you should not depend on
+them being in the order you expect.)
+
+\begin{figure}[ht]
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
                             actors_movies:
-actor      film       salary (millions)   title      director     year
-----------------------------------------------------------------------
-Bullock    Gravity    77                  Gravity    Cuaron       2013
-DiCaprio   Inception  59                  Inception  Nolan        2010
+actor      film         salary (millions)  title         director     year
+--------------------------------------------------------------------------
+Bullock    Gravity      77                 Gravity       Cuaron       2013
+DiCaprio   Inception    59                 Inception     Nolan        2010
+Johansson  The Avengers 20                 The Avengers  Whedon       2010
+Downey Jr. The Avengers 50                 The Avengers  Whedon       2010
 ....
 \end{Verbatim}
-(The sequence of the rows is not in general reliable, and you should not
-depend on them being in the order you expect.)
+\caption{The result of a merge operation on the DataFrames on p.~\pageref{originalDFs}.}
+\label{fig:merge}
+\end{figure}
 
 This DataFrame can be used to answer either of the questions we posed above,
 and others.
@@ -179,16 +167,15 @@ operations if you wish.
 \subsubsection{Odds and ends}
 
 \begin{enumerate}
-\itemsep.1em
+\itemsep1em
 \item Sometimes we want to merge on more than one column; for instance:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 df = pd.merge(votes,contributions,left_on=['first_name','last_name'],
         right_on=['candidate_first','candidate_last'])
 \end{Verbatim}
 which has the expected result.
 
-\vspace{.2in}
 \item The default merge operation (as we did above) is sometimes called an
 ``\textbf{inner join}''. This means that \textit{if there is no corresponding
 match for a row in one of the DataFrames, there will be no associated row in
@@ -203,26 +190,25 @@ corresponding null values if necessary. We can do this by specifying
 \texttt{'left'}, \texttt{'right'}, or \texttt{'outer'} as the value of the
 \texttt{'how'} argument to \texttt{pd.merge()}:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 df = pd.merge(votes,contributions,left_on=['first_name','last_name'],
         right_on=['candidate_first','candidate_last'],how='outer')
 \end{Verbatim}
 
-\vspace{.2in}
 \item Sometimes merging two data frames will result in column name
 collisions. Suppose, for example, that our \texttt{actors} table had had a
 \texttt{year} column indicating the birth year of the actor:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-                        actors:
-actor           year   film                   salary (millions)
----------------------------------------------------------------
-Downey Jr.      1965   The Avengers           50
-Johansson       1984   The Avengers           20
-DiCaprio        1974   Inception              59
-Hanks           1956   Forrest Gump           70
-Bullock         1964   Gravity                77
-...
+                            actors:
+    actor           year   film                   salary (millions)
+    ---------------------------------------------------------------
+    Downey Jr.      1965   The Avengers           50
+    Johansson       1984   The Avengers           20
+    DiCaprio        1974   Inception              59
+    Hanks           1956   Forrest Gump           70
+    Bullock         1964   Gravity                77
+    ...
 \end{Verbatim}
 
 Then the resulting DataFrame would need to have two columns named
@@ -231,7 +217,7 @@ conflicting columns with a ``\texttt{\_x}'' or ``\texttt{\_y}'' suffix,
 corresponding to the left/right tables in the join:
 
 \footnotesize
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=none]
                             actors_movies:
 actor      year_x   film       salary (millions)   title      director   year_y
 -------------------------------------------------------------------------------
@@ -243,27 +229,32 @@ DiCaprio   1974     Inception  59                  Inception  Nolan      2010
 (which, of course, you can rename at will via
 ``\texttt{actors\_movies.columns}''.)
 
-\item Finally, the above examples have all featured ``one-to-many'' relationships
-between the two tables. (\textit{Many} actors star in \textit{one} movie.) But
-sometimes we have a ``many-to-many'' relationship. Consider the following
-example:
+\item Finally, the above examples have all featured ``one-to-many''
+relationships between the two tables. (\textit{Many} actors star in
+\textit{one} movie.) But sometimes we have a ``many-to-many'' relationship.
 
-\small
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-costumes = pd.DataFrame(
+Consider the example in Figure~\ref{fig:costumes}. In order to dress every
+child in their Halloween costume, we need \textit{multiple} matches from
+\textit{both} data frames for each costume value. Each \texttt{Princess} has
+more than one accessory, and there are multiple children who want to
+\textit{be} princesses. Therefore, we can potentially end up with a lot of
+rows in our result.
+
+
+\begin{figure}
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
+>>> costumes = pd.DataFrame(
     {'costume':['Darth Vader','Darth Vader','Princess','Princess'],
      'accessory':['helmet','lightsaber','crown','wand']})
-
     accessory      costume
 0      helmet  Darth Vader
 1  lightsaber  Darth Vader
 2       crown     Princess
 3        wand     Princess
 
-children = pd.DataFrame(
+>>> children = pd.DataFrame(
     {'child':['Johnny','Sam','Betty Lou','Wendell','Kiara'],
      'costume':['Darth Vader','Darth Vader','Princess','Student','Princess']})
-
        child      costume
 0     Johnny  Darth Vader
 1        Sam  Darth Vader
@@ -271,8 +262,7 @@ children = pd.DataFrame(
 3    Wendell      Student
 4      Kiara     Princess
 
-pd.merge(costumes,children,on="costume")
-
+>>> pd.merge(costumes,children,on="costume")
     accessory      costume      child
 0      helmet  Darth Vader     Johnny
 1      helmet  Darth Vader        Sam
@@ -283,21 +273,18 @@ pd.merge(costumes,children,on="costume")
 6        wand     Princess  Betty Lou
 7        wand     Princess      Kiara
 \end{Verbatim}
-\normalsize
-
-In order to dress every child in their Halloween costume, we need
-\textit{multiple} matches from \textit{both} data frames for each costume
-value. Each \texttt{Princess} has more than one accessory, and there are
-multiple children who want to \textit{be} princesses. Therefore, we can
-potentially end up with a lot of rows in our result.
+\caption{Merging DataFrames with a many-to-many relationship.}
+\label{fig:costumes}
+\end{figure}
 
 Btw, notice that poor \texttt{Wendell} was left out of the merged DataFrame
 entirely, since his costume did not have any accessories. We can include him
-by doing a ``right join'' (or full ``outer join''):
+by doing a ``\textbf{right join}'' (or full ``\textbf{outer join}''), as shown
+in Figure~\ref{fig:outerJoin}.
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{figure}
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 pd.merge(costumes,children,on="costume",how="outer")
-
     accessory      costume      child
 0      helmet  Darth Vader     Johnny
 1      helmet  Darth Vader        Sam
@@ -309,10 +296,12 @@ pd.merge(costumes,children,on="costume",how="outer")
 7        wand     Princess      Kiara
 8         NaN      Student    Wendell
 \end{Verbatim}
+\caption{Including costume-less \texttt{Wendell} with an outer join.}
+\label{fig:outerJoin}
+\end{figure}
 
 \end{enumerate}
 
-\pagebreak
 \subsection{``By the way...why?''}
 
 At this point you may be asking, ``if we just have to merge the DataFrames to
@@ -320,20 +309,21 @@ do our analysis, why were they stored that way in the first place? Why not
 just have everything in one big CSV file?''
 
 The answer has to do with \textit{redundancy of information}. Consider the
-merged \texttt{actors\_movies} table. It's not the most compact way of
-expressing the information, because certain pieces of information are repeated
-unnecessarily.
+merged table in Figure~\ref{fig:merge} (p.~\pageref{fig:merge}). It's not the
+most compact way of expressing the information, because certain pieces of
+information are repeated unnecessarily.
 
 For instance, \textit{The Avengers} was released in 2012. Our data source
 needs to record that. But in the merged table, this year would be repeated
 \textit{for every actor/actress in the movie.} The same is true for the
 director of the film. By performing the merge, we have duplicated lots of
 values. In database terms, the data set has become \textbf{unnormalized}. This
-isn't always a bad thing, and in terms of performing standard ML algorithms,
-it's necessary. But you can see why we wouldn't want the data permanently
-stored that way. It consumes extra storage, plus it opens a Pandora's Box of
-possible contradictions: what if \texttt{Downey Jr.}'s \texttt{The Avengers}
-row said 2012, while \texttt{Johansson}'s said 2014. Who would we believe?
+isn't always a bad thing, and in terms of performing standard ML (machine
+learning) algorithms, it's necessary. But you can see why we wouldn't want the
+data permanently stored that way. It consumes extra storage, plus it opens a
+Pandora's Box of possible contradictions: what if \texttt{Downey Jr.}'s
+\texttt{The Avengers} row said 2012, while \texttt{Johansson}'s said 2014. Who
+would we believe?
 
 Database normalization is a larger topic than we have time to fully cover in
 this class, but the basics are very simple. Conceptually: \textit{each piece
@@ -345,10 +335,9 @@ certain analyses.
 
 \section{``Tidy'' data}
 
-The term ``tidy'' to describe a data set has sprung into prominence recently as
-a result of the excellent paper by Hadley Wickham (of R fame) who neatly
-captured the aspects of various data formatting choices that make life
-problematic for the analyst. 
+The term ``tidy'' to describe a data set has sprung into prominence recently
+as a result of the excellent paper by Hadley Wickham (of R fame) who neatly
+captured the perils of various data formatting choices.
 
 \begin{compactitem}
 \item \textbf{variable} -- a category of something, for which individual
@@ -404,46 +393,33 @@ who had that religion and that income level.)
 
 We tidy this with the \texttt{pd.melt()} function:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 tdf = pd.melt(df, ['religion'], var_name='income', value_name='frequency')
 \end{Verbatim}
 
 which gives us the tidy version:
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-                    religion    income  frequency
-0                   Agnostic     <$10k         27
-1                    Atheist     <$10k         12
-2                   Buddhist     <$10k         27
-3                   Catholic     <$10k        418
-    ...
+                               religion    income  frequency
+           0                   Agnostic     <$10k         27
+           1                    Atheist     <$10k         12
+           2                   Buddhist     <$10k         27
+           3                   Catholic     <$10k        418
+          ...
 \end{Verbatim}
-(Sometimes you'll hear the terms ``wide'' and ``long'' to refer to the untidy
-and tidy formats in this sort of example, respectively.)
 
-\vspace{.1in}
+(Sometimes you'll hear the terms ``\textbf{wide}'' and ``\textbf{long}'' to
+refer to the untidy and tidy formats in this sort of example, respectively.)
+
 By the way, the inverse operation of ``melt'' is often called
 ``\textbf{pivot}''. To reverse the above transformation in Pandas, you should
 use:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 df = tdf.pivot(index='religion',columns='income')
 \end{Verbatim}
 
-\vspace{.1in}
-\subsection{Exercise}
+for this operation.
 
-Test your understanding of tidy datasets by putting the following (messy) set
-into tidy form:
-
-\small
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-Name  Year  Major  School  Type    GPAFr  GPASo  GPAJr  GPASr  Creds  Mascot
-----------------------------------------------------------------------------
-Jane  Soph   CPSC     UMW  Public    2.4    3.8     NA     NA     48   Eagle
-Fred  Sen    ENGL     JMU  Public    2.9    3.1    2.3    2.9    106   Duke 
-                                  ...
-\end{Verbatim}
-\normalsize
 
 % Exercise:
 % load http://cs.umw.edu/~stephen/data219/students.csv and tidy it to:
