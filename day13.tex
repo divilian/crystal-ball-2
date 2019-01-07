@@ -1,0 +1,498 @@
+
+\documentclass[12pt]{article}
+
+\addtolength{\textwidth}{.8in}
+\addtolength{\hoffset}{-.4in}
+\addtolength{\textheight}{1in}
+\addtolength{\voffset}{-1in}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{upquote} % to convert funny quotes to straight quotes
+\usepackage{amsfonts}
+\usepackage{multicol}
+\usepackage{paralist}
+\setlength{\parindent}{15pt}
+
+\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
+
+
+\begin{document}
+
+\begin{center}
+\begin{Large}
+DATA 219 Notes -- Apr. 5, 2018
+\end{Large}
+\end{center}
+
+\section{k-Nearest Neighbors classifiers}
+
+Another common approach to the ML classification problem is sort of at the
+opposite extreme from Naive Bayes. Instead of very generally assuming that
+each of the features is an independent and separate indicator of a data
+point's class, the \textbf{kNN} (for ``$k$-nearest neighbors") algorithm
+assumes that a point's features are very much bound together. In order to
+classify a point, a kNN classifier finds the \textit{closest} training points
+to it, and predicts the class that those points suggest (majority rules).
+
+The parameter $k$ in kNN is simply the number of ``closest training points"
+we'll consider. It is nearly always an odd number, so that in the two-class
+case there are no ties. Suppose we have a 7-NN classifier, and we're asked to
+classify a particular person as either \texttt{Jedi} or \texttt{Sith}. If we
+find the seven most similar training points to our person, and discover that
+four of them are \texttt{Jedi} and the other three are \texttt{Sith}, we'll
+predict ``\texttt{Jedi}." The basic idea is that simple.
+
+\subsection{Distance measures}
+
+Much hinges on the question of \textit{closeness}. What do we mean when we say
+two data points are ``close" together? There are some options here, many of
+which are common sense. The first approach you might think of is to take the
+standard \textit{Euclidean distance}, also called the ``straight-line
+distance," between the data points. We just use the Pythagorean Theorem where
+each feature is plotted on an axis. And in fact this is the most common
+choice. Remember that the distance between two $n$-dimensional points $x$ and
+$y$ is:
+
+\begin{align*}
+d = \sqrt{(x_1-y_1)^2 + (x_2-y_2)^2 + (x_3-y_3)^2 + \dots + (x_n-y_n)^2}
+\end{align*}
+
+In other words, the straightforward square-root-of-sum-of-squared-differences
+works in \textit{any} number of dimensions, not just two.
+
+This isn't the only approach people use. In general, we can use any
+\textbf{distance measure} (or ``distance function," or ``distance metric")
+that assigns a numerical ``distance" value to any two points. To be valid, a
+distance measure must simply satisfy certain common sense
+rules.\footnote{Including: the distance between two points must always be
+greater than or equal to 0; the distance from $x$ to $y$ must be the same as
+the distance from $y$ to $x$; and the distance from $x$ to $z$ must not be any
+greater than the distance from $x$ to $y$ to $z$ (the ``triangle
+inequality.")} Another common choice is the \textbf{Manhattan distance} (or
+``taxicab distance") which is essentially the shortest path between the two
+points that doesn't travel diagonally (\textit{i.e.}, the path only travels
+along axes.)
+
+\subsection{Feature standardization}
+
+One very common issue is data sets that have features on widely different
+scales. Suppose one of our features is a person's age, and another is that
+person's salary. If we take the straightforward Euclidean distance between two
+people, we'll find that the salary difference -- measured in the tens of
+thousands -- completely overwhelms the age difference, which is at most a few
+decades. Clearly a difference of \$50/year in salary isn't nearly as
+significant as a difference of 50 years in age!
+
+The solution is to \textbf{transform} our features so they are all
+\textbf{standardized} (or ``Z-score normalized.") All we have to do is take
+each feature, and:
+
+\begin{compactenum}
+\item subtract its mean from each point, then
+\item divide each point by its standard deviation.
+\end{compactenum}
+
+This puts all features on the same level playing field, so to speak. If you
+remember from your stats class, what we've done is compute the
+\textbf{z-score} for each data point: the number of standard deviations above
+(or below) the mean it is.
+
+\subsection{Categorical features}
+
+What do we do if our features are categorical? Same thing we learned in the
+Naive Bayes lesson: make them numerical, in a principled way. Again, the most
+common approach by far is to ``one-hot" encode each categorical feature as a
+set of binary features, one for each feature value. (Recall that for
+lightsabers, this would turn the single feature value ``\texttt{red}" into a
+set of three features ``\texttt{0}," ``\texttt{0}," and ``\texttt{1}," meaning
+``this data point has zero ``blueness," zero ``greenness," and one
+``redness.")
+
+You can use \texttt{np.where()} function to create one-hot vectors, or, use
+the scikit-learn package's helpful ``\texttt{LabelBinarizer.fit\_transform}
+function:
+
+\small
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+from sklearn.preprocessing import LabelBinarizer
+lb = LabelBinarizer()
+lightsaber = lb.fit_transform(df.lightsaber)
+\end{Verbatim}
+\normalsize
+
+Careful: although this function takes a Series, it returns a NumPy array:
+
+\small
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> print(df.lightsaber.head())
+0      red
+1     blue
+2      red
+3    green
+
+>>> lb.fit_transform(df.lightsaber)[0:4]
+array([[0, 0, 1],
+       [1, 0, 0],
+       [0, 0, 1],
+       [0, 1, 0]])
+\end{Verbatim}
+\normalsize
+
+You'll have to stick all your transformed variables back together with
+\texttt{np.concatenate()} before passing them to a classifier.
+
+\subsection{Comparing kNN with Naive Bayes}
+
+Let's use the scikit-learn library to compare 3-NN with Naive Bayes. First, we
+load the data and split it randomly into training and test sets:
+
+\small
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+w = pd.read_csv("warriors.csv")
+train = w.sample(frac=.7)
+test = w.drop(train.index)
+\end{Verbatim}
+\normalsize
+
+Next, we one-hot encode the features (all of which are categorical):
+
+\small
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+def one_hot_this_puppy(df):
+    lb = LabelBinarizer()
+    lightsaber = lb.fit_transform(df.lightsaber)
+    height = lb.fit_transform(df.height)
+    beard = lb.fit_transform(df.beard)
+    demeanor = lb.fit_transform(df.demeanor)
+    return np.concatenate([lightsaber, height, beard, demeanor], axis=1)
+
+train_features = one_hot_this_puppy(train)
+test_features = one_hot_this_puppy(test)
+\end{Verbatim}
+\normalsize
+
+We'll call scikit-learn's Naive Bayes implementation:
+
+\small
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+from sklearn.naive_bayes import MultinomialNB
+naive_bayes = MultinomialNB()
+naive_bayes.fit(train_features,train.type.as_matrix())
+nb_predictions = naive_bayes.predict(test_features)
+\end{Verbatim}
+\normalsize
+
+and its KNN implementation:
+
+\small
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+from sklearn.neighbors import KNeighborsClassifier
+knn = KNeighborsClassifier(n_neighbors=3)
+knn.fit(train_features, train.type.as_matrix())
+knn_predictions = knn.predict(test_features)
+\end{Verbatim}
+\normalsize
+
+Finally, print the results:
+
+\small
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> print("Naive Bayes got {:.2f}% correct.".format(
+    sum(nb_predictions == test.type)/len(test)*100))
+>>> print("kNN(3) got {:.2f}% correct.".format(
+    sum(knn_predictions == test.type)/len(test)*100))
+
+Naive Bayes got 79.00% correct.
+kNN(3) got 86.33% correct.
+\end{Verbatim}
+\normalsize
+
+Pretty close, but for this data set, 3-NN has the edge.
+\pagebreak
+
+It's also illustrative to examine \textit{which} points Naive Bayes called
+correctly but 3-NN missed, and vice versa.
+
+\footnotesize
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+nb_right = []
+knn_right = []
+for i in range(len(nb_predictions)):
+    if nb_predictions[i] == test.type.iloc[i] != knn_predictions[i]:
+        nb_right.append(i)
+    if nb_predictions[i] != test.type.iloc[i] == knn_predictions[i]:
+        knn_right.append(i)
+
+nb_right_examples = test.iloc[nb_right]
+knn_right_examples = test.iloc[knn_right]
+
+>>> print("Naive Bayes got these right:")
+>>> print(nb_right_examples)
+>>> print("\nkNN got these right:")
+>>> print(knn_right_examples)
+\end{Verbatim}
+
+\scriptsize
+\begin{multicols}{2}
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+Naive Bayes got these right:
+    beard  height  demeanor lightsaber  type
+7      no  medium      calm      green  Jedi
+63     no   short  menacing      green  Jedi
+116    no  medium      calm      green  Jedi
+154    no  medium      calm      green  Jedi
+185    no   short  menacing      green  Jedi
+190    no   short  menacing      green  Jedi
+279    no  medium      calm       blue  Jedi
+600    no  medium      calm       blue  Jedi
+827    no   short  menacing      green  Jedi
+842    no   short  menacing      green  Jedi
+909    no   short  menacing      green  Jedi
+\end{Verbatim}
+\columnbreak
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+kNN got these right:
+    beard  height  demeanor lightsaber  type
+1      no   short      calm       blue  Sith
+33     no   short      calm       blue  Sith
+55     no   short      calm       blue  Sith
+94     no  medium      calm      green  Sith
+106    no   short      calm       blue  Sith
+254    no   short  menacing      green  Sith
+283    no   short      calm       blue  Sith
+366    no  medium      calm       blue  Sith
+380    no  medium      calm      green  Sith
+385    no  medium      calm       blue  Sith
+431    no   short      calm       blue  Sith
+468    no   short      calm       blue  Sith
+570    no   short      calm       blue  Sith
+581    no   short      calm       blue  Sith
+599    no   short      calm      green  Sith
+686    no  medium      calm      green  Sith
+713    no  medium      calm       blue  Sith
+733    no   short      calm       blue  Sith
+743    no  medium      calm       blue  Sith
+815    no   short  menacing      green  Sith
+870    no   short      calm       blue  Sith
+931    no  medium      calm       blue  Sith
+966    no  medium      calm      green  Sith
+991    no  medium      calm       blue  Sith
+\end{Verbatim}
+\end{multicols}
+\normalsize
+
+Interestingly, all of Naive Bayes's errors were in one direction (incorrect
+\texttt{Jedi} call) and all 3-NN's in the other. Naive Bayes seems to have the
+most trouble with clean-shaven, calm, non-red-lightsabered Sith Lords. It
+tends to call them ``Jedi," because two of the features --
+\texttt{demeanor=calm} and \texttt{lightsaber=blue/green} -- are highly
+\texttt{Jedi}-indicative. When factored in with just one
+\texttt{Sith}-indicative feature (\texttt{beard=no}), those two features
+overcome the third and tilt the Naive Bayes scales (incorrectly) towards Jedi.
+3NN is able to pick out these \texttt{Sith} from the \texttt{Jedi} masses.
+
+\subsection{Varying $k$}
+
+One question that arises is: ``what's the
+optimal value of $k$?" It may or may not surprise you to learn that there's no
+easy answer to this, and that it varies widely by data set and in fact even by
+the training set chosen.
+
+Here's some code to try all (odd) values of $k$ between 1 and 301:
+\small
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+corrects_train = []
+corrects_test = []
+for k in np.arange(1,301,2):
+    knn = KNeighborsClassifier(n_neighbors=k)
+    knn.fit(train_features, train.type.as_matrix())
+    knn_predictions_train = knn.predict(train_features)
+    knn_predictions_test = knn.predict(test_features)
+    corrects_train.append(sum(knn_predictions_train == train.type)/len(train)*100)
+    corrects_test.append(sum(knn_predictions_test == test.type)/len(test)*100)
+\end{Verbatim}
+\normalsize
+
+The plot looks like this:
+
+\begin{center}
+\includegraphics[width=0.9\textwidth]{k_vs_performance.pdf}
+\end{center}
+
+The performance on the training data is \textit{usually} better, as expected,
+although you'll see some values of $k$ here in the 80-100 range where
+paradoxically that's not true. More importantly, you'll notice that the line
+shows no simple pattern. Very low numbers are good, and then performance tails
+off...but then it goes back up again when $k$ is around 100 or so. Moreover,
+\textit{the apparent optimal choice of k depends on the training set.} Here
+are some more results from the same code, with different randomly-chosen
+training sets:
+
+\begin{center}
+\includegraphics[width=0.31\textwidth]{k_vs_performance1.pdf}
+\includegraphics[width=0.31\textwidth]{k_vs_performance2.pdf}
+\includegraphics[width=0.31\textwidth]{k_vs_performance3.pdf}
+\end{center}
+
+We see some similarities here, but by no means perfect uniformity. This is
+because a kNN classifier is a high-variance classifier (especially for low
+$k$), as described in the next section.
+
+\section{The ``Bias-Variance Tradeoff"}
+
+One of the most deep and fundamental principles of machine learning goes by
+the name of \textbf{the bias-variance tradeoff}. It's a version of the ``no
+free lunch" principle: classifiers that possess one advantage inherently have
+a counteracting disadvantage.
+
+Here are the two key terms:
+
+\begin{itemize}
+\itemsep.1em
+\item \textbf{bias}\footnote{Tip: when thinking about this topic, try to erase the previous definitions you
+have for the word ``\textit{bias}" that you have running around in your brain.
+They probably don't apply. When I think of ``bias" I think of a systematic
+propensity to err \textit{in a particular direction}. Like, ``you're biased
+towards thinking people are shorter than they are, because you're tall." But
+\textit{bias} here just means ``being `off' in general, in whatever direction,
+and probably not the same direction each time."}
+ -- the degree to which a model is expected to misclassify
+items, even those in its own training set, because it just can't ``bend" 
+enough to catch all the detail.
+\item \textbf{variance} -- the degree to which a model will differ based on
+the particular training set that is chosen, because it ``bends" too much to
+try and catch every data point.
+\end{itemize}
+
+The basic theory is as follows. Suppose you have a very simple classifier that
+tries to identify a single, smooth, perfectly straight line separating the
+data points. Maybe our model says ``just use the \texttt{lightsaber} feature
+by itself, and call `\texttt{Jedi}' or `\texttt{Sith}' based on whether the
+test point's lightsaber value is more typical of the \texttt{Jedi} Knights and
+\texttt{Sith} Lords in the data set.
+
+This simple classifier can be said to have \textbf{low variance}. Why? Because
+if, instead of those particular 714 training points chosen from the
+population, I had sampled a different 714 training points, \textit{the
+classification decisions I would make on new data would be about the same.} To
+see why this is the case, consider how different the training sets would have
+to me in order for me to make any \textit{different} decisions. Let's say my
+original 714 training points had:
+
+\begin{center}
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+        Jedi    Sith
+red       17      85
+blue     283      28
+green    299       2
+\end{Verbatim}
+\end{center}
+
+for their lightsaber colors. Clearly, my very simply classifier is going to
+predict \texttt{Sith} for any \texttt{red}-lightsaber wielder and
+\texttt{Jedi} for anyone else. Now if I had collected a different training
+set, the numbers above would be different, but they would have to be a
+\textit{lot} different to change any of my future predictions. I'd have to
+have an additional 68 \texttt{red} \texttt{Jedi}, for instance, or 255
+additional \texttt{blue} \texttt{Sith}, or a whopping 297 additional
+\texttt{green} \texttt{Sith}, without any increase in the other class. Not
+likely.
+
+That's the bright side. On the dark side, by classifying points in this way,
+this simple model is going to get a lot of data points wrong: $17+28+2=47$
+points incorrect \textit{in its own training set}, in fact. This mean it's a
+pretty \textbf{high bias} classifier.
+
+It's a tradeoff. In exchange for being virtually immune to the idiosyncrasies
+in the training sample, we've sacrificed some precision.
+
+The other extreme can be seen by visualizing a 1-NN classifier. Now, for a
+future data point, we're going to find the single nearest neighbor to it in
+our training set, and call \texttt{Jedi} or \texttt{Sith} accordingly. This is
+very \textbf{low bias} -- we're guaranteed to get every training point
+correct, in fact!\footnote{Unless there are data points with identical feature
+values but different labels, in which case whatcha gonna do.} But it is also
+very \textbf{high variance}: a different training set will result in many,
+many different classifications. Our classifier has essentially memorized a
+zillion individual examples, and will regurgitate all that intricate detail on
+command. But had we gotten a different random sample, the ``single nearest
+neighbor" to a test point would have been totally different, and might result
+in a different classification.
+     
+There are formulas you can use to work out quantitatively what the estimated
+bias and variance are for a classifier. But I think this dichotomy is more
+important from a conceptual perspective. The main lesson is: the more your
+classifier ``bends" (\textit{i.e.}, has a very wiggly and unpredictable
+boundary between its ranges of predicted classes) the more precise it
+potentially is in selectively labeling data points. However, this also means
+that a lot of its decisions are going to hinge on the particular data sample
+it was trained on, which means it will probably be picking up noise in
+addition to signal.
+
+
+\section{The ``Curse of Dimensionality"}
+
+Another key ML principle goes by the humorous name \textbf{the curse of
+dimensionality}. It goes something like this. Suppose that in addition to
+\texttt{height}, \texttt{demeanor}, \texttt{lightsaber}, and \texttt{beard},
+we also have at our disposal many other features about Jedi \& Sith: their
+ages, salaries, home planets, personality profiles, number of traffic tickets,
+\textit{etc.} This is good news, right? It gives us more and more data to sift
+through statistically and discover correlations, right? What's not to like?
+
+Yes, this is potentially good news, but with a catch. It turns out that as we
+increase the number of features more and more (or, put another way, as we
+increase the ``dimensionality" of the problem from our original four
+dimensions to 5, 6, 7, ..., and up into the hundreds) we have a data sparsity
+problem. In terms of kNN classifiers, you can think of it this way:
+effectively, \textit{all} the points effectively become far apart. We want to
+find the 3 (or 15, or 77) ``nearest neighbors," but when we have so many
+features (many of which will turn out to be irrelevant for the problem), we
+find that \textit{any} two data points will differ on a large number of them.
+Essentially, our noise swamps our signal.
+
+Another aspect of the problem concerns the amount of training data that we
+need. When we have tons of features, we need an enormous number of training
+samples in order to guarantee that we have several samples with each
+combination of values (or their ranges). In our original problem, we didn't
+need to much data to ensure that we'd have at least a few \texttt{tall},
+\texttt{green}-lightsabered, \texttt{menacing} individuals with \texttt{no}
+beard. But how many training points will we need before we have several
+\texttt{tall}, \texttt{green}-lightsabered, \texttt{menacing}, 38-year-old,
+extroverted, abstract-thinking individuals from Tatooine with 4 traffic
+tickets and \texttt{no} beard who earn 6,000 Galactic credits annually?
+Answer: a lot. And if we don't have that many, a kNN classifier trained on all
+those features is going to suffer trying to find ``people like this one" in
+order to make a prediction.
+
+The moral to the story is that we will often need to trim our set of features,
+sometimes aggressively, if we have too many. It feels wasteful -- all this
+great data on all these people, and we're throwing it away! -- but it's the
+right thing to do. This process is called \textbf{feature selection}, and
+we'll cover it more fully in a future lesson.
+
+\vspace{.1in}
+In the meantime, here are three useful principles for avoiding the curse:
+
+\begin{itemize}
+\itemsep.1em
+\item By far the most important thing to recognize is that if you have
+additional features that are \textit{truly} (and pretty strongly) correlated
+with the target, it's okay to include them. Adding more stuff that actually
+contains useful information for prediction isn't generally a problem. The
+problem is when you add features that are largely \textit{noise}, since
+they will overwhelm the truly significant features if there are too many of
+them.
+\item A common rule of thumb is to make sure you have at least \textit{five}
+training points for each combination of feature values. (In our Jedi example,
+with three \texttt{height}s and three \texttt{lightsaber} values and two
+values for the other features, this would imply a training set of at least $(3
+\times 3 \times 2 \times 2) \times 5 = 180$ training points.)
+\item When the size of the training set becomes too low, use
+\textit{parametric} methods (like Naive Bayes or linear regression) rather
+than instance-based methods (like kNN) because they suffer less from the
+curse.
+\end{itemize}
+
+\end{document}

@@ -1,0 +1,376 @@
+\documentclass[12pt]{article}
+
+\addtolength{\textwidth}{.8in}
+\addtolength{\hoffset}{-.4in}
+\addtolength{\textheight}{1in}
+\addtolength{\voffset}{-1in}
+
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{upquote} % to convert funny quotes to straight quotes
+\usepackage{amsfonts}
+\usepackage{paralist}
+\setlength{\parindent}{15pt}
+
+\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
+
+
+\begin{document}
+
+\begin{center}
+\begin{Large}
+DATA 219 Notes -- Apr. 3, 2018
+\end{Large}
+\end{center}
+
+\section{Connecting to an external API}
+
+I called the screen-scraping scenario ``the worst of all possible worlds."
+Using an API, the subject of today's lesson, is sort of the best. I say ``sort
+of" because it's certainly not the \textit{easiest}. The easiest is when you
+have a ready-made CSV file with exactly the data you want, and you suck it
+into a DataFrame, done. The thing is, much of the data you'll be interested in
+analyzing as a Data Scientist wasn't put together like that for you. Instead,
+it exists as part of a vast database somewhere, and you need flexibility and
+power to extract on demand exactly the parts you want. This is what a good API
+lets you do.
+
+API actually stands for ``Application Programming Interface," which is a
+pretty uninformative acronym. What it really means is ``a set of functions
+someone has provided for you to call in order to access their data, together
+with clean documentation telling you precisely what each of those functions
+do." As you'll see with experience, some APIs are better designed than others,
+and make it easier to get what you want. In this module we'll look at two
+examples and generalize some common principles from them.
+
+\subsection{REST APIs}
+
+Another strange pseudo-acronym you'll encounter is ``REST"\footnote{This sort
+of stands for ``REpresentational State Transfer," another utterly unhelpful
+phrase.}, which is a \textit{style} of API. REST APIs have the following
+characteristics:
+
+\begin{itemize}
+\itemsep.1em
+
+\item They're designed to be used over the Web. (Although ``over the Web" may
+not mean what you think it means; for one, it \textit{doesn't} mean ``using a
+browser." Instead, it means ``accessing the data using HTTP requests in the
+form of structured URLs/hyperlinks." We'll be writing \textit{Python code} to
+retrieve what appear to be pseudo-Web-pages outside our browser.)
+
+\item They're simple and elegant. Unlike their predecessor (and competitor)
+protocols SOAP and RPC, REST was designed and promoted by
+people\footnote{Originally Roy Fielding in his 2000 Ph.D. dissertation from
+UC-Irvine.} who didn't like clutter and who wanted communication to be
+streamlined and compactly specified. REST APIs are typically nice to use.
+
+\item They're based directly on the HTTP protocol itself, and under the hood
+make use of the HTTP operations like \texttt{GET}, \texttt{HEAD},
+\texttt{POST}, \texttt{DELETE}, \texttt{PUT}, \textit{etc.} Because of this,
+different REST APIs tend to be pretty uniform in how they work.
+
+\item They're ``stateless," as HTTP is itself. This means the server retains
+no \textit{memory} of the past requests from a client. (``Server" is a word
+meaning ``a machine on the Internet that you want to access," and ``client"
+here essentially means ``your own computer, which makes requests of the
+server.") This has some limitations, but makes APIs quick and simple to use.
+
+\item The data they provide can come in a variety of formats, typically JSON
+or XML.
+
+\end{itemize}
+
+\subsubsection{Other terms}
+
+APIs that conform to Roy Fielding's original spec are known colloquially as
+``RESTful." 
+
+You'll also sometimes hear the buzzwords ``Web services" or ``SOA"
+(Service-oriented Architecture). Although these terms are a bit broader and
+communicate something subtly different than just ``the use of Web-based APIs"
+(REST or otherwise), in practice you will see terms like this used jointly to
+refer to the same technologies. If you hear someone talking about ``a Web
+services approach," your ears should perk up and you should anticipate being
+able to apply at least some of the lessons in this module.
+
+Finally, the term \textbf{endpoint} refers to a particular, addressable part
+of an API that is normally defined by a base URL. For instance, the standard
+Twitter search API is at \url{https://api.twitter.com/1.1/search/tweets.json}
+and the endpoint for getting full information about specific tweets is \url{
+https://api.twitter.com/1.1/statuses/lookup.json}. In general, an API will
+have many different endpoints, each of which defines its own parameters and is
+used for a particular type of information request.
+
+\section{Accessing RESTful APIs with the \texttt{requests} package}
+
+Python's \texttt{requests} package is an easy way to make a call to an
+external API and get the results. It basically encapsulates the under-the-hood
+stuff that formulates, sends, and parses the results of an HTTP request.
+
+HTTP defines various operations such as \texttt{GET}, \texttt{POST}, and
+\texttt{HEAD}. The \texttt{requests} package bundles these up in function
+names with similar names: \texttt{requests.get()}, \texttt{requests.post()},
+\textit{etc.} The most common method we'll use in API access is the
+\texttt{.get()} command. It can actually be used to retrieve \textit{any}
+Web-accessible page on the network:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+import requests
+class_home_page = requests.get("http://cs.umw.edu/~stephen/data219")
+print(class_home_page.content)
+\end{Verbatim}
+
+If you run the above code, you'll see the (gnarly) HTML code for the entire
+course web page on your screen as one big string. Seeing this emphasizes that
+\textit{when we execute RESTful API requests, we're really not doing much more
+than accessing ``web pages," where ``web page" here means a set of results
+that the server puts together for us.} This similarity to how browsers work is
+what makes RESTful APIs so simple and powerful.
+
+Most of the time we won't get HTML back, but rather a data format such as XML
+or JSON. Predictably, I'll start with a Star Wars example. The SWAPI (Star
+Wars API) is a neat little database that returns JSON data. Let's ask it for
+``person with ID 13":
+
+\small
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> response = requests.get("https://swapi.co/api/people/13")
+>>> print(json.load(response.content))
+{'name': 'Chewbacca', 'height': '228', 'mass': '112', 'hair_color': 'brown',
+'skin_color': 'unknown', 'eye_color': 'blue', 'birth_year': '200BBY',
+'gender': 'male', 'homeworld': 'https://swapi.co/api/planets/14/', 'films':
+['https://swapi.co/api/films/2/', 'https://swapi.co/api/films/6/',
+'https://swapi.co/api/films/3/', 'https://swapi.co/api/films/1/',
+'https://swapi.co/api/films/7/'], 'species':
+['https://swapi.co/api/species/3/'], 'vehicles':
+['https://swapi.co/api/vehicles/19/'], 'starships':
+['https://swapi.co/api/starships/10/', 'https://swapi.co/api/starships/22/'],
+'created': '2014-12-10T16:42:45.066000Z', 'edited':
+'2014-12-20T21:17:50.332000Z', 'url': 'https://swapi.co/api/people/13/'}
+\end{Verbatim}
+\normalsize
+
+By calling \texttt{json.load()} on the \texttt{.content} of this response, we
+get a Python dictionary with all Chewie's info. Note that some of the data
+consists of \textit{other REST URLs}, a sign of a well-written API.
+
+\small
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> chewie = json.load(response.content)
+>>> print(json.loads(requests.get(chewie['homeworld']).content))
+{'climate': 'tropical',
+ 'created': '2014-12-10T13:32:00.124000Z',
+ 'diameter': '12765',
+ 'edited': '2014-12-20T20:58:18.442000Z',
+ 'films': ['https://swapi.co/api/films/6/'],
+ 'gravity': '1 standard',
+ 'name': 'Kashyyyk',
+ 'orbital_period': '381',
+ 'population': '45000000',
+ 'residents': ['https://swapi.co/api/people/13/',
+  'https://swapi.co/api/people/80/'],
+ 'rotation_period': '26',
+ 'surface_water': '60',
+ 'terrain': 'jungle, forests, lakes, rivers',
+ 'url': 'https://swapi.co/api/planets/14/'}
+\end{Verbatim}
+\normalsize
+
+
+
+\section{The Twitter API}
+
+Twitter's API uses the same principle, although it's of course larger and more
+complicated. In addition, there's the hurdle of \textit{authenticating} your
+Python program with the API so you can access the data.
+
+\subsection{Authentication}
+
+Many APIs require some form of \textbf{authentication}, which essentially
+means you need to provide some personal information to identify you to the
+site. Since we'll be dealing only with open APIs, this isn't a security thing
+as much as it's a ``control of information" thing. By forcing you to register
+with the site and provide some contact info, the organization retains a
+measure of control and knowledge over how its information is used. Also, many
+sites impose \textbf{rate limits} which constrain how much information you can
+suck from the site every hour, and the way they track this is by associating
+data requests with user accounts.
+
+Every site has a different procedure for this, and the documentation varies
+considerably in helpfulness. It's usually a matter of finding and connecting
+the dots. Twitter, like many sites, uses the \textbf{OAuth} authentication
+protocol (see \url{oauth.net}), an open standard that allows users to grant
+one website permission to access data from another. (You've probably used this
+without realizing it if you've ever enabled some third-party app which then
+caused a confirmation dialog box to pop up saying, ``application so-and-so is
+requesting access to the following information of yours...do you approve?")
+
+For Twitter, here's the procedure I used:
+
+\begin{enumerate}
+\itemsep.1em
+\item If you're not actually a Twitter user, create a Twitter account.
+\item Sign on to \url{dev.twitter.com}.
+\item Go to \url{apps.twitter.com} and create an ``application." For our
+purposes, an application is sort of like a project, of which you can have
+several. It's mainly an organizational thing.
+\item Navigate to your application and choose ``Keys and Access Tokens."
+Create an Access Token.
+\end{enumerate}
+
+You will now see, on the ``Keys and Access Tokens" page, \textit{four} strings
+of gobbledygook, all four of which you'll need:
+
+\vspace{.1in}
+\small
+\begin{compactitem}
+\item A ``consumer key." Mine is \texttt{9dFucBtR1P58pJICXGV2gaKhj}.
+\item A ``consumer secret." Mine is
+\texttt{uKufTBegOrw5hrjNQmXFwcVtWjSb2bUHsMEoBwjN5gHzTbpJ0U}.
+\item An ``access token." Mine is
+\texttt{1019144197-5dhD0p1VbE80kPnzZrhjq43G08iMbguggkn67q1}.
+\item An ``access token secret." Mine is
+\texttt{JOtRHxgzhj6KQhuOuwljB214UImybVANFX6pbSYsDJhTd}.
+\end{compactitem}
+\normalsize
+\vspace{.1in}
+
+What do all these different things mean? Honestly, you don't need to know.
+Just realize they're all necessary components of the way Twitter
+authenticates, and if you just use them all in the right places, you'll be
+able to get to any Twitter data you want, programmatically.
+
+(Btw, the second and fourth of those items -- the ``secrets" -- are not
+supposed to be shared with anyone, nor to appear in human-readable form in
+your source code. For one-off data analysis projects, I confess I don't think
+this is super important.)
+
+\subsection{Authenticating with the \texttt{requests\_oauthlib} package}
+
+To authenticate with OAuth, we'll use Python's \texttt{requests\_oauthlib}
+package as follows:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+from requests_oauthlib import OAuth1
+cons_key = "MlUmay5kA1vGWKokmmFofgRLX"
+cons_secret = "2FFYCyI2rhUIEltkepeNhVcZvYufXJukCJMqE1s3ALKoLYm7LD"
+access_token = "1019144197-cMFsHfxTZiG0oyOidzM7bCW4uX6PzjXVOyNQTUK"
+access_secret = "fmW3KSw0kSYH43QPqSxUscnZD8XF8M8oEJnKm2sRAcq70"
+oauth = OAuth1(cons_key, cons_secret, access_token, access_secret)
+\end{Verbatim}
+
+We now have an object called \texttt{oauth} which can be passed to functions
+in the \texttt{requests} package to get data.
+
+\subsection{HTTP GET parameters}
+
+The Twitter API is documented at \url{https://dev.twitter.com/docs}, a page
+well worth perusing in detail. You'll see numerous endpoints documented there,
+each of which has its parameters listed when you click through.
+
+Conceptually, making an API request is like making a function call: you're
+triggering some operation, passing parameters, and getting a return value. The
+syntax is a bit different though. In Python, you're used to making a function
+call like this:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+get_user_timeline('katyperry',4)
+\end{Verbatim}
+
+to indicate something like ``get the latest four tweets from user
+\texttt{@katyperry}." The corresponding syntax in URL Land is like this:
+
+\footnotesize
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=katyperry&count=4
+\end{Verbatim}
+\normalsize
+
+Note that parameters are ``passed" as key/value pairs, with no spaces, after a
+``\texttt{?}", and separated by ``\texttt{\&}" signs. The following code:
+
+\footnotesize
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+four_from_katy = json.loads(requests.get(
+    "https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=katyperry&count=4",
+            auth=oauth).content)
+for tweet in four_from_katy:
+    print(tweet.text)
+\end{Verbatim}
+\normalsize
+
+produces this result (today):
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+You’re not going to miss this dance @effiepassero. #americanidol
+@CadeFoehner Keep that feather, keep catching those dreams. #americanidol
+HONEY!  #americanidol
+@MaraJustine1 There’s not just glitter on your nails It’s in every pore,
+and it comes out every time you sing  #americanidol
+\end{Verbatim}
+
+By the way, if a value you want to pass contains a space, you'll need to
+convert that space to a plus sign (``\texttt{+}"). For instance, the standard
+search endpoint is \texttt{https://api.twitter.com/1.1/search/tweets.json},
+and requires a ``\texttt{q}" parameter with your query string. I could search
+for Star Wars toys with:
+
+\small
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+toys = json.loads(requests.get(
+    "https://api.twitter.com/1.1/search/tweets.json?q=star+wars+toys&count=5",
+            auth=oauth).content)
+\end{Verbatim}
+\normalsize
+
+This endpoint returns a dictionary of information:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> print(list(toys.keys()))
+['statuses', 'search_metadata']
+\end{Verbatim}
+
+Looks like the tweets themselves (``\texttt{statuses}") are in the
+\texttt{statuses} key, so:
+
+\small
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> for tweet in toys['statuses']:
+        print(tweet['text'])
+The #StarWars portfolio of #toys is about to get bigger. #Hasbro announced
+it’s going to make #JabbatheHutt’s sail… https://t.co/FYC1DLftXX
+RT @hottoysofficial: #HotToys 1/6th scale #ObiWanKenobi (Regular &amp; Deluxe
+Version) collectible figures from #StarWars EP3 are available for…
+HotToys 1/6 Old Luke Skywalker Star Wars Movie Series 12'' Man Figure
+Collection https://t.co/NbHgtpnDwi #Toys https://t.co/ejrGXjVT3F
+Star Wars Black Series  6" Rey (JEDI TRAINING )Toys R Us Exclusive
+https://t.co/ArxT9kPjZt https://t.co/lcLbp7pwjG
+\end{Verbatim}
+\normalsize
+
+
+If you have weird characters other than spaces, I suggest the \texttt{parse()}
+method from the \texttt{urllib} library to make things kosher:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+import urllib.parse
+>>> print(urllib.parse.quote_plus("http://cs.umw.edu/star wars toys! 20% off"))
+'http%3A%2F%2Fcs.umw.edu%2Fstar+wars+toys%21+20%25+off'
+\end{Verbatim}
+
+
+\subsection{Specialized packages}
+
+For many popular APIs, including Twitter, you may find Python packages written
+to streamline and hide some of the protocol idiosyncrasies. These may be
+easier to use, depending on how well written and maintained they are. For
+Twitter, there are numerous ones: \texttt{python-twitter},
+\texttt{TwitterAPI}, \texttt{tweepy}, \texttt{TweetPony}, \texttt{twython},
+and more. This is a testimony to how powerful (and common) it is to be able to
+access data through external APIs.
+
+ADD SECTION FOR FOOD2FORK
+
+\end{document}

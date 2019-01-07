@@ -1,0 +1,249 @@
+\documentclass[12pt]{article}
+
+\addtolength{\textwidth}{.8in}
+\addtolength{\hoffset}{-.4in}
+\addtolength{\textheight}{1in}
+\addtolength{\voffset}{-1in}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{upquote} % to convert funny quotes to straight quotes
+\usepackage{amsfonts}
+\usepackage{paralist}
+\setlength{\parindent}{15pt}
+
+\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
+
+
+\begin{document}
+
+\begin{center}
+\begin{Large}
+DATA 219 Notes -- Feb. 20, 2018
+\end{Large}
+\end{center}
+
+\section{Time is complicated}
+
+One of the most common categories of information you'll ever deal with are
+those dealing with various aspects \textit{time}. It turns out this is
+considerably more complex than you might think at first. For one thing, the
+English word ``time" can mean several different things -- a point in time
+(3:05pm on Feb.~20, 2018), an abstract wall clock time (3:05pm), a duration of
+time (2 and a half hours), \textit{etc.} For another, the clock and calendar
+systems that humans have devised are just plain weird. (Why does it go from
+11am to 12\underline{\textbf{p}}m to 1pm? Why do some months have more days
+than others? Why do some years have more than others? Why doesn't every month
+start over on a Monday? \textit{Etc.} There are good answers to some of these
+questions, and lousy answers to others, but they all make dealing with time a
+major pain.
+
+Python helps deal with the pain through the \texttt{datetime} package. Here's
+the stuff we need:
+
+\begin{itemize}
+\itemsep1em
+
+\item \textbf{The \texttt{timedelta} type}. Objects of this type represent
+\textit{durations in time}. You could create one like this:
+    \begin{itemize}
+    \itemsep.1em
+    \item \texttt{one\_semester = datetime.timedelta(weeks=15)}
+    \item \texttt{this\_class = datetime.timedelta(hours=1, minutes=15)}
+    \item \texttt{finger\_snap = datetime.timedelta(seconds=.1)}
+    \end{itemize}
+
+    (You can also use \texttt{days}, \texttt{milliseconds}, and
+\texttt{microseconds}. Anything else is ambiguous.)
+
+    Don't think of the \texttt{timedelta} object you create as being
+intrinsically ``in" any particular unit -- just think of it as an ``amount of
+time," which could be expressed in any units.
+
+    \texttt{timedelta}s can be positive or negative, and you can add or
+subtract them to/from each other.
+
+\item \textbf{The \texttt{date} type}. Each \texttt{date} object represents a
+date in an idealized Gregorian calendar. You can create one via:
+    \begin{itemize}
+    \itemsep.1em
+    \item \texttt{sunny\_day = datetime.date(2018,2,20)}
+    \item \texttt{here\_we\_are = datetime.date.today()}
+    \end{itemize}
+
+    You can \textit{subtract} two \texttt{date}s to get a \texttt{timedelta}.
+You can \textit{add} a \texttt{date} to a \texttt{timedelta} to get another
+\texttt{date}. Note that if your \texttt{timedelta} has precision more
+granular than days, it is lost in these operations:
+
+\small
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> datetime.date.today() == datetime.date.today() + finger
+True
+
+>>> datetime.date.today() == datetime.date.today() + this_class
+True
+
+>>> datetime.date.today() == datetime.date.today() + one_semester
+False
+\end{Verbatim}
+\normalsize
+
+    You can also compare dates with comparison operators like \texttt{<} and
+\texttt{>=}.
+
+\item \textbf{The \texttt{time} type.} A ``time," by itself, represents an
+abstract wall clock time, independent of any particular day. It doesn't mean
+``9am this morning" but rather ``9am's in general."
+    \begin{itemize}
+    \itemsep.1em
+    \item \texttt{start\_of\_class = datetime.time(hours=14, minute=0)}
+    \end{itemize}
+
+    These can also be compared in expected ways, but \textit{not} added or
+subtracted.
+
+\item Finally, we have \textbf{the \texttt{datetime} type}, which as its name
+suggests, combines features of both dates and times. In fact, a
+\texttt{datetime} object represents \textit{an absolute, specific point in
+history}. Creation options include:
+    \small
+    \begin{itemize}
+    \itemsep.1em
+    \item \texttt{this\_exact\_moment = datetime.datetime.now()}
+    \item \texttt{terrorist\_attack = datetime.datetime(2001, 9, 11, 10, 33)}
+    \item \texttt{todays\_class = datetime.datetime.combine(here\_we\_are, start\_of\_class)}
+    \end{itemize}
+    \normalsize
+
+    \texttt{datetime}s can be subtracted from each other, and
+\texttt{timedelta}s can be added or subtracted to/from them to produce other
+\texttt{datetime}s. They can also be compared. Finally, \texttt{.time()} and
+\texttt{.date()} methods will produce the constituent parts as \texttt{time}
+or \texttt{date} objects, accordingly.
+
+\item Oh, and one more thing...I should add that there's such a thing as a
+``\texttt{timestamp}", which in Python isn't a class, but simply a word
+describing a \texttt{float} value. A timestamp is -- get this -- \textit{the
+number of seconds that have elapsed since the stroke of midnight Jan.~1, 1970
+UTC} (Coordinated Universal Time -- the Greenwich Mean
+Timezone).\footnote{That particular instant in time is sometimes called ``The
+Epoch." It's an arbitrary reference point, but was chosen in part to be
+approximately equal to Stephen's original birthday.} This will occasionally
+come up, since even though it's gibberish to humans, it is extremely easy to
+work with mathematically.
+
+\end{itemize}
+
+\vspace{.2in}
+
+\subsection{Parsing and formatting}
+
+Now most of the time we won't be creating \texttt{datetime} objects using the
+techniques above. Instead, we'll be \textit{parsing} them from string data.
+
+There are a seemingly unlimited number of ways that dates and times can be
+expressed in strings. Just consider a few possibilities:
+
+\begin{compactitem}
+\item Feb. 20, 2018 2pm
+\item Feb 20, 2018 2:00pm
+\item Feb 20, 2018 2:00 P.M.
+\item 2/20/18 2:00 P.M.
+\item 2/20/18 14:00
+\item 02/20/18 14:00:00
+\item 20-Feb-2018 2:00pm
+\item 20-Feb-2018 14:00
+\item 2018-Feb-20 14:00:00
+\item ...
+\end{compactitem}
+
+and on it goes. It's a testimony to the power of the human mind that we can
+look at these and at a glance infer what date/time was intended. Getting a
+computer to automatically do so is somewhat of a challenge.
+
+\subsubsection{Parsing with \texttt{.strptime()}}
+
+The \texttt{date}, \texttt{time}, and \texttt{datetime} classes all have a
+(somewhat clunky) method called ``\texttt{.strptime()}" that you can call,
+passing (1) a string representing a date, time, or datetime, and (2) a
+formatting string telling the method how to interpret it. This is best seen
+through an example:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+my_string = "2/20/2018 14:00"
+start_of_class = datetime.datetime.strptime(my_string, "%m/%d/%Y %H:%M")
+
+>>> print(start_of_class)
+2018-02-20 14:00:00
+\end{Verbatim}
+
+This example demonstrates a full ``round-trip" operation: we started with a
+\texttt{string}, parsed it into a \texttt{datetime}, and then printed it back
+to the screen as a \texttt{string}. Note that the format of the printout
+didn't match the format of ``\texttt{my\_string}"; this is okay. What matters
+internally to our program is that our date \& time objects \textit{represent}
+the right things, not that they are printed in certain ways.
+
+Now what are all those funky percent signs and junk in the second argument to
+\texttt{.strptime()}? They all have a special meaning. Here are some common
+ones (others are in the docs):
+
+\begin{center}
+\begin{tabular}{|c|l|}
+\hline
+\%a & Weekday (abbreviated): Sun, Mon, \textit{etc.} \\
+\%A & Weekday (full): Sunday, Monday, \textit{etc.} \\
+\%w & Weekday (number): 0, 1, ..., 6 \\
+\%d & Day of month (number): 0, 1, ..., 31 \\
+\%b & Month (abbreviated): Jan, Feb, \textit{etc.} \\
+\%B & Month (full): January, February, \textit{etc.} \\
+\%m & Month (number): 01, 02, ..., 12 \\
+\%y & \textbf{Two}-digit year: 00, 01, ..., 99 \\
+\%Y & \textbf{Four}-digit year: ..., 1999, 2000, 2001, ...\\
+\hline
+\%H & Hour on \textbf{24-hour} clock: 01, 02, ..., 23 \\
+\%I & Hour on \textbf{12-hour} clock: 01, 02, ..., 12 \\
+\%p & AM/PM (only used in conjunction with \textbf{\%I}) \\
+\%M & Minute: 01, 02, ..., 59 \\
+\%S & Second: 01, 02, ..., 59 \\
+\hline
+\end{tabular}
+\end{center}
+
+You have to be really careful here and just go slow. Examine the date and/or
+time input that you have in your data set, and work out which bits of info,
+combined with which literal characters (like ``\texttt{/}" and ``\texttt{:}"
+in the example above), appear in which order.
+
+\subsubsection{Formatting with \texttt{.strftime()}}
+
+Complementarily to \texttt{.strptime()} is ``\texttt{.strftime()}". (Note that
+the ``p" stands for ``\textbf{p}arse," while
+the ``f" stands for ``\textbf{f}ormat.") This is the reverse operation: given
+a \texttt{date}, \texttt{time}, or \texttt{datetime} \textit{object}, spit it
+out as a string of characters. This isn't used nearly as often, but it
+occasionally is, and it's useful to know as a translation mechanism.
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> print(start_of_class.strftime("%A, %B the %dth at %I%p."))
+Tuesday, February the 20th at 02PM.
+\end{Verbatim}
+
+One common error: note that you call \texttt{.strptime()} directly on the
+\textit{class} (\texttt{date}, \texttt{time}, or \texttt{datetime}), passing
+two arguments:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+an_object = datetime.datetime.strptime(my_birthday_string, "%m/%d/%Y %H:%M")
+\end{Verbatim}
+
+but you call \texttt{.strftime()} on the object in question
+(a \texttt{date}, \texttt{time}, or \texttt{datetime}), passing
+one argument:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+a_string = my_birthday_object.strftime("%m/%d/%Y %H:%M")
+\end{Verbatim}
+
+\end{document}

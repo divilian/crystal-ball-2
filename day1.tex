@@ -1,0 +1,216 @@
+% ADD scatterplot matrices, and yes you can do them in Python
+
+\chapter{Spyder, review, misc tricks}
+
+\section{Spyder}
+We'll be using Spyder this semester: a Python-based data analysis environment
+written especially for Data Science and scientific programming.
+
+It comes with the Anaconda distribution, as does pretty much everything else
+we'll use this semester (scikit-learn, NumPy, SciPy, Pandas, Matplotlib,
+\textit{etc.}) Download it from here: \url{https://www.anaconda.com/download}. 
+
+\textbf{Note:} make sure to get Python \textbf{3.*}, not \textbf{2.*}!! (They
+are \textit{not} mutually compatible.) The number(s) after the dot don't
+matter so much. But before the dot \textit{must} be a \textbf{``3"}.
+
+Don't worry: all the stuff you learned using Python Jupyter Notebooks still
+applies! The only difference is that using an IDE like Spyder is not
+Web-based: it's entirely offline, responsive, and more powerful. You will be
+creating your own \texttt{.py} files directly.
+
+
+\section{Review (?) from DATA 101}
+
+\begin{compactitem}
+\itemsep.1em
+\item Data stuff
+    \begin{compactitem}
+    \item Contingency tables
+    \item Weighted averages (and averages of averages)
+    \item Scatterplots
+    \item Histograms
+    \item Boxplots
+    \item Quantiles
+    \end{compactitem}
+
+\item Python stuff
+    \begin{compactitem}
+    \item Lists and dictionaries
+    \item \texttt{for} loops
+    \item Modifying in-place vs. returning a copy
+    \item Pandas Series \& DataFrames
+        \begin{compactitem}
+        \itemsep.1em
+        \item The ``index"
+        \item \texttt{.iloc} vs. \texttt{.loc} vs. neither
+        \item Single ints/labels vs. slices vs. lists
+        \item Queries
+        \end{compactitem}
+    \end{compactitem}
+\end{compactitem}
+
+\section{Some more advanced extensions to the above}
+
+\subsection{Multi-list iteration}
+
+Suppose you have:
+%\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+    episode7 = [ 9, 6, 10, 10, 9, 10, 10, 10 ]
+    episode8 = [ 9, 7,  4,  8, 8, 10, 10,  7 ]
+%\end{Verbatim}
+and you want a new list \texttt{avgSW} that gives the average rating each
+viewer gave the two movies.
+
+\begin{enumerate}
+\itemsep.1em
+\item One way to do it (caveman style):
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+avgSW = []
+for i in range(len(episode7)):
+    avgSW.append((episode7[i]+episode8[i])/2)
+\end{Verbatim}
+
+\item Another way to do it (modern idiomatic Python):
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+avgSW = []
+for e7, e8 in zip(episode7, episode8):
+    avgSW.append((e7+e8)/2)
+\end{Verbatim}
+
+\end{enumerate}
+
+
+\subsection{Pandas DF updating}
+
+Sometimes you can run into trouble when trying to update a Pandas DataFrame.
+For instance, take this DataFrame:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+    >>> print(characters)
+                           rank  saber   side
+    name                                     
+    Darth Vader       Sith Lord    red   Dark
+    Obi-wan Kenobi  Jedi Master   blue  Light
+    Yoda            Jedi Master  green  Light
+    Luke Skywalker         Jedi  green  Light
+    Kylo Ren         Apprentice    red   Dark
+    Rey              Apprentice   blue  Light
+\end{Verbatim}
+
+This query works just fine:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+    >>> characters.loc['Kylo Ren':'Rey']['rank']
+    name
+    Kylo Ren    Apprentice
+    Rey         Apprentice
+    Name: rank, dtype: object
+\end{Verbatim}
+
+so naturally you'd think you could do this:
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+    >>> characters.loc['Kylo Ren':'Rey']['rank'] = 'Jedi'
+\end{Verbatim}
+
+Alas, no: \texttt{A value is trying to be set on a copy of a slice from a
+DataFrame.}
+
+The solution is to use this syntax:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+    >>> characters.loc['Kylo Ren':'Rey','rank'] = 'Jedi'
+\end{Verbatim}
+
+(Your mileage may vary.)
+
+\subsection{Contingency tables in Pandas}
+
+\subsubsection{\texttt{.value\_counts()}}
+You can do a quick and dirty contingency table in Pandas using
+\texttt{.value\_counts()} (possibly in conjunction with \texttt{.groupby()}):
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+    >>> characters.side.value_counts()
+    Light    4
+    Dark     2
+    Name: side, dtype: int64
+
+    >>> characters.groupby('rank').side.value_counts()
+    rank         side 
+    Apprentice   Dark     1
+                 Light    1
+    Jedi         Light    1
+    Jedi Master  Light    2
+    Sith Lord    Dark     1
+    Name: side, dtype: int64
+\end{Verbatim}
+
+\subsubsection{\texttt{pd.crosstab()}}
+The \texttt{pd.crosstab()} function is a bit easier on the eyes, though, and
+can compute margins:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+    >>> side_saber = pd.crosstab(characters.side, columns=characters.saber, 
+                                                             margins=True)
+    saber  blue  green  red  All
+    side                        
+    Dark      0      0    2    2
+    Light     2      2    0    4
+    All       2      2    2    6
+\end{Verbatim}
+
+Get overall percentages with:
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+    >>> side_saber / side_saber.loc['All']['All'] * 100
+    saber       blue      green        red         All
+    side                                              
+    Dark    0.000000   0.000000  33.333333   33.333333
+    Light  33.333333  33.333333   0.000000   66.666667
+    All    33.333333  33.333333  33.333333  100.000000
+\end{Verbatim}
+
+or by column by doing:
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+    >>> side_saber / side_saber.loc['All'] * 100
+    saber   blue  green    red         All
+    side                                  
+    Dark     0.0    0.0  100.0   33.333333
+    Light  100.0  100.0    0.0   66.666667
+    All    100.0  100.0  100.0  100.000000
+\end{Verbatim}
+
+By rows is a bit trickier:
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+    >>> side_saber.div(side_saber['All'],axis=0) * 100
+    saber       blue      green         red    All
+    side                                          
+    Dark    0.000000   0.000000  100.000000  100.0
+    Light  50.000000  50.000000    0.000000  100.0
+    All    33.333333  33.333333   33.333333  100.0
+\end{Verbatim}
+
+% Significant?:
+% import scipy.stats.chi2_contingency
+% chi2_contingency(side_saber)
+
+\vspace{4in}
+\pagebreak
+\subsection{Notched boxplots}
+
+You can add the argument ``\texttt{notch=True}" to
+``\texttt{aDataFrame.boxplot()}" to get a ``notched" boxplot. This visually
+indicates whether or not there is a stat sig diff between groups, based on
+\textit{whether the notched areas overlap}:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+    >>> students.boxplot('sat',by='gender',notch=True)
+    >>> students.boxplot('height',by='gender',notch=True)
+\end{Verbatim}
+
+\begin{center}
+\includegraphics[width=0.45\textwidth]{sat.pdf}
+\includegraphics[width=0.45\textwidth]{height.pdf}
+\end{center}
+
+\end{document}

@@ -1,0 +1,287 @@
+\documentclass[12pt]{article}
+
+\addtolength{\textwidth}{.8in}
+\addtolength{\hoffset}{-.4in}
+\addtolength{\textheight}{1in}
+\addtolength{\voffset}{-1in}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{upquote} % to convert funny quotes to straight quotes
+\usepackage{amsfonts}
+\usepackage{paralist}
+\setlength{\parindent}{15pt}
+
+\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
+
+
+\begin{document}
+
+\begin{center}
+\begin{Large}
+DATA 219 Notes -- Mar. 13, 2018
+\end{Large}
+\end{center}
+
+\section{Accessing data from databases}
+
+``Database" is a very loose term for ``a repository of information that can
+be readily accessed." When we use that term in Data Science, we mean a data
+source that is managed by a piece of software called a \textbf{DBMS}, or
+\textbf{database management system}. (True, a bunch of lists, dictionaries, or
+Pandas DataFrames is also ``a repository of information that can be accessed,"
+but when we use the term \textbf{database} we're not talking about that.)
+
+There are principally two reasons to learn how to access data from databases:
+
+\begin{itemize}
+\itemsep.1em
+\item Sometimes, our data is simply available in that form only. We may want
+to import it into Python/Pandas and deal with it using the techniques from the
+first half of the semester, but in order to get it in there, we need to
+(briefly) interface with the database and issue the proper commands.
+\item Sometimes, our data is just flat \textit{big}. There's a limit to how
+much data Spyder can store live in memory and deal with on the spot. Suppose
+you had to analyze all the eBay transactions over the past two years? Or all
+the tweets made in the world over the last month? That stuff can't remotely
+fit in your system's memory. Hence, we have to access it through a database
+which will manage the sheer size and scope for us, and work with it a little
+at a time.
+\end{itemize}
+
+\subsection{Two kinds of databases}
+
+There are essentially two kinds of databases in the world:
+\textbf{relational}, and \textbf{NoSQL}.
+
+Previously this semester, we've worked with data spread across multiple
+DataFrames that we need to join together in some way. This structure is
+extremely common, so much so that most of traditional database schema theory
+is based directly on it. A \textbf{relational database} is a repository of
+information in which the data is stored in \textbf{tables} (a table is pretty
+much \textit{exactly} a DataFrame in spirit), and on which the language
+\textbf{SQL} can be used to query it and manipulate it. A software system that
+enables a user to create and work with relational databases is called an
+\textbf{RDBMS}, or \textbf{relational database management system}.
+
+There are many, many RDBMS's out there: Oracle, Sybase, Microsoft SQL Server,
+MySQL, PostgreSQL, and literally dozens of others. They all work in very much
+the same way: they store data in tables, and they are manipulated via SQL.
+Ever since Ted Codd invented the relational model in 1970, this organizational
+paradigm has proven to be so powerful and computationally efficient that it
+has dominated the database world. Only recently have some alternate paradigms
+gained some traction (so-called ``NoSQL" databases), but even so, the majority
+of the world's structured data is all in relational databases of some sort.
+
+Relational DBMS's are much more similar to each other than NoSQL systems are
+to each other. The wide variety of NoSQL DBMS's (Cassandra, MongoDB, Redis,
+Neo4j, \textit{etc.}) means that learning how to use one doesn't give you much
+knowledge about how to use one of the others. Some store key/value pairs;
+others store objects and binary data; some store information as a graph
+(network). Part of the great power of the relational model is that SQL has
+proven to be a flexible, broadly-applicable query language that many different
+vendors have adopted and which suits many data needs.
+
+\subsection{SQLite}
+
+SQLite is a really slim, trim RDBMS that stores all of its data in a single
+file. When you work with SQLite (or any RDBMS), though, you don't think in
+terms of files, but in terms of tables. The fact that the tables are stored in
+file(s) in some strange format is invisible to you as the user of the data,
+and this is in fact one of the great powers of the relational model:
+separating the conceptual data from the storage implementation.
+
+\subsubsection{Interfacing to SQLite}
+
+``Connecting" to a relational database basically means establishing a
+communication path over which you can talk SQL. In Python, this is pretty
+easy:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+import sqlite3
+
+con = sqlite3.connect('my_local_file')
+cur = con.cursor()
+\end{Verbatim}
+
+% DO I really want to mess with "cursors," though, since you can just do the
+% pd.read_sql(SQL,connection) thing? (even for sqlite_master to get table
+% names?)
+A ``cursor" is kind of hard to get your head around, but if you think of a
+``placeholder" (like the blinky cursor in Spyder or a word processing
+application), you're not too far off. Imagine Google Docs, with multiple
+people simultaneously editing the same document: each one has a literal cursor
+showing ``where they are" in the document. Similarly, multiple programs can
+access a database at the same time, and each one has a placeholder, or cursor.
+
+What you do with a cursor is \textbf{execute an SQL command}. SQL is a new
+language, but it's not nearly as complex as something like Python because it's
+not a programming language, but a \textit{query language}. You don't write
+programs in it; you specify queries in it. This means that the range of things
+you can do in SQL is much more restricted, and hence the language is easier to
+learn.
+
+Here's the general paradigm:
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+query_results = cur.execute("YOUR SQL STATEMENT GOES HERE")
+results_list = query_results.fetchall():
+\end{Verbatim}
+
+The string inside the call to \texttt{.execute()} is called ``an embedded SQL
+statement." This means we have code in one language (SQL) ``embedded" inside
+another (Python). Do not be alarmed at this.
+
+The \texttt{.fetchall()} command says ``okay, after carrying out this query on
+the database, go \textit{actually} load all that data into Python." You
+\textbf{don't} want to do this if the result of the query is likely to be
+large. Instead, there is a \texttt{.fetchone()} command that can get one
+result at a time, that you can use in a loop.
+
+\subsubsection{Browsing the tables}
+
+How do we know what tables exist in the database? We can run this command:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+query_results = cur.execute("SELECT name FROM sqlite_master WHERE type='table'")
+print(query_results.fetchall())
+\end{Verbatim}
+
+to find out.
+
+\subsubsection{Inhaling an entire table}
+
+Once we've got the names of the tables, we often won't even need the
+\texttt{cur} object any more, since Pandas provides a short cut. Suppose we
+want to read an entire table into a DataFrame. \textit{If the data is small
+enough to load into memory}, we can do this with a one-liner:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+df = pd.read_sql("select * from table_name", con)
+\end{Verbatim}
+
+This gives us a fully-fledged DataFrame, with column names, a reasonable guess
+at their types, \textit{etc.} 
+
+So one way to deal with a (smallish) SQLite database is just to connect to it
+with code like the above, get all the table names, read each one into a
+DataFrame, and continue in Pandas Land, forgetting all about SQLite. Now, you
+can leverage all the knowledge you've learned up to this point. Bingo!
+
+\subsubsection{(Slightly) more complex SQL}
+
+Because the data is sometimes too large to do this, though, it's worth
+learning a little SQL so you can make the RDBMS do some of the heavy lifting,
+and give you trimmed results for your Python program to work with.
+
+The workhorse is the SQL \texttt{SELECT} statement. Here are some common
+variants:
+
+\begin{itemize}
+\itemsep.1em
+\item To compute the \textit{number} of rows, or individual values, without
+returning the entire result, use \texttt{count(*)}, \texttt{max()},
+\texttt{min()}, \textit{etc.}:
+
+\footnotesize
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+select count(*) from table_name
+select max(col1) from table_name
+\end{Verbatim}
+\normalsize
+
+\item To get only the first few rows (similar to Pandas' \texttt{.head()}
+operation) tack on a ``limit" expression:
+
+\footnotesize
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+select * from table_name limit 10
+\end{Verbatim}
+\normalsize
+
+\item To get only certain columns, change the ``\texttt{*}" to a
+comma-separated list of column names:
+
+\footnotesize
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+select col1 from table_name
+select col1,col2,col3 from table_name limit 10
+\end{Verbatim}
+\normalsize
+
+\item To get only certain rows, add a ``where clause" after the table name:
+
+\footnotesize
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+select * from table_name where col1==val1
+select col2 from table_name where col1==val1 and col2>val2
+select col1,col2 from table_name where col1==val1 and not col2>val2 limit 10
+\end{Verbatim}
+\normalsize
+
+(The usual boolean operations work with keywords \texttt{and}, \texttt{or},
+and \texttt{not}, and parentheses for grouping.)
+
+\item The ``\texttt{in}" keyword can be useful in a ``where clause" for
+querying membership in a set:
+
+\scriptsize
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+select * from table_name where col1 in (val1,val2)
+select col1,col2 from table_name where col1==val1 and not col2 in (val1,val2,val3) limit 10
+\end{Verbatim}
+\normalsize
+
+\item To get only unique rows (similar to Pandas' \texttt{.drop\_duplicates()}
+functionality) use the word \texttt{distinct} before the column names:
+
+\scriptsize
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+select distinct * from table_name
+select col1,col2 from table_name where not col1 in (val1,val2,val3) or col2!=val4 limit 5
+\end{Verbatim}
+\normalsize
+
+The \texttt{distinct} option is useful in conjunction with \texttt{count()}:
+\scriptsize
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+select count(distinct col1) from table_name
+\end{Verbatim}
+\normalsize
+
+\item You can have SQLite do sorting with ``\texttt{order by}":
+\scriptsize
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+select * from table_name order by col1
+select distinct col1,col2 from table_name where col3==val1 order by col2,col1 desc limit 5
+\end{Verbatim}
+\normalsize
+
+As you can see, you can sort on multiple columns, and sort in reverse order
+with the \texttt{desc} keyword.
+
+\item SQL supports a ``group by" operation very much like Pandas does:
+
+\scriptsize
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+select col1,count(*) from table_name group by col1
+select col1,max(col2) from table_name where col3==val1 group by col2 order by col1 desc limit 5
+\end{Verbatim}
+\normalsize
+
+\item Finally, to do a merge/join operation, use the \texttt{join} keyword:
+
+\scriptsize
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+select * from table_1 join table_2 on col1==col2
+select col1,col2 from table_1 join table_2 on table_1.x==table_2.q where col3>val1 limit 5
+\end{Verbatim}
+\normalsize
+
+The \texttt{join} keyword supports \texttt{left}, \texttt{right}, and
+\texttt{outer} options.
+
+\end{itemize}
+
+There are lots and lots of other options as well. See the online
+documentation.
+\end{document}

@@ -1,0 +1,626 @@
+\documentclass[12pt]{article}
+
+\addtolength{\textwidth}{.8in}
+\addtolength{\hoffset}{-.4in}
+\addtolength{\textheight}{1in}
+\addtolength{\voffset}{-1in}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{upquote} % to convert funny quotes to straight quotes
+\usepackage{amsfonts}
+\usepackage{paralist}
+\setlength{\parindent}{15pt}
+
+\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
+
+
+\begin{document}
+
+\begin{center}
+\begin{Large}
+DATA 219 Notes -- Mar. 20, 2018
+\end{Large}
+\end{center}
+
+\section{Screen scraping}
+
+Welcome to the worst of all possible worlds\footnote{Actually, the
+\textit{second}-worst; the very worst is when the data you seek isn't even in
+electronic form at all.}: when the data you want to analyze is on a
+human-readable but machine-unfriendly website somewhere. It's there, you can
+see it...but getting it from a pretty web page into a Pandas DataFrame is a
+non-trivial proposition.
+
+Usually this situation occurs when the provider of the data, and the designer
+of the website, didn't envision anyone using the data for any purpose other
+than viewing it through the website itself. Sometimes there is another reason:
+that the organization wanted to deliberately make this operation difficult so
+that you \textit{couldn't} easily use it for other purposes. Either way,
+though, as long as the data is accessible and visible through your browser, it
+is at least theoretically extractable into the form we need to do our magic.
+
+\section{HTML}
+
+(Most) web pages look snazzy and colorful when you view them: the word ``code"
+doesn't jump immediately to mind. When you load a web page, though, what
+you're actually getting from the server you specify is a plain-text file
+written in a language called HTML, or \textbf{hypertext markup language}. It
+consists of a combination of content and formatting/structural commands (or
+``markup") to instruct the browser how to \textbf{render} the page.
+(``Rendering" a page means ``interpreting all that HTML formatting stuff and
+actually presenting a pretty page formatted the way it specifies.)
+
+The first important thing to know about HTML is that it is
+\textit{hierarchical}, not flat. This makes it more like JSON than CSV. Even
+though every HTML file is a single sequence of characters, it encodes a
+tree-like structure in which elements can exist inside other elements, which
+can exist inside other elements, \textit{etc.}, with no limit to the amount of
+nesting.
+
+The basic building block of HTML is the \textbf{element}, which is delimited
+by starting and ending \textbf{tags}. Tags are key words, most of which
+indicate something structural or stylistic, enclosed in wakkas (``\texttt{<
+... >}"). The ending tag has a slash (``\texttt{/}") immediately before the
+keyword, showing that it matches the corresponding opening tag. So, for
+instance, one pair of starting and ending tags might be ``\texttt{<title>}"
+and ``\texttt{</title>}".
+
+Note that the entire contents of the \textit{element} is (1) the starting tag,
+(2) the ending tag, and (3) \textit{everything in between}, which could be
+text in addition to other elements.
+
+\vspace{.2in}
+\pagebreak
+Here's a very simple, but complete, example:
+
+\line(1,0){400}
+\scriptsize
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+<html>
+<head>
+    <title>All About Stephen</title>
+    <style>
+        img { width:150px; }
+        td { border-width:1px; }
+    </style>
+</head>
+<body>
+<h1>Stephen Davies, Esquire</h1>
+
+<p>Deep in the bowels of
+<a href="http://buildings.umwblogs.org/trinkle-hall/">Trinkle Hall</a> resides a
+carbon-based life form known to outsiders only as <b>Stephen</b>. This
+mysterious being fulfills several roles <u>not</u> widely known to
+humankind.</p>
+
+<p><i>Some</i> of these functions are delineated below. Please memorize them
+and then immediately destroy this page upon reading it.</p>
+
+<h2>Areas of operation</h2>
+
+<table border=2 cellpadding=15>
+    <tr><td class="pic"><img src="http://clipart.com/prof.jpg" width=200 /></td>
+        <td class="role">College professor</td>
+        <td class="description">Stephen teaches computer science and data science
+    to willing undergraduates, shaping them into the heroes of tomorrow. </td>
+        <td><ul><li>Super rewarding</li>
+            <li>Exciting</li>
+            <li>Ever-changing</li>
+            <li>Fun</li></ul></td>
+        <td><b>50%</b> of total time</td>
+    </tr>
+    <tr><td class="pic"><img src="http://clipart.com/dad.png" width=200 /></td>
+        <td class="role">Dad</td>
+        <td class="description"> With a wife, three teenagers, and two cats (one
+    of whom throws up a lot), Stephen's home life is a constant source of love,
+    anxiety, and Hallmark moments.</td>
+        <td><ul><li>Amazing</li>
+            <li>Loving</li>
+            <li>Complicated</li>
+            <li>Surprising</li></ul></td>
+        <td><b>30%</b> of total time</td>
+    </tr>
+</table>
+</body>
+</html>
+\end{Verbatim}
+\line(1,0){400}
+\normalsize
+
+\vspace{.2in}
+Lots going on here. The first way to get your bearings is to start visually
+lining up starting tags with their corresponding ending tags and perceive the
+structure. Notice that this entire page begins with ``\texttt{<html>}" and
+ends with ``\texttt{</html>}". This is in essence the ``root node" of the
+page's entire hierarchical tree. It has two immediate ``children": a
+\texttt{head} element, and a \texttt{body} element. Each of those have
+starting and ending tags as well. Inside the \texttt{head} element is a
+\texttt{title} element, \textit{etc.}
+
+As you can guess, each of these tags is interpreted by the browser to mean a
+particular kind of structure/formatting. ``\texttt{h1}" means ``top-level
+heading" which in practicality means ``render it in a large font, with some
+extra space around it." The ``\texttt{b}" element means to put something in
+boldface. The ``\texttt{table}" element means to construct a table-like
+structure, with rows (``\texttt{tr}") and cells within rows (``\texttt{td}").
+\textit{Etc.} HTML is in general a big mess of things that are supposed to
+indicate structure (like \texttt{table} and \texttt{h2}) and things that
+specify specific formatting (like \texttt{i} and \texttt{u}). All of this is
+eminently look-up-able online.
+
+Some starting tags (not ending) contain additional information called
+\textbf{attributes}. You can see this with the \texttt{a} and \texttt{img}
+tags from the example above:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+<a href="http://buildings.umwblogs.org/trinkle-hall/">Trinkle Hall</a>
+\end{Verbatim}
+
+The \texttt{a} tag stands for ``anchor" and is the most common way of
+embedding a hyperlink (which you can click on to go to another page) in a
+document. Note that the words that will appear in the page are the
+\textbf{contents} of the element, not part of the tag itself. The tag, in
+addition to the required ``\texttt{a}" has a key/value pair where the key is
+the string \texttt{href} and the value is the URL the user will be directed to
+if they click on the link. This key/value pair is called an
+\textbf{attribute}.
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+<img src="http://clipart.com/prof.jpg" width=200 />
+\end{Verbatim}
+
+In the \texttt{img} example, we have \textit{two} attributes: one for the
+filename of the image, and the other for some specific formatting suggestions
+(in this case, a width of 200 pixels). An element can have many different
+attributes, in any order.
+
+(By the way, the sharp-eyed reader may have noticed something else odd about
+the \texttt{img} example, above: an extra slash before the ending
+``\texttt{>}". This is an HTML shorthand for ``starting and ending the element
+all within a single tag, since it has no content anyway." Whenever you have
+something of the form ``\texttt{<x></x>}" you can replace it with the
+equivalent ``\texttt{<x/>}" to save typing and file size.)
+
+Lastly, I'll point out that near the top of this example, there's a bunch of
+stuff which looks a bit visually jarring; it doesn't look like HTML. And it's
+not. I'm referring to this:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+    <style>
+        img { width:150px; }
+        td { border-width:1px; }
+    </style>
+\end{Verbatim}
+
+This code is called \textbf{CSS} (or \textbf{Cascading Style Sheets}) which is
+sort of a companion technology to HTML to give additional formatting control.
+(Originally, HTML was supposed to strictly delineate document
+\textit{structure}, and CSS could then be used to specify the formatting of
+that structure. This strict separation of concerns, which was a good idea, has
+gotten very muddy in the intervening years, however.)
+
+\pagebreak
+The whole thing, once rendered, looks something like this:
+
+\begin{center}
+\includegraphics[width=0.9\textwidth]{stephenpage.pdf}
+\end{center}
+
+\section{Web Developer Tools}
+
+Firefox, Chrome, and several other browsers come equipped with very
+sophisticated ``web developer tools" that let you browse the HTML, CSS, and
+rendered page, and figure out what elements got rendered via which portions of
+the screen. They're very handy, and you should get into the habit of using
+them. In Firefox, they're available via the ``Tools | Web Developer | Toggle
+tools..." menu option. In Chrome, you go to the little three vertical dots,
+then choose ``More Tools | Developer Tools."
+
+
+\section{Parsing with BeautifulSoup}
+
+From the point of view of Data Science, we don't care very much about all this
+formatting stuff. To us, it's clutter. On the page is some important data we'd
+like to analyze, and the goal is to sift through all this HTML and CSS crapola
+looking for it and extracting it. To help us with this task is a Python
+library called BeautifulSoup.
+
+I generally recommend \textbf{downloading} the web page you want to parse
+rather than have Python read it for you over the network. This just eliminates
+one more possible source of error. (Exception: if you need a Python program to
+act as a \textbf{web crawler} and read pages on demand as it discovers their
+URLs. More on that later.) Note that you can still open the page in your
+browser even after downloading it: just go to ``File | Open File..." or the
+equivalent operation in your browser.
+
+Once you've done this, and now have your HTML in a file called
+``\texttt{myfile.html}", then you can parse it with BeautifulSoup using:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+from bs4 import BeautifulSoup
+soup = BeautifulSoup(open("myfile.html"), "html.parser")
+\end{Verbatim}
+
+By convention, the variable for this parsed structure is called
+``\texttt{soup}". The second argument to the \texttt{BeautifulSoup} function
+tells it which \textbf{parser} we want to use to analyze the code; there are
+other choices here, but stick with \texttt{"html.parser"} for now.
+
+One possibly useful command (though limited if your web page is large) is:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> print(soup.prettify())
+\end{Verbatim}
+
+This prints out the contents of the page, but
+in a way that is ``properly" structured and indented. You may have noticed
+that the HTML file may or may not be physically indented and spaced in a way
+reflective of the structure; the parser discerns the implied structure from
+the tag sequence, and prints it how it will ``really" be seen by a browser.
+
+At this point, I generally take one of two approaches: either I navigate the
+structure \textbf{top-down} looking for where the data I'm interested in is
+situated, or I find the data by searching through the file, and use a
+\textbf{bottom-up} approach to get it from there.
+
+\subsection{The top-down approach}
+
+By using ``\texttt{soup.contents}", you get the immediate descendants of
+the root node of the HTML hierarchy. Each of these could be examined for its
+type, like this:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+for child in soup.contents:
+    print(type(child))
+<class 'bs4.element.Tag'>
+<class 'bs4.element.NavigableString'>
+\end{Verbatim}
+
+So our entire document is composed of an element (misleadingly named ``Tag"
+here, but w/e) and a ``\texttt{NavigableString}" which essentially just means
+``string of literal text". For elements, it's useful to print out their
+``\texttt{.name}". For strings, it's useful to print them out verbatim. Here,
+we see:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> soup.contents[0].name
+'html'
+>>> soup.contents[1]
+'\n'
+\end{Verbatim}
+
+So the first child is the entire \texttt{html} element in all its embedded
+glory, and this is followed by a single, pesky newline. Now you know.
+
+Drilling down another level, we see:
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> html_children = soup.contents[0]
+for child in html_children:
+    print(type(child))
+<class 'bs4.element.NavigableString'>
+<class 'bs4.element.Tag'>
+<class 'bs4.element.NavigableString'>
+<class 'bs4.element.Tag'>
+<class 'bs4.element.NavigableString'>
+\end{Verbatim}
+
+Two tags, with three strings interleaved. Let's examine them:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> html_children.contents[0]
+'\n'
+>>> html_children.contents[1].name
+'head'
+>>> html_children.contents[2]
+'\n'
+>>> html_children.contents[3].name
+'body'
+>>> html_children.contents[4]
+'\n'
+\end{Verbatim}
+
+You're starting to see a pattern: a lot of the strings are just newline
+characters that split up the HTML text file and make it more readable. What we
+really care about is the content under the tags. Let's dig one deeper:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> head_children = html_children.contents[1].contents
+>>> head_children[0]
+'\n'
+>>> head_children[1].name
+'title'
+>>> head_children[2]
+'\n'
+>>> head_children[3].name
+'style'
+>>> head_children[4]
+'\n'
+\end{Verbatim}
+
+    Okay, you get the idea. We can drill down to whatever level we want just
+by following the appropriate children. To get the title of the page, we could
+do:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> head_children[1].contents[0]
+'All About Stephen'
+\end{Verbatim}
+
+(This is because the second element (element \#1) of the \texttt{head} element
+is the \texttt{title} element, and its only child is the string \texttt{'All
+About Stephen'}.)
+
+Sometimes a quicker method to find your way through the forest is to use this
+syntax at the interactive console:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> [ x.name for x in body_children ]
+[None, 'h1', None, 'p', None, 'p', None, 'h2', None, 'table', None]
+\end{Verbatim}
+
+You can better see at a glance what's what. Now that I know the first
+``\texttt{p}" is element \#3 of the body, I could find that hyperlink via:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> [ x.name for x in list(body_children)[3] ]
+[ None, 'a', None, 'b', None, 'u', None]
+\end{Verbatim}
+
+and grab it via:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+dat_hyperlink =  list(list(body_children)[3])[1]
+\end{Verbatim}
+
+BeautifulSoup lets you access the attributes of an HTML element by treating
+the element as a dictionary. Pretty cool. I can snag the actual link, then,
+with:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> dat_hyperlink['href']
+'http://buildings.umwblogs.org/trinkle-hall/'
+\end{Verbatim}
+
+\subsection{The bottom-up approach}
+
+Often, though, you quickly find yourself in a tangled mess as you try to dive
+from the top of the document all the way to what you want. It's frequently
+easier to search for the data you want using BeautifulSoup's search
+facilities.
+
+In the case above, suppose I wanted to create a DataFrame with two columns:
+the roles Stephen plays, and the percentage of his total time each one takes.
+The final form should look something like this:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+                role  perc
+0  College professor  50.0
+1                Dad  30.0
+            ...
+\end{Verbatim}
+
+
+To find my way through the forest, I search through the HTML with developer
+tools, locating one of the pieces of data I know is there. For instance, the
+number \texttt{50}, which I can see on the page is one of the percentages.
+When I click on this (or just search for it in a text file), I find myself in
+the middle of this code:
+
+\footnotesize
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+...
+<table border=2 cellpadding=15>
+<tr><td class="pic"><img src="a.jpg"></td>
+    <td class="role">College professor</td>
+    <td class="description">
+    Stephen teaches computer science and data science to willing undergraduates,
+    shaping them into the heroes of tomorrow.
+    </td>
+    <td>
+    <ul>
+    <li>Super rewarding</li>
+    <li>Exciting</li>
+    <li>Ever-changing</li>
+    <li>Fun</li>
+    </ul>
+    </td>
+    <td>
+    <b>50%</b> of total time
+    </td>
+</tr>
+...
+\end{Verbatim}
+\normalsize
+
+Looks like the role name I want is the text under a \texttt{td} element whose
+class is ``\texttt{role}". And it looks like the percentage I want is
+(*groan*) in a boldface (\texttt{b}) tag, underneath the last \texttt{td} tag
+of the row, which has no \texttt{class}.
+
+BeautifulSoup's \texttt{.find\_all()} method makes this slightly less of a
+headache. To quickly grab all the \texttt{tr} elements in the document, I can
+do this:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+trs = list(soup.find_all("tr"))
+\end{Verbatim}
+
+The variable \texttt{trs} is now a list of \textit{elements} (BeautifulSoup
+``\texttt{Tag}" objects) each of which I can examine for (say) \texttt{td}
+children with a \texttt{role} \texttt{class} attribute. And you can call
+\texttt{.find\_all()} on \textit{any} tag (to search from that point in the
+hierarchy down), not just on the top-level \texttt{soup} element. So:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+roles = []
+trs = soup.find_all("tr")
+for tr in trs:
+    tds = tr.find_all("td")
+    for td in tds:
+        if 'class' in td.attrs and 'role' in td['class']:
+            ...
+\end{Verbatim}
+
+(A slight weirdness in that \texttt{if} statement: notice that I'm checking
+whether \texttt{'role'} is \textbf{\texttt{in}} \texttt{td['class']} instead
+of simply being \texttt{==} to \texttt{td['class']}. That's because in HTML,
+the \texttt{class} attribute of an tag can have \textit{multiple}
+(space-separated) values, not just one, and so \texttt{td['class']} is
+actually a \textit{list}, not a single string.)
+
+Now when we reach the body of that \texttt{if} statement, we have successfully
+found one of the desired \texttt{td} attributes. How do we then get the text
+under it? Just call \texttt{.get\_text()} on it, and then append it to the
+list. This creates my desired list of roles that we can stick in my DataFrame.
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+            ...
+            roles.append(td.get_text())
+\end{Verbatim}
+
+To get the percentages, we just need a slightly different approach: first,
+we're going to assume the percentage is in the \textit{last} \texttt{td} tag,
+and second, we need to go inside that to retrieve the percentage from the
+embedded boldface tag. Adding this to our \texttt{for} loop almost gets us
+there:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+percs = []
+...
+    the_bold = tds[-1].find("b")
+    percs.append(the_bold.get_text())
+\end{Verbatim}
+
+although we'd like to also strip that percentage sign off and convert it to an
+actual numeric value, so we'll do this instead:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+percs = []
+...
+    the_bold = tds[-1].find("b")
+    percs.append(float(the_bold.get_text()[:-1]))
+\end{Verbatim}
+
+and now we can create our DataFrame with both columns. (Note that
+``\texttt{.find()}" does the same thing as ``\texttt{.find\_all()}" except
+that it only grabs the first matching element rather than all of them.) The
+complete code is here:
+
+\line(1,0){400}
+\footnotesize
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+roles = []
+percs = []
+
+trs = soup.find_all("tr")
+for tr in trs:
+    tds = tr.find_all("td")
+    for td in tds:
+        if 'class' in td.attrs and 'role' in td['class']:
+            roles.append(td.get_text())
+    the_bold = tds[-1].find("b")
+    percs.append(float(the_bold.get_text()[:-1]))
+
+df = pd.DataFrame({'role':roles, 'perc':percs})[['role','perc']]
+\end{Verbatim}
+\normalsize
+\line(1,0){400}
+
+\subsection{Other bs4 features}
+
+The BeautifulSoup library has a myriad of alternatives for navigating and
+searching the tree. Here are a few.
+
+\subsubsection{Searching by id or class}
+
+\texttt{.find()} and \texttt{.find\_all()} each have optional \texttt{id} and
+\texttt{class\_} (note the trailing underscore!) parameters that can be used
+to restrict a search to only elements with matching attributes.
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+soup.find_all("td", class_="pic")
+\end{Verbatim}
+
+\subsubsection{Using the Python ``dot" syntax}
+
+If we know the names of the tags, we can navigate a structure by using a
+Pandas-like ``dot" syntax. Check it out:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> soup.head.title
+<title>All About Stephen</title>
+
+>>> soup.head.name
+title
+
+>>> soup.head.title.string
+'All About Stephen'
+
+>>> soup.body.table.td.img['src']
+'a.jpg'
+\end{Verbatim}
+
+\subsubsection{Accessing all attributes}
+
+In addition to treating an element (``\texttt{Tag}") as a dictionary to
+retrieve its element values, you can also use the ``\texttt{.attrs}" syntax to
+get the dictionary directly:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> soup.body.find("a").attrs
+{'href': 'http://buildings.umwblogs.org/trinkle-hall/'}
+
+>>> soup.body.find("td").attrs
+{'class': ['pic']}
+\end{Verbatim}
+
+(As noted before, see how the value of the ``\texttt{class}" attribute is a
+list here.)
+
+\subsubsection{Getting just text with \texttt{.get\_text()}}
+
+The aforementioned \texttt{.get\_text()} method is actually a bit more
+powerful than just extracting the contents of a single plain text element
+underneath an element. It can also be used to get \textit{all the text} from
+that point down in the hierarchy, ignoring all tags. Check it out:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> soup.body.find("p").get_text()
+'Deep in the bowels of Trinkle Hall resides a\ncarbon-based life form
+known to outsiders only as Stephen. This\nmysterious being fulfills several
+roles not widely known to\nhumankind.'
+\end{Verbatim}
+
+\subsubsection{Finding more than one tag name at once}
+
+You can pass a \textit{list} to \texttt{.find\_all()} to match more than one
+type of tag in a search:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+soup.find_all(["td", "th", "p"])
+\end{Verbatim}
+
+And if you know how to use \textbf{regular expressions} (outside the scope of
+this class) you can use them as arguments to \texttt{.find\_all()} and
+friends:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+soup.find_all(re.compile("^q"))
+soup.find_all(re.compile("r"))
+soup.find_all(re.compile("s$"))
+\end{Verbatim}
+
+(finds all tags whose name begin with q, contain r, or end with s,
+respectively.)
+
+\subsubsection{CSS selectors}
+
+Finally, if you're familiar with CSS selector syntax, you can do all that jazz
+by calling the \texttt{.select()} method:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+soup.select("div#master, tr td.data")
+\end{Verbatim}
+
+\end{document}

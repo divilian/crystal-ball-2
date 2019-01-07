@@ -1,0 +1,1009 @@
+% ADD SKLEARN STUFF (SEE JEDISCIKIT.PY)
+% INCLUDING ONE-HOT ENCODING
+
+\documentclass[12pt]{article}
+
+\addtolength{\textwidth}{.8in}
+\addtolength{\hoffset}{-.4in}
+\addtolength{\textheight}{1in}
+\addtolength{\voffset}{-1in}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{upquote} % to convert funny quotes to straight quotes
+\usepackage{amsfonts}
+\usepackage{paralist}
+\setlength{\parindent}{15pt}
+
+\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
+
+
+\begin{document}
+
+\begin{center}
+\begin{Large}
+DATA 219 Notes -- Mar. 22, 2018
+\end{Large}
+\end{center}
+
+\section{Machine Learning (ML) classifiers}
+
+For some folks, the coolest and most exciting parts of Data Science are the
+under-the-hood techniques for doing prediction and analytics. We'll look at a
+few of them briefly in this class, and you'll delve into them more fully in
+later courses.
+
+Recall that a \textbf{classifier} is an algorithm/program to predict which of
+several \textbf{labels} (or \textbf{classes}) to assign to a data point.
+Perhaps we're trying to predict what political party someone is affiliated
+with, and our labels are ``Democrat," ``Republican," and ``Green." Perhaps
+we're trying to predict whether someone will default on a loan we're
+considering giving them, and the labels are ``safe" and ``high-risk."
+
+There are many different algorithms for classification, but they all use a set
+of \textbf{labeled examples} as ``\textbf{training data}." The idea is that by
+scrutinizing a bunch of examples for which we \textit{know} the label, we can
+intelligently figure out what label to assign to new, \textbf{unlabeled
+examples}.
+
+The attributes of our training data (and new data) that we'll use for
+prediction are sometimes called \textbf{features}. If our training data is in
+a DataFrame, the features are essentially all the relevant columns except for
+one, which is the \textbf{target}. Our goal, given a new data point that has
+values for all the features, is to label its target with the label it's most
+likely to have, assuming the training data are representative examples. 
+
+A classifier's \textbf{performance} can be measured in several ways, but the
+most straightforward is to score how many unlabeled examples it gives the
+correct label to. This of course begs the question: if the example is
+\textit{un}labeled, how can we know whether or not the classifier's label was
+correct? What we have to do in practice is set aside some of our (precious)
+labeled data as a set of \textbf{test data}. We sort of pretend we don't know
+the answers for the test data, feed them to the algorithm which has been
+trained on the \textit{training} points, and then score how well it did.
+
+One of the simplest (and quickest to compute) classifiers around is called the
+\textbf{Naive Bayes classifier}, for reasons which will become apparent. In
+some ways, it's the rock-bottom, no-frills default algorithm for
+classification. One reason it's important is that it's simple and actually
+works surprisingly (even embarrassingly) well in many cases. Another reason is
+that even when it doesn't turn out in the end to have the best performance,
+it's still a \textbf{baseline} which other algorithms' performance can be
+compared to. A researcher might report: ``our whiz-bang algorithm X got 89.4\%
+of examples correct on this test set, compared with 83.7\% for straightforward
+Naive Bayes."
+
+\subsection{Background: Probability}
+
+Probability theory is an area of mathematics that deals with
+\textit{quantifying uncertainty}. We may not be sure that something is going
+to happen, but we want to be precise about \textit{how} sure we are, given
+everything else we may know.
+
+\subsubsection{Terms}
+
+Some terms: an \textbf{outcome} is something that may (or may not) happen.
+This varies widely depending on the domain: a child that's born may or may not
+be male; a train passenger may or may not have red hair; a customer may or may
+not buy a particular product. ``Male," ``red," and ``The Girl on the Train,
+hardback edition" are all outcomes in these examples.
+
+An \textbf{event}, by contrast, is a \textit{set} (group) of outcomes that
+we're interested in. Often we don't care so much whether or not the customer
+specifically bought ``The Girl on the Train, hardback edition" as whether they
+bought \textit{any} book by Paula Hawkins, or maybe any hardback book, or
+maybe any book at all (as opposed to a DVD).
+
+Sometimes we'll use the symbol $\Omega$ (``omega") to refer to the
+\textbf{sample space}, which is simply the set of \textit{all possible
+outcomes}. This will vary depending on what's under consideration; it might be
+\{ male, female \} in one case and \{ red, blonde, brunette, bald, other \} in
+another case.
+
+We'll also use the notation $\overline{\cdot}$ to mean ``any outcome
+\textit{except} something." For instance, $\overline{\textrm{red}}$ means
+``the train passenger had a hair color \textit{other than} red."
+
+\subsubsection{Probability measures}
+
+A \textbf{probability measure} is a function that tells us intuitively how
+likely an outcome is to occur. We'll use the simple notation ``P($\cdot$)" for
+this, read as ``the probability of (something)." The probability of any
+outcome is always \textit{a number between 0 and 1}. 0 means it can never
+possibly occur, 1 means it will definitely occur, and there's a continuum in
+between. In our first example, we might say P(male) = .5, P(red) = .1, and
+P(The Girl on the Train, hardback edition) = .0001.
+
+You can talk about the probability of an event too, of course, and it's simply
+the sum of the outcome probabilities. P(male-or-female) = 1, P(red or blonde
+or bald) = .6, P(any hardcover book) = .08. We'll say that P($\Omega$) will be
+1: after all, \textit{something} has to happen, even if it's ``the customer
+didn't buy anything," an outcome to which we'll assign a probability.
+
+\subsubsection{``Joint" probability}
+
+Very commonly, we'll be considering the likelihood that two different events
+\textit{both} occur. For instance, perhaps we're interested in the probability
+that a train passenger is a red-headed female. We'll write this as P(red,
+female). The comma signals \textbf{joint} probability, which simply means that
+both of these outcomes/events must occur in order for the combined event to be
+considered to have occurred. If we wrote P(red, $\overline{\textrm{female}}$),
+it would mean `the probability that the passenger is a red-headed
+\textit{non}-female.
+
+If you think about it, you'll realize that the joint probability cannot be
+greater than either of the two individual probabilities. Adding another
+condition (not female) to the first (red-headed) can't possibly
+\textit{increase} the chance of it happening. Other than that, we don't know
+how to compute the joint probability from the individual ones, though (yet).
+
+Finally, note that P(A,B) is the same thing as P(B,A).
+
+\subsubsection{``Conditional" probability}
+
+Another notion we'll use a great deal is \textbf{conditional} probability,
+written with a vertical bar like P(red $| \overline{\textrm{female}}$). This
+means ``if I know for a fact that the passenger is not female, what's the
+probability that they're red-headed?" Notice this is very different than the
+joint probability. With conditional probability, I'm assuming that the second
+event \textit{does} occur, and then asking how that revises my original
+prediction. Unlike with joint probability, adding a vertical bar \textit{can}
+make the answer increase.
+
+Consider this example: what's the probability that a random U.S. citizen has a
+Pinterest account? Let's estimate that as P(pinterest) = .15. But what if we
+learned that the chosen person was female? What is P(pinterest $|$ female)? Just
+to shamelessly stereotype, I'm going to go out on a limb and say it's higher;
+perhaps .26. On the other hand, what if we learned the person was male? What
+is P(pinterest $|$ male)? I'll say it's more like .04. In both cases, we
+adjusted our estimated probability in light of additional information: up in
+one case, and down in the other.
+
+This is the heart of what's called ``\textbf{Bayesian reasoning}" (you'll see
+why in the next section) which is where our classifier gets its name.
+
+Two other terms that come up frequently are ``\textbf{prior probability}" and
+``\textbf{posterior probability}". The ``\textbf{prior}" is the probability of
+an event \textit{without} applying conditioning. In the previous example .15
+was the ``prior probability" that the person was a pinterest user. When we
+learned our subject was female, we revised that to the ``\textbf{posterior}"
+of .26.
+
+Finally, note that P(A$|$B) is \textbf{\textit{not}} the same thing as
+P(B$|$A). In general, these are very different numbers. Work out the pinterest
+example further in your head to see why.
+
+\subsubsection{The relationship between joint and conditional}
+
+Mathematically, here's how these two concepts are related. If A and B are two
+events, then:
+
+\vspace{-.2in}
+\begin{align*}
+P(A|B) = \frac{P(A,B)}{P(B)}
+\end{align*}
+
+Suppose I knew that the probability of a random U.S. citizen being a
+\textit{male pinterest user} was .04. And now suppose I knew that about half
+of U.S. citizens are male. Then, I could compute:
+
+\vspace{-.2in}
+\begin{align*}
+P(\textrm{male,pinterest}) = .04 \\
+P(\textrm{male}) = .5 \\
+P(\textrm{pinterest} | \textrm{male}) &= \frac{P(\textrm{male},
+\textrm{pinterest})}{P(\textrm{pinterest})} \\
+                    &= \frac{P(\textrm{pinterest},
+\textrm{male})}{P(\textrm{pinterest})} \\
+                    &= \frac{.04}{.15} = .267 \\
+\end{align*}
+
+\subsubsection{Bayes' Rule}
+
+Knowing how joint and conditional probabilities are related, and knowing that
+P(A,B) = P(B,A), we can derive the following law:
+
+\vspace{-.2in}
+\begin{align*}
+P(A|B) = \frac{P(B|A) \cdot P(A)}{P(B)}
+\end{align*}
+
+This is called \textbf{Bayes' Rule} (sometimes \textbf{Bayes' Law} or
+\textbf{Bayes' Theorem}) after the 18th-century Presbyterian minister Thomas
+Bayes. It is one of the most influential (and controversial, actually)
+statements in statistics and even all of mathematics.
+
+\subsubsection{Independence}
+
+We need one more background concept before we attack Naive Bayes Classifiers,
+and that is the \textbf{independence} of events.
+
+Simply put, two events are ``independent" if \textit{whether one of them
+occurs has no bearing on whether the other one occurs}. It does \textit{not}
+mean the events are mutually exclusive. It means that the probability of each
+one of them occurring has nothing to do with the other.
+
+It's best seen through an example. Suppose I chose a random U.S. citizen, and
+I observe two things: whether or not they're white, and whether or not they're
+female. If I asked you for your estimate of the ``prior" for the race
+question, you'd probably come up with something like P(white) = .6. Now I ask
+you: suppose, before observing their race, that you learned your subject was
+female. Does this cause you to update your ``prior" estimate to a more
+accurate ``posterior"?
+
+The answer is no. Whether or not someone is white is \textit{independent} of
+whether they're female. You thought P(white) was .6, and you still think
+P(white$|$female) is .6. The opposite was true in the pinterest example: your
+estimate of their pinterest status \textit{did} change when you learned about
+their gender. Therefore, those two events are \textit{not} independent.
+
+Both of the following mathematical identities are true \textit{\textbf{only
+\underline{if}}} the events $A$ and $B$ are independent:
+\vspace{-.2in}
+\begin{align*}
+P(A,B) &= P(A) \cdot P(B) \\
+P(A|B) &= P(A)
+\end{align*}
+
+\section{The Naive Bayes algorithm}
+
+Suppose we're designing a security system for a Galactic Cruiser. One thing we
+need to do is identify possible evildoers on our security cameras. Given what
+we can observe about them, can we tell good guys from bad guys?
+
+Here's some training data:
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+    beard  height  demeanor lightsaber  type
+       no   short  menacing      green  Sith
+      yes  medium      calm      green  Jedi
+       no    tall  menacing        red  Sith
+      yes  medium      calm       blue  Jedi
+      yes  medium      calm       blue  Jedi
+       no  medium      calm       blue  Sith
+       no    tall  menacing        red  Jedi
+       no  medium  menacing        red  Sith
+       no   short      calm       blue  Jedi
+      yes  medium  menacing      green  Sith
+                    . . .
+\end{Verbatim}
+
+Our features are the first four columns: whether the person in question has a
+\texttt{beard}, what their \texttt{height} is (clustered in three broad
+ranges), whether their \texttt{demeanor} is \texttt{menacing} or
+\texttt{calm}, and what color \texttt{lightsaber} they wield. The final
+column is our label: this person is known to be a \texttt{Jedi} (good guy) or
+a \texttt{Sith} (bad guy).
+
+A test point that we might want to evaluate looks like this:
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+    beard  height  demeanor lightsaber  type
+      yes   short  menacing        red   ?? 
+\end{Verbatim}
+
+A short, menacing, bearded person with a red lightsaber has just showed up on
+security camera \#305. Should we sound the alarm? That, of course, depends
+upon their (as yet unknown) \texttt{type}. We want to predict this based on
+our past examples.
+
+The \textbf{Naive Bayes} classification algorithm applies conditional
+probability to this problem. Really, what we're asking is: ``which of
+the following two quantities is greater:
+
+\begin{enumerate}
+\itemsep.05em
+\item P(Jedi $|$ yes, short, menacing, red),  or
+\item P(Sith $|$ yes, short, menacing, red)?"
+\end{enumerate}
+ 
+Note that we're combining joint and conditional probabilities here. Given that
+we have the \textit{joint} event ``bearded, short, menacing, and red," what's
+the \textit{conditional} probability of them being a Jedi (or Sith)? If we
+estimate the first as .8 and the second as .2, we won't sound the alarm.
+
+\subsection{Using Bayes' rule}
+
+With Bayes' rule, we can rewrite these as:
+
+\vspace{-.2in}
+\begin{align}
+P(\textrm{Jedi} \ | \ \textrm{yes}, \textrm{short}, \textrm{menacing},
+\textrm{red}) &=
+\frac{P(\textrm{yes}, \textrm{short}, \textrm{menacing}, \textrm{red} \ | \ 
+\textrm{Jedi}) \cdot P(\textrm{Jedi})}{P(\textrm{yes}, \textrm{short},
+\textrm{menacing},
+\textrm{red})} \label{eqn:jedi} \\
+P(\textrm{Sith} \ | \ \textrm{yes}, \textrm{short}, \textrm{menacing},
+\textrm{red}) &=
+\frac{P(\textrm{yes}, \textrm{short}, \textrm{menacing}, \textrm{red} \ | \ 
+\textrm{Sith}) \cdot P(\textrm{Sith})}{P(\textrm{yes}, \textrm{short},
+\textrm{menacing},
+\textrm{red})}  \label{eqn:sith}
+\end{align}
+
+Let's focus on the first of these two expressions, since the second is
+identical except for the word Sith.
+
+We've turned things on their head. In essence, instead of asking ``given these
+physical features, are they a Jedi?" we're asking ``given they're a Jedi,
+would they have these physical features?" 
+
+The right-hand side of that equation has three parts. Ignore the denominator
+for a moment. The right-part of the numerator, P(Jedi), is our \textbf{prior}
+probability. That's easy to estimate from the training data: we just count up
+what percentage of our samples are Jedi overall.
+
+The left-hand side of the numerator needs more work. It reads:
+
+\vspace{-.2in}
+\begin{align*}
+P(\textrm{yes}, \textrm{short}, \textrm{menacing}, \textrm{red} \ | \ \textrm{Jedi}) 
+\end{align*}
+
+Now \textbf{\textit{\underline{if}}} it just so happened that those four
+features were \textit{independent} of one another, this would actually be
+super easy to compute. We could just do this:
+
+\vspace{-.2in}
+\begin{align*}
+P(\textrm{yes} \ |\ \textrm{Jedi}) \cdot
+P(\textrm{short} \ |\ \textrm{Jedi}) \cdot
+P(\textrm{menacing} \ |\ \textrm{Jedi}) \cdot
+P(\textrm{red} \ |\ \textrm{Jedi})
+\end{align*}
+
+Under this assumption, we've split the expression into \textit{each feature
+individually.} These are all now trivially obtainable from the training data.
+What's P(yes $|$ Jedi)? Look at \textit{only the Jedi} in the training data,
+and count up how many ``yesses" and ``nos" there are. The fraction that are
+yesses is our estimate of P(yes $|$ Jedi).\footnote{If you have trouble seeing
+this, go back to the definition of conditional probability. We're really
+calculating $\dfrac{P(\textrm{yes},\textrm{Jedi})}{P(\textrm{Jedi})}$ here,
+which is ``the number of bearded Jedi divided by the number of total Jedi."}
+
+This is called \textbf{the Naive Bayes assumption}. Of course it's probably
+not true that beardedness, height, demeanor, and lightsaber color are all
+independent of each other; for one thing, if some or all of these features are
+indicative of Jedi-ness (which we hope), then they certainly \textit{do} vary
+together. But the Naive Bayes classifier says ``aw heck, let's just throw
+caution to the wind and see how things work out."
+
+\subsection{A numerical example}
+
+Let's work out the numerical answer (numerator only) for the training data
+listed earlier. First, we consider \textit{only} the five \texttt{Jedi} rows,
+and obtain for equation (\ref{eqn:jedi}):
+
+\vspace{-.2in}
+\begin{align*}
+P(\textrm{yes} \ |\ \textrm{Jedi}) \cdot
+P(\textrm{short} \ |\ \textrm{Jedi}) \cdot
+P(\textrm{menacing} \ |\ \textrm{Jedi}) \cdot
+P(\textrm{red} \ |\ \textrm{Jedi}) \cdot P(\textrm{Jedi}) = \\
+\frac{3}{5} \cdot \frac{1}{5} \cdot \frac{1}{5} \cdot \frac{1}{5} \cdot
+\frac{5}{10} = .0024\\
+\end{align*}
+
+Now let's do the same thing for equation (\ref{eqn:sith}) and the five \texttt{Sith} rows:
+
+\vspace{-.2in}
+\begin{align*}
+P(\textrm{yes} \ |\ \textrm{Sith}) \cdot
+P(\textrm{short} \ |\ \textrm{Sith}) \cdot
+P(\textrm{menacing} \ |\ \textrm{Sith}) \cdot
+P(\textrm{red} \ |\ \textrm{Sith}) \cdot P(\textrm{Sith}) = \\
+\frac{1}{5} \cdot \frac{1}{5} \cdot \frac{4}{5} \cdot \frac{2}{5} \cdot
+\frac{5}{10} = .0064\\
+\end{align*}
+
+\subsubsection{Throw away the denominator}
+
+These are the two numerators. To get true probabilities, we have to divide by
+the denominators, of course. But the nice thing is: \textit{the denominators
+are the \underline{same} in the two cases!} For both expressions, we would
+need to divide by P(\textrm{yes}, \textrm{short}, \textrm{menacing},
+\textrm{red}) (in words, ``what's the probability that any random person would
+be a bearded, short, menacing person with a red lightsaber?") which of course
+has the same value even if we compute it twice. For this reason, we
+\textit{throw away the denominator} since in the end all we really care about
+is ``which is higher, P(Jedi $|$ stuff) or P(Sith $|$ stuff)?" In this case,
+it's P(Sith $|$ stuff) and so we boldly predict: ``this person looks like a
+Sith: sound the alarm."
+
+\section{A Python implementation}
+
+How can we automate this in Python? Let's assume that our data is in a Pandas
+DataFrame, as shown above. Now imagine writing this function:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+def predict(beard, height, demeanor, lightsaber):
+    ...
+\end{Verbatim}
+
+This function takes as input a test (unlabeled) point and returns a prediction
+for it: either the word ``Jedi" or the word ``Sith."
+
+\pagebreak    % remove this next time I teach the class
+
+We'll do most of the work outside the function, actually. We'll read in the
+file and then pre-compute all the probabilities that we'll need for our
+calculations. If you think it through, the calculations above imply the need
+for the following probabilities:
+
+\begin{itemize}
+\itemsep.1em
+\item $P(label)$ for every one of the target labels (these are the ``priors")
+\item $P(value|label)$ for every value in a column and every target label (the
+conditionals)
+\end{itemize}
+
+In our case, this amounts to:
+
+\vspace{.1in}
+\begin{compactitem}
+\item Priors:
+    \begin{compactitem}
+    \item $P(\textrm{Jedi})$
+    \item $P(\textrm{Sith})$
+    \end{compactitem}
+
+\item Conditionals:
+    \begin{compactitem}
+    \item $P(\textrm{no}|\textrm{Jedi})$ and
+$P(\textrm{no}|\textrm{Sith})$\footnote{Recall that ``\texttt{yes}" and
+``\texttt{no}" refer to whether the person in question has a beard.}
+    \item $P(\textrm{yes}|\textrm{Jedi})$ and $P(\textrm{yes}|\textrm{Sith})$
+    \item $P(\textrm{tall}|\textrm{Jedi})$ and $P(\textrm{tall}|\textrm{Sith})$
+    \item $P(\textrm{medium}|\textrm{Jedi})$ and $P(\textrm{medium}|\textrm{Sith})$
+    \item $P(\textrm{short}|\textrm{Jedi})$ and $P(\textrm{short}|\textrm{Sith})$
+    \item $P(\textrm{menacing}|\textrm{Jedi})$ and $P(\textrm{menacing}|\textrm{Sith})$
+    \item $P(\textrm{calm}|\textrm{Jedi})$ and $P(\textrm{calm}|\textrm{Sith})$
+    \item $P(\textrm{red}|\textrm{Jedi})$ and $P(\textrm{red}|\textrm{Sith})$
+    \item $P(\textrm{green}|\textrm{Jedi})$ and $P(\textrm{green}|\textrm{Sith})$
+    \item $P(\textrm{blue}|\textrm{Jedi})$ and $P(\textrm{blue}|\textrm{Sith})$
+    \end{compactitem}
+
+\end{compactitem}
+
+These are all straightforward to compute with Pandas. First, we read the file
+into a DataFrame (called ``\texttt{w}" for ``warriors"):
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+import numpy as np
+import pandas as pd
+w = pd.read_csv("warriors.csv")
+\end{Verbatim}
+
+I find it convenient to create a dictionary, called something like
+``\texttt{probs}" to store all the probabilities. To compute the priors, all
+we have to do is figure out what fraction of the rows go with each label:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+probs = {}
+probs['Jedi'] = len(w[w.type=='Jedi'])/len(w)
+probs['Sith'] = len(w[w.type=='Sith'])/len(w)
+\end{Verbatim}
+
+For the conditionals like ``$P(\textrm{calm}|\textrm{Sith})$", we ask:
+\textit{considering only the rows that have \texttt{Sith} labels}, what
+fraction also have \texttt{calm} labels? That boils down to this:
+
+\footnotesize
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+probs['calm|Sith'] = (len(w[(w.type=='Sith') & (w.demeanor=='calm')]) /
+    len(w[(w.type=='Sith')]))
+\end{Verbatim}
+\normalsize
+
+The other 9 conditionals follow exactly the same pattern. (It may strike you
+that we're repeating a lot of very similar code here, and making slight edits
+to each one, and that there's a better, more general way. You're right. Stay
+tuned for the next section.)
+
+\pagebreak
+
+Now for the actual \texttt{predict()} function. All we have to do is multiply
+everything out per the above equations and see which of the two numerators is
+greater.
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+def predict(beard, height, demeanor, lightsaber):
+    jediness = (probs[beard+"|Jedi"] *
+                probs[height+"|Jedi"] *
+                probs[demeanor+"|Jedi"] *
+                probs[lightsaber+"|Jedi"] *
+                probs["Jedi"])
+    sithness = (probs[beard+"|Sith"] *
+                probs[height+"|Sith"] *
+                probs[demeanor+"|Sith"] *
+                probs[lightsaber+"|Sith"] *
+                probs["Sith"])
+    if jediness > sithness:
+        return "Jedi"
+    else:
+        return "Sith"
+\end{Verbatim}
+
+Easy peasy. Note that we don't use the \texttt{w} variable inside this
+function at all. We've already computed all the \texttt{probs}, and once we've
+done that, the DataFrame and the data itself ceases to matter. We run the
+function just by passing it the values derived from our spycam:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> predict("yes","tall","calm","blue")
+'Jedi'
+
+>>> predict("no","tall","menacing","red")
+'Sith'
+\end{Verbatim}
+
+
+\subsection{Estimating confidence}
+
+Our \texttt{predict()} function, as written, just gives a binary answer:
+either \texttt{Sith} or \texttt{Jedi}. It may be useful to know \textit{how
+confident} it is in its prediction for any given input. All we need to do is
+compute the correct ratio. Remember that \texttt{jediness} and
+\texttt{sithness} are just the \textit{numerators} of probabilities, and that
+those probabilities have the same denominator. Therefore, in order to compute
+the true $P(\textrm{Jedi}|e)$, where $e$ is all our evidence (calm, no beard,
+and so forth), we just need to compute:
+
+\begin{align*}
+P(\textrm{Jedi}|e) = \frac{\textrm{jediness}}{\textrm{jediness} + \textrm{sithness}}
+\end{align*}
+
+and similarly, 
+
+\begin{align*}
+P(\textrm{Sith}|e) = \frac{\textrm{sithness}}{\textrm{jediness} + \textrm{sithness}}
+\end{align*}
+
+The denominator drops out when we divide the quantities anyway.
+
+So let's enhance our \texttt{predict()} function to return a list of
+\textit{two} values: the prediction, and the confidence level (on a scale of
+.5 to 1, meaning ``only 50\% confident in our prediction" all the way to
+``absolutely 100\% confident in our prediction." To wit:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+def predict(beard, height, demeanor, lightsaber):
+    ...
+    if jediness > sithness:
+        return ["Jedi", jediness/(jediness+sithness)]
+    else:
+        return ["Sith", sithness/(jediness+sithness)]
+\end{Verbatim}
+
+Taking it for a spin:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> predict("no","tall","menacing","red")
+['Sith', 0.9760957241941071]
+
+>>> predict("yes","tall","menacing","blue")
+['Jedi', 0.7298292697172792]
+\end{Verbatim}
+
+We're incredibly confident that our beardless, tall, menacing, red-wielder is
+a Sith, but not nearly so confident that our bearded, tall, menacing
+blue-wielder is a Jedi.
+
+\vspace{.2in}
+\subsection{Coding it more generally}
+
+The above calculation of the probabilities left something to be desired, since
+it was hardcoded and repetitive. We can improve on this by writing our code in
+a more general way, rather than explicitly referring to problem-specific names
+like \texttt{'Jedi'} and \texttt{'demeanor'} and \texttt{'blue'}. Here's one
+way to do all the calculations:
+
+\pagebreak
+
+\begin{center}
+\line(1,0){400}
+\end{center}
+\footnotesize
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+df = pd.read_csv("...")
+
+probs = {}
+features = df.columns[:-1]
+target = df.columns[-1]
+
+for label in df[target].drop_duplicates():
+    probs[label] = len(df[df[target] == label])/len(df)
+    for feature in features:
+        for value in df[feature].drop_duplicates():
+            probs[value+"|"+label] = (
+                len(df[(df[target] == label) & (df[feature] == value)]) / 
+                    len(df[df[target] == label]))
+\end{Verbatim}
+\normalsize
+\begin{center}
+\line(1,0){400}
+\end{center}
+
+Here's we're assuming (1) the last column of the DataFrame is the target, and
+(2) all the values in the columns are unique (\textit{e.g.}, that we won't
+have an ``\texttt{out-of-state}" column with some ``\texttt{yes}" values and
+also have a ``\texttt{married}" column with ``\texttt{yes}" values. But those
+are pretty much our only assumptions.
+
+The \texttt{predict()} method itself will be generalized as follows: instead
+of taking exactly four parameters named ``\texttt{beard}",
+``\texttt{demeanor}", \textit{etc.}, it will take a \textit{list} of
+parameter values, so that it can be called like this:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+predict(['yes','tall','menacing','blue'])
+\end{Verbatim}
+
+Here's one implementation of the function:
+
+\begin{center}
+\line(1,0){400}
+\end{center}
+\footnotesize
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+def predict(values):
+    scores = []
+    top_prob = 0
+    top_answer = ""
+    for label in df[target].drop_duplicates():
+        prob = probs[label]                     # Start with the prior
+        for value in values:
+            prob *= probs[value+"|"+label]
+        scores.append(prob)
+        if prob > top_prob:
+            top_prob = prob
+            top_answer = label
+    return [ top_answer, top_prob / sum(scores) ]
+\end{Verbatim}
+\normalsize
+\begin{center}
+\line(1,0){400}
+\end{center}
+
+We use the variable \texttt{scores} to keep a list of the numerators for each
+target label: this is only necessary to compute the confidence level in the
+result.
+
+\subsection{Measuring performance}
+
+So how well does this classifier work? This depends on how we measure its
+``goodness." Commonly, we'll simply ask, ``what percentage of the time is it
+right?" and count errors the same in either direction (calling ``Sith" for an
+actual Jedi, or calling ``Jedi" for an actual Sith).
+
+As we know, we can't test a classifier's performance on the data it's trained
+on and expect to get anything accurate. So we'll need to split our data into a
+training set and a test set. This can be done easily in Pandas with:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+complete_data_set = pd.read_csv("warriors.csv")
+train = complete_data_set.sample(frac=.7)
+test = complete_data_set.drop(train.index)
+w = train
+\end{Verbatim}
+
+This call to \texttt{.sample()} chooses 70\% of the original, complete
+DataFrame's rows and copies them to a DataFrame called ``\texttt{train}". Then
+the next line makes ``\texttt{test}" a DataFrame of all the others (the
+remaining 30\%). For convenience, we then copy \texttt{train} into the
+\texttt{w} variable so that none of our previous code has to change.
+
+All our probabilities are thus computed based \textit{only} on the training
+data (the random 70\% of the data set). We can then use the \texttt{test} set
+to compute our accuracy. All we need to do is iterate through the
+\texttt{test} set, passing each row to \texttt{predict()} and seeing whether
+we get the correct answer:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+num_correct = 0
+for i in range(len(test)):
+    row = test.iloc[i]
+    p = predict(row['beard'],row['height'],row['demeanor'],row['lightsaber'])
+    if p[0] == row['type']:
+        num_correct += 1
+
+print("We got " + str(num_correct/len(test)*100) +  
+    "% correct on the test data.")
+\end{Verbatim}
+
+We get a different answer every time we run our program, since it will choose
+a different training/test split in each case.
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+We got 82.63% correct on the test data.
+\end{Verbatim}
+
+\subsection{Numerical/continuous variables}
+
+In all the examples above, we had categorical features. Computing something
+like ``$P(\textrm{calm}|\textrm{Jedi})$" is thus just a matter of counting the
+\texttt{Jedi} rows which (exactly) match the value \texttt{calm}. But what if
+we have a numeric feature, like a person's age or salary?
+
+One quick-and-dirty way to deal with numeric features is to ``bin" them, kind
+of like a histogram. Note that this is actually what we already did with the
+``\texttt{height}" column in the Jedi example: instead of heights like 4'9"
+and 6'6", we had values like \texttt{short} and \texttt{tall}.
+
+This has obvious drawbacks. For one, we're throwing away all the detail
+present in the measurement and treating different values exactly alike. For
+another, it's up to us to somewhat arbitrarily choose how many bins to use and
+where the demarcation lines are. This has an \textit{ad hoc} feel to it.
+
+Better is to treat the continuous variable as what it really is: a number.
+\textbf{Gaussian Naive Bayes} is probably the most common way to deal with
+this in a principled fashion: we make the assumption that the numeric feature
+is distributed \textbf{normally} (``normal"==``Gaussian"), and estimate its
+mean and standard deviation from the training data. Then, to estimate
+$P(value|target\_label)$ for any particular test data point's value, we choose
+the estimated value of its \textbf{probability density} and use that.
+
+Suppose we had a numeric \texttt{height} feature (measured in inches) instead
+of a categorical one. Our data might look like this:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+    beard  height  demeanor lightsaber  type
+       no    62.5  menacing      green  Sith
+      yes    68.3      calm      green  Jedi
+       no    78.1  menacing        red  Sith
+      yes    63.9      calm       blue  Jedi
+      yes    61.9      calm       blue  Jedi
+       no    68.2      calm       blue  Sith
+       no    80.1  menacing        red  Jedi
+       no    33.5      calm      green  Jedi
+                    . . .
+\end{Verbatim}
+
+Our Gaussian Naive Bayes assumption will be that \textit{for each class, the
+\texttt{height} feature is distributed normally}. If we take all the
+\texttt{Jedi} rows, and calculate their \texttt{height}s' mean and standard
+deviation, we get:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> warriors[warriors.type=='Jedi'].height.mean()
+64.0571428571429
+
+>>> warriors[warriors.type=='Jedi'].height.std()
+9.661931704216865
+\end{Verbatim}
+
+Performing the same calculation for the \texttt{Sith} rows gives us:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> warriors[warriors.type=='Sith'].height.mean()
+68.3902173913043
+
+>>> warriors[warriors.type=='Sith'].height.std()
+9.319673312968604
+\end{Verbatim}
+
+Looks like Sith Lords are a bit taller than Jedi in general, and slightly less
+variable.
+
+\vspace{.1in}
+Let's say we're doing a prediction for a data point with a height of 69
+inches. We'll need to know the value of the density at $x$=69 for both our
+estimated Jedi and estimated Sith distributions. Using the SciPy library, we
+can get ``frozen" density functions for each distribution:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+import scipy.stats
+jedi_height = scipy.stats.norm(64.0571428571429, 9.661931704216865)
+sith_height = scipy.stats.norm(68.3902173913043, 9.319673312968604)
+\end{Verbatim}
+
+and then, to calculate the densities, we just call \texttt{.pdf()} on those
+objects:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> jedi_height.pdf(69)
+0.036230663486274517
+
+>>> sith_height.pdf(69)
+0.042717943988373371
+\end{Verbatim}
+
+Not surprisingly, the Sith number comes out a fair bit higher, since according
+to our estimated density, the average Sith's height is taller than the average
+Jedi's.
+
+Keep in mind that the ``.0362" and ``.0427" numbers here are a bit hard to
+interpret. They are \textit{not} ``the probability that a Jedi/Sith is exactly
+69 inches tall" -- that probability, as with all continuous random variables,
+is \textit{zero}. Instead, it's ``the value of the density at $x$=69" which
+isn't really in any units that make sense. It's okay, though, since we are
+throwing away out denominator and doing relative comparisons anyway.
+
+By the way, there are also other useful things you can call on a frozen SciPy
+distribution, including \texttt{.cdf()} to get the value of the cumulative
+density function at any point, \texttt{.ppf()} to get quantile,
+\texttt{.rvs()} to generate random variates, ordinary statistical things like
+\texttt{.median()}, \texttt{.mean()}, \texttt{.std()}, and other more exotic
+statistical things like moments, confidence intervals, differential entropy,
+survival functions, \textit{etc.} See the documentation for details.
+
+\subsubsection{Incorporating into the classifier}
+
+Let's add this feature to our classifier. First, the not-so-generally-coded
+version, which had lines like this:
+
+\footnotesize
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+probs['tall|Sith'] = (len(w[(w.type=='Sith') & (w.demeanor=='tall')]) /
+    len(w[(w.type=='Sith')]))
+\end{Verbatim}
+\normalsize
+
+Since \texttt{height} is now numeric, we need to replace all those
+height-related lines with code like this:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+sith_heights = w[w.type == 'Sith'].height
+sith_height = scipy.stats.norm(sith_heights.mean(),sith_heights.std())
+jedi_heights = w[w.type == 'Jedi'].height
+jedi_height = scipy.stats.norm(jedi_heights.mean(),jedi_heights.std())
+\end{Verbatim}
+
+``\texttt{sith\_height}" is now our frozen distribution function. In 
+\texttt{predict()}, then, we simply use it as another multiplier:
+
+\begin{center}
+\line(1,0){400}
+\end{center}
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+def predict(beard, height, demeanor, lightsaber):
+    jediness = (probs[beard+"|Jedi"] *
+                probs[demeanor+"|Jedi"] *
+                probs[lightsaber+"|Jedi"] *
+                probs["Jedi"])
+    sithness = (probs[beard+"|Sith"] *
+                probs[demeanor+"|Sith"] *
+                probs[lightsaber+"|Sith"] *
+                probs["Sith"])
+
+    jediness *= jedi_height.pdf(height)
+    sithness *= sith_height.pdf(height)
+
+    if jediness > sithness:
+        return "Jedi"
+    else:
+        return "Sith"
+\end{Verbatim}
+\begin{center}
+\line(1,0){400}
+\end{center}
+
+Notice we've removed the ``\texttt{probs[height+"|Jedi"]}" lines,
+since they're no longer applicable: \texttt{height} is numeric now. Instead,
+we multiply our \texttt{jediness}/\texttt{sithness} by the value of the
+corresponding class's estimated density at that point.
+
+To incorporate this numeric variable into the more general version of the
+code, we need to intelligently distinguish between numeric and categorical
+columns. This can be done via the \texttt{.dtype} accessor on a DataFrame
+column:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> print(w.lightsaber.dtype)
+dtype('O')
+
+>>> print(w.height.dtype)
+dtype('float64')
+\end{Verbatim}
+
+(The ``\texttt{O}" stands for ``object," which is Pandas' non-intuitive way of
+telling you that the column is something non-numeric, like a string.) You can
+directly compare the result to a value like ``\texttt{np.dtype("float64")}",
+but the safer and preferred way is to use NumPy's \texttt{.issubdtype()}
+function which more intelligently detects any numeric type (ints, floats,
+\textit{etc.}, no matter the precision).
+
+Our generic implementation begins with:
+
+\begin{center}
+\line(1,0){400}
+\end{center}
+\footnotesize
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+probs = {}
+densities = {}
+target = df.columns[-1]
+numeric_features = [ c for c in df.columns[:-1] 
+    if np.issubdtype(df[c].dtype, np.number) ]
+categorical_features = [ c for c in df.columns[:-1]
+    if not np.issubdtype(df[c].dtype, np.number) ]
+\end{Verbatim}
+\begin{center}
+\line(1,0){400}
+\end{center}
+\normalsize
+
+We're creating a \texttt{densities} dictionary, somewhat similar to our
+\texttt{probs} dictionary, to store feature-specific information for our
+numeric variables (\texttt{probs} will continue to store information for
+categorical variables.) Instead of simple numeric values, \texttt{densities}
+will store frozen density functions.
+
+We now populate \texttt{densities} (and \texttt{probs}):
+
+\begin{center}
+\line(1,0){400}
+\end{center}
+\footnotesize
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+for label in df[target].drop_duplicates():
+    rows_with_this_label = df[df[target] == label]
+    probs[label] = len(rows_with_this_label)/len(df)
+    for feature in numeric_features:
+        density = scipy.stats.norm(rows_with_this_label[feature].mean(),
+            rows_with_this_label[feature].std())
+        densities[feature+"|"+label] = density
+    for feature in categorical_features:
+        for value in df[feature].drop_duplicates():
+            probs[value+"|"+label] = (
+                len(df[(df[target] == label) & (df[feature] == value)]) / 
+                    len(df[df[target] == label]))
+\end{Verbatim}
+\normalsize
+\begin{center}
+\line(1,0){400}
+\end{center}
+
+Our generic \texttt{predict()} function needs to be adjusted somewhat, since
+if we just pass a list of values, we can't tell \textit{which} feature a
+numeric value is supposed to go with. There are various ways to solve this,
+but we'll choose to pass a key/value pair string here (like
+\texttt{"height=69.3"}):
+
+\footnotesize
+\begin{center}
+\line(1,0){400}
+\end{center}
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+def predict(values):
+    scores = []
+    top_prob = 0
+    top_answer = ""
+    for label in df[target].drop_duplicates():
+        prob = probs[label]    # Start with the prior
+        for value in values:
+            if "=" in value:
+                # Numeric feature.
+                numeric_feature, numeric_value = value.split("=")
+                numeric_value = float(numeric_value)
+                prob *= densities[numeric_feature+"|"+label].pdf(numeric_value)
+            else:
+                # Categorical feature.
+                prob *= probs[value+"|"+label]
+        scores.append(prob)
+        if prob > top_prob:
+            top_prob = prob
+            top_answer = label
+    return [ top_answer, top_prob / sum(scores) ]
+\end{Verbatim}
+\begin{center}
+\line(1,0){400}
+\end{center}
+\normalsize
+
+And we call it like this:
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+>>> predict(['yes','height=65','menacing','blue'])
+['Jedi', 0.85863336769968801]
+
+>>> predict(['yes','height=85','menacing','blue'])
+['Jedi', 0.72742228657164021]
+\end{Verbatim}
+
+How's this thing do?
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+We got 82.33% correct on the test data.
+\end{Verbatim}
+
+Not too shabby.
+\end{document}

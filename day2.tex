@@ -1,0 +1,290 @@
+\documentclass[12pt]{article}
+
+\addtolength{\textwidth}{.8in}
+\addtolength{\hoffset}{-.4in}
+\addtolength{\textheight}{1in}
+\addtolength{\voffset}{-1in}
+
+\usepackage{wasysym}
+\usepackage{multicol}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{enumerate}
+\usepackage{parskip}
+\usepackage{paralist}
+\usepackage{upquote} % to convert funny quotes to straight quotes
+\setlength{\parindent}{15pt}
+\pagestyle{empty}
+
+\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
+
+\begin{document}
+
+\begin{center}
+\begin{Large}
+DATA 219 Notes -- Jan. 23, 2018
+\end{Large}
+\end{center}
+\vspace{.3in}
+
+\section{Administuff}
+
+\begin{compactitem}
+\item Data Mavens first meeting of the year \textbf{tomorrow} @5pm in Woodard
+202. Come join us -- we're cool!
+\end{compactitem}
+
+\section{``Are these things correlated?"}
+
+A very common exploratory operation is to ask yourself whether two variables
+in a data set are related to each other in some way. After looking at
+variables individually (via things like min/median/mean/max, histograms, bar
+charts) this is often the next thing you do. So how can we tell whether there
+is a genuine relationship between variables, versus just a spurious
+pseudo-connection?
+
+Here are my preferred quick-and-dirty ways.
+
+\subsection{Two categorical variables}
+
+A quick and dirty way to tell whether two variables in a contingency table
+affect each other is to run a $\chi ^2$ test:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+    >>> import scipy.stats
+    >>> scipy.stats.chi2_contingency(my_contingency_table)
+\end{Verbatim}
+
+For example:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+    >>> side_saber = pd.crosstab(characters.side, columns=characters.saber)
+    >>> side_saber
+    saber  blue  green  red
+    side                   
+    Dark      0      0    2
+    Grey      2      2    0
+
+    >>> scipy.stats.chi2_contingency(side_saber)
+    (6.0, 0.049787068367863951, 2, array([[ 0.66666667,  0.66666667,  0.66666667],
+            [ 1.33333333,  1.33333333,  1.33333333]]))
+\end{Verbatim}
+
+You can read the \texttt{chi2\_contingency} documentation to figure out what
+all this means, but the first quick-and-dirty thing to look at is the
+\textit{second} element of the return value. It's the so-called
+\textit{p-value}, and roughly speaking if it's less than .05, you can be
+confident that these two variables \textit{are} correlated in some way. (In
+the above example, they are...barely.)
+
+\subsection{One categorical and one numeric variable}
+
+My favorite tool is the notched boxplot (see day \#1's notes). (You can also
+do a t-test if the notches look funny; see \texttt{scipy.stats.ttest\_ind} and
+\texttt{scipy.stats.ttest\_rel} and read carefully.)
+
+
+\subsection{Two numeric variables}
+
+Besides visually inspecting scatterplots to spot correlations, the Pearson's
+correlation coefficient can give you a quick-and-dirty answer:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+    >>> import scipy.stats.stats
+    >>> scipy.stats.stats.pearsonr(my_var1, my_var2)
+\end{Verbatim}
+
+For instance:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+    >>> scipy.stats.stats.pearsonr(men_ht,men_sat)
+    (-0.080877008297474018, 0.29443331215713264)
+\end{Verbatim}
+
+The second number is the p-value: if it's greater than about .05, then these
+two variables are likely \textit{not} correlated.
+
+
+\section{NumPy}
+
+At the near-bottom of the Python data analysis ecosystem is the NumPy
+library. SciPy, Pandas, scikit-learn, and many other things are built on top
+of it.
+
+Its wheelhouse is the \textit{ndarray}, a highly-optimized and efficient
+multidimensional array datatype. It's blazing fast, and supports advanced
+vectorized and broadcasting operations as we'll see. A lot of this boils down
+to \textit{avoiding writing expensive loops in Python} and letting the faster,
+native, underlying language (C) do bulky computations in a fraction of the
+time.
+
+NumPy also has a lot of other really useful stuff in it, including linear
+algebra routines and sophisticated random number generation. In practice, you
+often use some higher-level library to access these things, but under the hood
+they in turn use NumPy.
+
+\subsection{ndarrays}
+
+The standard NumPy import is:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+import numpy as np
+\end{Verbatim}
+
+after which you can make \textit{ndarray}s in a variety of ways:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+a = np.array(['larry','curly','moe'])    # 1-d array ("vector")
+b = np.array([[1,2,3],[8,9,10])          # 2-d array ("matrix")
+c = np.zeros(25)                         # 1-d array of all zeros
+d = np.zeros((9,7))                      # 2-d array of all zeros
+                                         # See also ".ones()" and ".empty()"
+e = np.arange(5,855)                     # Like .range(), but for ndarrays
+
+\end{Verbatim}
+
+\subsubsection{dtypes}
+
+Every \textit{ndarray} has a \texttt{dtype}, or ``data type," which you can
+access using the ``\texttt{.dtype}" accessor. You can also call
+``\texttt{.astype(...)}" to perform data conversion. The types we'll care most
+about are \texttt{np.int32} and \texttt{np.float64} for integers and
+floating-point (``decimal") numbers, respectively.
+
+\subsubsection{vectorization / broadcasting}
+
+Similar to how you've seen Pandas work, NumPy provides vectorizing and
+broadcasting operations so you can avoid writing and executing loops. For
+example, if you want to add the elements of two arrays together, instead of
+doing something like this:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+for i in range(len(m)):
+    q[i] = m[i] + n[i]
+\end{Verbatim}
+
+you just write this:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+q = m + n
+\end{Verbatim}
+
+Not only is this nicer syntactically, and less typing (and opportunity for
+error), but it's \textit{much, much faster} for large data sets. It cannot be
+overemphasized that you want to avoid loops (and especially nested loops) for
+any serious calculations if you can help it at all. Sometimes this requires
+rewiring your brain a bit to anticipate where you can take advantage of
+vectorized operations.
+
+Play around with this idea using operators like ``\texttt{**}" and
+``\texttt{<=}".
+
+In addition to operators, NumPy also provides a number of functions (called
+``\textit{ufuncs}" or ``universal functions") that work in a similar way.
+Instead of:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+for i in range(len(f)):
+    g[i] = math.sqrt(f[i])
+\end{Verbatim}
+
+you just write this:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+g = np.sqrt(f)
+\end{Verbatim}
+
+Play around with ufuncs like ``\texttt{np.sin()}", and ``\texttt{np.power()}".
+
+There are also many other standard functions which take an \textit{ndarray}
+and return a single result, like ``\texttt{np.max()}", ``\texttt{np.any()}",
+``\texttt{np.cumsum()}", and many, many others. \textit{Before you ever write
+a loop, take a moment to consider whether it might be a good idea to browse
+the NumPy documentation and avoid it.}
+
+\subsubsection{Reshaping}
+
+NumPy \textit{ndarray}s have a \texttt{.reshape()} function that lets you
+coerce a multi-dimensional array to different dimensions:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+thing = np.array([[1,2,3],[4,5,6],[7,8,9],[10,11,12]])
+print(thing)
+[[ 1  2  3]
+ [ 4  5  6]
+ [ 7  8  9]
+ [10 11 12]]
+
+thing = thing.reshape(2,6)
+print(thing)
+[[ 1  2  3  4  5  6]
+ [ 7  8  9 10 11 12]]
+
+thing = thing.reshape(3,4)
+print(thing)
+[[ 1  2  3  4]
+ [ 5  6  7  8]
+ [ 9 10 11 12]]
+\end{Verbatim}
+
+You can also perform a matrix \textbf{transpose} operation using \texttt{.T}
+(no bananas, note):
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+print(thing.T)
+[[ 1  5  9]
+ [ 2  6 10]
+ [ 3  7 11]
+ [ 4  8 12]]
+\end{Verbatim}
+
+\subsubsection{Slices: warning}
+
+You can take ``slices" of an \textit{ndarray} just like you can a normal
+Python list, using the colon syntax. Beware, though: \textit{in NumPy, these
+are \textbf{views} on the original list, not copies!} In order to make a copy,
+you must explicitly call ``\texttt{.copy()}" on the array.
+
+To illustrate the possible weirdness:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+x = np.array([4,9,8,3,2])
+y = x[2:4]
+print(y)
+[8 3]
+
+y[1] = 999999999
+print(x)
+[        4         9         8 999999999         2]
+
+\end{Verbatim}
+
+\subsection{Random number generation}
+
+One thing we'll use surprisingly often in Data Science is random number
+generation. NumPy provides a super good library for this, all of which is in
+the namespace \texttt{np.random}. Just about every distribution you can think
+of is present, including:
+
+\begin{Verbatim}[fontsize=small,samepage=true,frame=none]
+print(np.random.normal(10,3,5))
+[ 13.14637747   8.0170962   14.69793015   5.28517005   7.71561529]
+
+print(np.random.normal(10,30,5))
+[ -7.17146      9.32914316   7.63719265  11.72634167  23.12532128]
+
+print(np.random.uniform(6,10,5))
+[ 7.3502029   8.82037522  7.89682321  7.75582494  7.98879983]
+
+print(np.random.exponential(5,5))
+[ 2.41409743  0.59398243  2.12184356  2.04372147  1.56823102]
+
+print(np.random.exponential(50,5))
+[ 47.4720236    6.82838706   5.14356732  60.47055961   0.47463824]
+\end{Verbatim}
+
+In all these examples, the last argument to the function is the desired
+\textit{size} (number of elements) of the resulting array.
+
+\end{document}
