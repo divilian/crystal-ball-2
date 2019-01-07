@@ -1,35 +1,11 @@
-\documentclass[12pt]{article}
 
-\addtolength{\textwidth}{.8in}
-\addtolength{\hoffset}{-.4in}
-\addtolength{\textheight}{1in}
-\addtolength{\voffset}{-1in}
-
-\usepackage{amsmath}
-\usepackage{graphicx}
-\usepackage{upquote} % to convert funny quotes to straight quotes
-\usepackage{amsfonts}
-\usepackage{paralist}
-\setlength{\parindent}{15pt}
-
-\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
-
-
-\begin{document}
-
-\begin{center}
-\begin{Large}
-DATA 219 Notes -- Feb. 20, 2018
-\end{Large}
-\end{center}
-
-\section{Time is complicated}
+\chapter{Dates and times}
 
 One of the most common categories of information you'll ever deal with are
-those dealing with various aspects \textit{time}. It turns out this is
+those dealing with various aspects of \textit{time}. It turns out this is
 considerably more complex than you might think at first. For one thing, the
 English word ``time'' can mean several different things -- a point in time
-(3:05pm on Feb.~20, 2018), an abstract wall clock time (3:05pm), a duration of
+(3:05pm on Feb.~20, 2019), an abstract wall clock time (3:05pm), a duration of
 time (2 and a half hours), \textit{etc.} For another, the clock and calendar
 systems that humans have devised are just plain weird. (Why does it go from
 11am to 12\underline{\textbf{p}}m to 1pm? Why do some months have more days
@@ -67,7 +43,7 @@ subtract them to/from each other.
 date in an idealized Gregorian calendar. You can create one via:
     \begin{itemize}
     \itemsep.1em
-    \item \texttt{sunny\_day = datetime.date(2018,2,20)}
+    \item \texttt{sunny\_day = datetime.date(2019,2,20)}
     \item \texttt{here\_we\_are = datetime.date.today()}
     \end{itemize}
 
@@ -76,16 +52,15 @@ You can \textit{add} a \texttt{date} to a \texttt{timedelta} to get another
 \texttt{date}. Note that if your \texttt{timedelta} has precision more
 granular than days, it is lost in these operations:
 
-\small
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 >>> datetime.date.today() == datetime.date.today() + finger
-True
+    True
 
 >>> datetime.date.today() == datetime.date.today() + this_class
-True
+    True
 
 >>> datetime.date.today() == datetime.date.today() + one_semester
-False
+    False
 \end{Verbatim}
 \normalsize
 
@@ -94,7 +69,7 @@ False
 
 \item \textbf{The \texttt{time} type.} A ``time,'' by itself, represents an
 abstract wall clock time, independent of any particular day. It doesn't mean
-``9am this morning'' but rather ``9am's in general.''
+``2pm this afternoon'' but rather ``2pm's in general.''
     \begin{itemize}
     \itemsep.1em
     \item \texttt{start\_of\_class = datetime.time(hours=14, minute=0)}
@@ -107,6 +82,7 @@ subtracted.
 suggests, combines features of both dates and times. In fact, a
 \texttt{datetime} object represents \textit{an absolute, specific point in
 history}. Creation options include:
+\pagebreak
     \small
     \begin{itemize}
     \itemsep.1em
@@ -135,9 +111,8 @@ work with mathematically.
 
 \end{itemize}
 
-\vspace{.2in}
 
-\subsection{Parsing and formatting}
+\section{Parsing and formatting}
 
 Now most of the time we won't be creating \texttt{datetime} objects using the
 techniques above. Instead, we'll be \textit{parsing} them from string data.
@@ -145,24 +120,25 @@ techniques above. Instead, we'll be \textit{parsing} them from string data.
 There are a seemingly unlimited number of ways that dates and times can be
 expressed in strings. Just consider a few possibilities:
 
+\small
 \begin{compactitem}
-\item Feb. 20, 2018 2pm
-\item Feb 20, 2018 2:00pm
-\item Feb 20, 2018 2:00 P.M.
-\item 2/20/18 2:00 P.M.
-\item 2/20/18 14:00
-\item 02/20/18 14:00:00
-\item 20-Feb-2018 2:00pm
-\item 20-Feb-2018 14:00
-\item 2018-Feb-20 14:00:00
+\item Feb. 20, 2019 2pm
+\item Feb 20, 2019 2:00pm
+\item Feb 20, 2019 2:00 P.M.
+\item 2/20/19 2:00 P.M.
+\item 2/20/19 14:00
+\item 02/20/19 14:00:00
+\item 20-Feb-2019 2:00pm
+\item 2019-Feb-20 14:00:00
 \item ...
 \end{compactitem}
+\normalsize
 
 and on it goes. It's a testimony to the power of the human mind that we can
 look at these and at a glance infer what date/time was intended. Getting a
 computer to automatically do so is somewhat of a challenge.
 
-\subsubsection{Parsing with \texttt{.strptime()}}
+\subsection{Parsing with \texttt{.strptime()}}
 
 The \texttt{date}, \texttt{time}, and \texttt{datetime} classes all have a
 (somewhat clunky) method called ``\texttt{.strptime()}'' that you can call,
@@ -170,12 +146,12 @@ passing (1) a string representing a date, time, or datetime, and (2) a
 formatting string telling the method how to interpret it. This is best seen
 through an example:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-my_string = "2/20/2018 14:00"
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+my_string = "2/20/2019 14:00"
 start_of_class = datetime.datetime.strptime(my_string, "%m/%d/%Y %H:%M")
 
 >>> print(start_of_class)
-2018-02-20 14:00:00
+    2019-02-20 14:00:00
 \end{Verbatim}
 
 This example demonstrates a full ``round-trip'' operation: we started with a
@@ -211,12 +187,13 @@ ones (others are in the docs):
 \end{tabular}
 \end{center}
 
+\pagebreak
 You have to be really careful here and just go slow. Examine the date and/or
 time input that you have in your data set, and work out which bits of info,
 combined with which literal characters (like ``\texttt{/}'' and ``\texttt{:}''
 in the example above), appear in which order.
 
-\subsubsection{Formatting with \texttt{.strftime()}}
+\subsection{Formatting with \texttt{.strftime()}}
 
 Complementarily to \texttt{.strptime()} is ``\texttt{.strftime()}''. (Note that
 the ``p'' stands for ``\textbf{p}arse,'' while
@@ -225,16 +202,16 @@ a \texttt{date}, \texttt{time}, or \texttt{datetime} \textit{object}, spit it
 out as a string of characters. This isn't used nearly as often, but it
 occasionally is, and it's useful to know as a translation mechanism.
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 >>> print(start_of_class.strftime("%A, %B the %dth at %I%p."))
-Tuesday, February the 20th at 02PM.
+    Tuesday, February the 20th at 02PM.
 \end{Verbatim}
 
 One common error: note that you call \texttt{.strptime()} directly on the
 \textit{class} (\texttt{date}, \texttt{time}, or \texttt{datetime}), passing
 two arguments:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 an_object = datetime.datetime.strptime(my_birthday_string, "%m/%d/%Y %H:%M")
 \end{Verbatim}
 
@@ -242,7 +219,7 @@ but you call \texttt{.strftime()} on the object in question
 (a \texttt{date}, \texttt{time}, or \texttt{datetime}), passing
 one argument:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 a_string = my_birthday_object.strftime("%m/%d/%Y %H:%M")
 \end{Verbatim}
 
