@@ -26,9 +26,9 @@ DATA 219 Notes -- Apr. 3, 2018
 
 \section{Connecting to an external API}
 
-I called the screen-scraping scenario ``the worst of all possible worlds."
+I called the screen-scraping scenario ``the worst of all possible worlds.''
 Using an API, the subject of today's lesson, is sort of the best. I say ``sort
-of" because it's certainly not the \textit{easiest}. The easiest is when you
+of'' because it's certainly not the \textit{easiest}. The easiest is when you
 have a ready-made CSV file with exactly the data you want, and you suck it
 into a DataFrame, done. The thing is, much of the data you'll be interested in
 analyzing as a Data Scientist wasn't put together like that for you. Instead,
@@ -36,28 +36,28 @@ it exists as part of a vast database somewhere, and you need flexibility and
 power to extract on demand exactly the parts you want. This is what a good API
 lets you do.
 
-API actually stands for ``Application Programming Interface," which is a
+API actually stands for ``Application Programming Interface,'' which is a
 pretty uninformative acronym. What it really means is ``a set of functions
 someone has provided for you to call in order to access their data, together
 with clean documentation telling you precisely what each of those functions
-do." As you'll see with experience, some APIs are better designed than others,
+do.'' As you'll see with experience, some APIs are better designed than others,
 and make it easier to get what you want. In this module we'll look at two
 examples and generalize some common principles from them.
 
 \subsection{REST APIs}
 
-Another strange pseudo-acronym you'll encounter is ``REST"\footnote{This sort
-of stands for ``REpresentational State Transfer," another utterly unhelpful
+Another strange pseudo-acronym you'll encounter is ``REST''\footnote{This sort
+of stands for ``REpresentational State Transfer,'' another utterly unhelpful
 phrase.}, which is a \textit{style} of API. REST APIs have the following
 characteristics:
 
 \begin{itemize}
 \itemsep.1em
 
-\item They're designed to be used over the Web. (Although ``over the Web" may
+\item They're designed to be used over the Web. (Although ``over the Web'' may
 not mean what you think it means; for one, it \textit{doesn't} mean ``using a
-browser." Instead, it means ``accessing the data using HTTP requests in the
-form of structured URLs/hyperlinks." We'll be writing \textit{Python code} to
+browser.'' Instead, it means ``accessing the data using HTTP requests in the
+form of structured URLs/hyperlinks.'' We'll be writing \textit{Python code} to
 retrieve what appear to be pseudo-Web-pages outside our browser.)
 
 \item They're simple and elegant. Unlike their predecessor (and competitor)
@@ -71,11 +71,11 @@ make use of the HTTP operations like \texttt{GET}, \texttt{HEAD},
 \texttt{POST}, \texttt{DELETE}, \texttt{PUT}, \textit{etc.} Because of this,
 different REST APIs tend to be pretty uniform in how they work.
 
-\item They're ``stateless," as HTTP is itself. This means the server retains
-no \textit{memory} of the past requests from a client. (``Server" is a word
-meaning ``a machine on the Internet that you want to access," and ``client"
+\item They're ``stateless,'' as HTTP is itself. This means the server retains
+no \textit{memory} of the past requests from a client. (``Server'' is a word
+meaning ``a machine on the Internet that you want to access,'' and ``client''
 here essentially means ``your own computer, which makes requests of the
-server.") This has some limitations, but makes APIs quick and simple to use.
+server.'') This has some limitations, but makes APIs quick and simple to use.
 
 \item The data they provide can come in a variety of formats, typically JSON
 or XML.
@@ -85,14 +85,14 @@ or XML.
 \subsubsection{Other terms}
 
 APIs that conform to Roy Fielding's original spec are known colloquially as
-``RESTful." 
+``RESTful.'' 
 
-You'll also sometimes hear the buzzwords ``Web services" or ``SOA"
+You'll also sometimes hear the buzzwords ``Web services'' or ``SOA''
 (Service-oriented Architecture). Although these terms are a bit broader and
-communicate something subtly different than just ``the use of Web-based APIs"
+communicate something subtly different than just ``the use of Web-based APIs''
 (REST or otherwise), in practice you will see terms like this used jointly to
 refer to the same technologies. If you hear someone talking about ``a Web
-services approach," your ears should perk up and you should anticipate being
+services approach,'' your ears should perk up and you should anticipate being
 able to apply at least some of the lessons in this module.
 
 Finally, the term \textbf{endpoint} refers to a particular, addressable part
@@ -125,14 +125,14 @@ print(class_home_page.content)
 If you run the above code, you'll see the (gnarly) HTML code for the entire
 course web page on your screen as one big string. Seeing this emphasizes that
 \textit{when we execute RESTful API requests, we're really not doing much more
-than accessing ``web pages," where ``web page" here means a set of results
+than accessing ``web pages,'' where ``web page'' here means a set of results
 that the server puts together for us.} This similarity to how browsers work is
 what makes RESTful APIs so simple and powerful.
 
 Most of the time we won't get HTML back, but rather a data format such as XML
 or JSON. Predictably, I'll start with a Star Wars example. The SWAPI (Star
 Wars API) is a neat little database that returns JSON data. Let's ask it for
-``person with ID 13":
+``person with ID 13'':
 
 \small
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
@@ -191,7 +191,7 @@ Python program with the API so you can access the data.
 Many APIs require some form of \textbf{authentication}, which essentially
 means you need to provide some personal information to identify you to the
 site. Since we'll be dealing only with open APIs, this isn't a security thing
-as much as it's a ``control of information" thing. By forcing you to register
+as much as it's a ``control of information'' thing. By forcing you to register
 with the site and provide some contact info, the organization retains a
 measure of control and knowledge over how its information is used. Also, many
 sites impose \textbf{rate limits} which constrain how much information you can
@@ -205,7 +205,7 @@ protocol (see \url{oauth.net}), an open standard that allows users to grant
 one website permission to access data from another. (You've probably used this
 without realizing it if you've ever enabled some third-party app which then
 caused a confirmation dialog box to pop up saying, ``application so-and-so is
-requesting access to the following information of yours...do you approve?")
+requesting access to the following information of yours...do you approve?'')
 
 For Twitter, here's the procedure I used:
 
@@ -213,25 +213,25 @@ For Twitter, here's the procedure I used:
 \itemsep.1em
 \item If you're not actually a Twitter user, create a Twitter account.
 \item Sign on to \url{dev.twitter.com}.
-\item Go to \url{apps.twitter.com} and create an ``application." For our
+\item Go to \url{apps.twitter.com} and create an ``application.'' For our
 purposes, an application is sort of like a project, of which you can have
 several. It's mainly an organizational thing.
-\item Navigate to your application and choose ``Keys and Access Tokens."
+\item Navigate to your application and choose ``Keys and Access Tokens.''
 Create an Access Token.
 \end{enumerate}
 
-You will now see, on the ``Keys and Access Tokens" page, \textit{four} strings
+You will now see, on the ``Keys and Access Tokens'' page, \textit{four} strings
 of gobbledygook, all four of which you'll need:
 
 \vspace{.1in}
 \small
 \begin{compactitem}
-\item A ``consumer key." Mine is \texttt{9dFucBtR1P58pJICXGV2gaKhj}.
-\item A ``consumer secret." Mine is
+\item A ``consumer key.'' Mine is \texttt{9dFucBtR1P58pJICXGV2gaKhj}.
+\item A ``consumer secret.'' Mine is
 \texttt{uKufTBegOrw5hrjNQmXFwcVtWjSb2bUHsMEoBwjN5gHzTbpJ0U}.
-\item An ``access token." Mine is
+\item An ``access token.'' Mine is
 \texttt{1019144197-5dhD0p1VbE80kPnzZrhjq43G08iMbguggkn67q1}.
-\item An ``access token secret." Mine is
+\item An ``access token secret.'' Mine is
 \texttt{JOtRHxgzhj6KQhuOuwljB214UImybVANFX6pbSYsDJhTd}.
 \end{compactitem}
 \normalsize
@@ -242,7 +242,7 @@ Just realize they're all necessary components of the way Twitter
 authenticates, and if you just use them all in the right places, you'll be
 able to get to any Twitter data you want, programmatically.
 
-(Btw, the second and fourth of those items -- the ``secrets" -- are not
+(Btw, the second and fourth of those items -- the ``secrets'' -- are not
 supposed to be shared with anyone, nor to appear in human-readable form in
 your source code. For one-off data analysis projects, I confess I don't think
 this is super important.)
@@ -280,7 +280,7 @@ get_user_timeline('katyperry',4)
 \end{Verbatim}
 
 to indicate something like ``get the latest four tweets from user
-\texttt{@katyperry}." The corresponding syntax in URL Land is like this:
+\texttt{@katyperry}.'' The corresponding syntax in URL Land is like this:
 
 \footnotesize
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
@@ -288,8 +288,8 @@ https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=katyperry&co
 \end{Verbatim}
 \normalsize
 
-Note that parameters are ``passed" as key/value pairs, with no spaces, after a
-``\texttt{?}", and separated by ``\texttt{\&}" signs. The following code:
+Note that parameters are ``passed'' as key/value pairs, with no spaces, after a
+``\texttt{?}'', and separated by ``\texttt{\&}'' signs. The following code:
 
 \footnotesize
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
@@ -312,9 +312,9 @@ and it comes out every time you sing  #americanidol
 \end{Verbatim}
 
 By the way, if a value you want to pass contains a space, you'll need to
-convert that space to a plus sign (``\texttt{+}"). For instance, the standard
+convert that space to a plus sign (``\texttt{+}''). For instance, the standard
 search endpoint is \texttt{https://api.twitter.com/1.1/search/tweets.json},
-and requires a ``\texttt{q}" parameter with your query string. I could search
+and requires a ``\texttt{q}'' parameter with your query string. I could search
 for Star Wars toys with:
 
 \small
@@ -332,7 +332,7 @@ This endpoint returns a dictionary of information:
 ['statuses', 'search_metadata']
 \end{Verbatim}
 
-Looks like the tweets themselves (``\texttt{statuses}") are in the
+Looks like the tweets themselves (``\texttt{statuses}'') are in the
 \texttt{statuses} key, so:
 
 \small

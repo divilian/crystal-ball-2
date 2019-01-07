@@ -30,26 +30,26 @@ DATA 219 Notes -- Apr. 5, 2018
 Another common approach to the ML classification problem is sort of at the
 opposite extreme from Naive Bayes. Instead of very generally assuming that
 each of the features is an independent and separate indicator of a data
-point's class, the \textbf{kNN} (for ``$k$-nearest neighbors") algorithm
+point's class, the \textbf{kNN} (for ``$k$-nearest neighbors'') algorithm
 assumes that a point's features are very much bound together. In order to
 classify a point, a kNN classifier finds the \textit{closest} training points
 to it, and predicts the class that those points suggest (majority rules).
 
-The parameter $k$ in kNN is simply the number of ``closest training points"
+The parameter $k$ in kNN is simply the number of ``closest training points''
 we'll consider. It is nearly always an odd number, so that in the two-class
 case there are no ties. Suppose we have a 7-NN classifier, and we're asked to
 classify a particular person as either \texttt{Jedi} or \texttt{Sith}. If we
 find the seven most similar training points to our person, and discover that
 four of them are \texttt{Jedi} and the other three are \texttt{Sith}, we'll
-predict ``\texttt{Jedi}." The basic idea is that simple.
+predict ``\texttt{Jedi}.'' The basic idea is that simple.
 
 \subsection{Distance measures}
 
 Much hinges on the question of \textit{closeness}. What do we mean when we say
-two data points are ``close" together? There are some options here, many of
+two data points are ``close'' together? There are some options here, many of
 which are common sense. The first approach you might think of is to take the
 standard \textit{Euclidean distance}, also called the ``straight-line
-distance," between the data points. We just use the Pythagorean Theorem where
+distance,'' between the data points. We just use the Pythagorean Theorem where
 each feature is plotted on an axis. And in fact this is the most common
 choice. Remember that the distance between two $n$-dimensional points $x$ and
 $y$ is:
@@ -62,15 +62,15 @@ In other words, the straightforward square-root-of-sum-of-squared-differences
 works in \textit{any} number of dimensions, not just two.
 
 This isn't the only approach people use. In general, we can use any
-\textbf{distance measure} (or ``distance function," or ``distance metric")
-that assigns a numerical ``distance" value to any two points. To be valid, a
+\textbf{distance measure} (or ``distance function,'' or ``distance metric'')
+that assigns a numerical ``distance'' value to any two points. To be valid, a
 distance measure must simply satisfy certain common sense
 rules.\footnote{Including: the distance between two points must always be
 greater than or equal to 0; the distance from $x$ to $y$ must be the same as
 the distance from $y$ to $x$; and the distance from $x$ to $z$ must not be any
 greater than the distance from $x$ to $y$ to $z$ (the ``triangle
-inequality.")} Another common choice is the \textbf{Manhattan distance} (or
-``taxicab distance") which is essentially the shortest path between the two
+inequality.'')} Another common choice is the \textbf{Manhattan distance} (or
+``taxicab distance'') which is essentially the shortest path between the two
 points that doesn't travel diagonally (\textit{i.e.}, the path only travels
 along axes.)
 
@@ -85,7 +85,7 @@ decades. Clearly a difference of \$50/year in salary isn't nearly as
 significant as a difference of 50 years in age!
 
 The solution is to \textbf{transform} our features so they are all
-\textbf{standardized} (or ``Z-score normalized.") All we have to do is take
+\textbf{standardized} (or ``Z-score normalized.'') All we have to do is take
 each feature, and:
 
 \begin{compactenum}
@@ -102,12 +102,12 @@ remember from your stats class, what we've done is compute the
 
 What do we do if our features are categorical? Same thing we learned in the
 Naive Bayes lesson: make them numerical, in a principled way. Again, the most
-common approach by far is to ``one-hot" encode each categorical feature as a
+common approach by far is to ``one-hot'' encode each categorical feature as a
 set of binary features, one for each feature value. (Recall that for
-lightsabers, this would turn the single feature value ``\texttt{red}" into a
-set of three features ``\texttt{0}," ``\texttt{0}," and ``\texttt{1}," meaning
-``this data point has zero ``blueness," zero ``greenness," and one
-``redness.")
+lightsabers, this would turn the single feature value ``\texttt{red}'' into a
+set of three features ``\texttt{0},'' ``\texttt{0},'' and ``\texttt{1},'' meaning
+``this data point has zero ``blueness,'' zero ``greenness,'' and one
+``redness.'')
 
 You can use \texttt{np.where()} function to create one-hot vectors, or, use
 the scikit-learn package's helpful ``\texttt{LabelBinarizer.fit\_transform}
@@ -285,7 +285,7 @@ kNN got these right:
 Interestingly, all of Naive Bayes's errors were in one direction (incorrect
 \texttt{Jedi} call) and all 3-NN's in the other. Naive Bayes seems to have the
 most trouble with clean-shaven, calm, non-red-lightsabered Sith Lords. It
-tends to call them ``Jedi," because two of the features --
+tends to call them ``Jedi,'' because two of the features --
 \texttt{demeanor=calm} and \texttt{lightsaber=blue/green} -- are highly
 \texttt{Jedi}-indicative. When factored in with just one
 \texttt{Sith}-indicative feature (\texttt{beard=no}), those two features
@@ -295,7 +295,7 @@ overcome the third and tilt the Naive Bayes scales (incorrectly) towards Jedi.
 \subsection{Varying $k$}
 
 One question that arises is: ``what's the
-optimal value of $k$?" It may or may not surprise you to learn that there's no
+optimal value of $k$?'' It may or may not surprise you to learn that there's no
 easy answer to this, and that it varies widely by data set and in fact even by
 the training set chosen.
 
@@ -339,11 +339,11 @@ We see some similarities here, but by no means perfect uniformity. This is
 because a kNN classifier is a high-variance classifier (especially for low
 $k$), as described in the next section.
 
-\section{The ``Bias-Variance Tradeoff"}
+\section{The ``Bias-Variance Tradeoff''}
 
 One of the most deep and fundamental principles of machine learning goes by
 the name of \textbf{the bias-variance tradeoff}. It's a version of the ``no
-free lunch" principle: classifiers that possess one advantage inherently have
+free lunch'' principle: classifiers that possess one advantage inherently have
 a counteracting disadvantage.
 
 Here are the two key terms:
@@ -351,17 +351,17 @@ Here are the two key terms:
 \begin{itemize}
 \itemsep.1em
 \item \textbf{bias}\footnote{Tip: when thinking about this topic, try to erase the previous definitions you
-have for the word ``\textit{bias}" that you have running around in your brain.
-They probably don't apply. When I think of ``bias" I think of a systematic
+have for the word ``\textit{bias}'' that you have running around in your brain.
+They probably don't apply. When I think of ``bias'' I think of a systematic
 propensity to err \textit{in a particular direction}. Like, ``you're biased
-towards thinking people are shorter than they are, because you're tall." But
+towards thinking people are shorter than they are, because you're tall.'' But
 \textit{bias} here just means ``being `off' in general, in whatever direction,
-and probably not the same direction each time."}
+and probably not the same direction each time.''}
  -- the degree to which a model is expected to misclassify
-items, even those in its own training set, because it just can't ``bend" 
+items, even those in its own training set, because it just can't ``bend'' 
 enough to catch all the detail.
 \item \textbf{variance} -- the degree to which a model will differ based on
-the particular training set that is chosen, because it ``bends" too much to
+the particular training set that is chosen, because it ``bends'' too much to
 try and catch every data point.
 \end{itemize}
 
@@ -417,13 +417,13 @@ very \textbf{high variance}: a different training set will result in many,
 many different classifications. Our classifier has essentially memorized a
 zillion individual examples, and will regurgitate all that intricate detail on
 command. But had we gotten a different random sample, the ``single nearest
-neighbor" to a test point would have been totally different, and might result
+neighbor'' to a test point would have been totally different, and might result
 in a different classification.
      
 There are formulas you can use to work out quantitatively what the estimated
 bias and variance are for a classifier. But I think this dichotomy is more
 important from a conceptual perspective. The main lesson is: the more your
-classifier ``bends" (\textit{i.e.}, has a very wiggly and unpredictable
+classifier ``bends'' (\textit{i.e.}, has a very wiggly and unpredictable
 boundary between its ranges of predicted classes) the more precise it
 potentially is in selectively labeling data points. However, this also means
 that a lot of its decisions are going to hinge on the particular data sample
@@ -431,7 +431,7 @@ it was trained on, which means it will probably be picking up noise in
 addition to signal.
 
 
-\section{The ``Curse of Dimensionality"}
+\section{The ``Curse of Dimensionality''}
 
 Another key ML principle goes by the humorous name \textbf{the curse of
 dimensionality}. It goes something like this. Suppose that in addition to
@@ -443,11 +443,11 @@ through statistically and discover correlations, right? What's not to like?
 
 Yes, this is potentially good news, but with a catch. It turns out that as we
 increase the number of features more and more (or, put another way, as we
-increase the ``dimensionality" of the problem from our original four
+increase the ``dimensionality'' of the problem from our original four
 dimensions to 5, 6, 7, ..., and up into the hundreds) we have a data sparsity
 problem. In terms of kNN classifiers, you can think of it this way:
 effectively, \textit{all} the points effectively become far apart. We want to
-find the 3 (or 15, or 77) ``nearest neighbors," but when we have so many
+find the 3 (or 15, or 77) ``nearest neighbors,'' but when we have so many
 features (many of which will turn out to be irrelevant for the problem), we
 find that \textit{any} two data points will differ on a large number of them.
 Essentially, our noise swamps our signal.
@@ -463,7 +463,7 @@ beard. But how many training points will we need before we have several
 extroverted, abstract-thinking individuals from Tatooine with 4 traffic
 tickets and \texttt{no} beard who earn 6,000 Galactic credits annually?
 Answer: a lot. And if we don't have that many, a kNN classifier trained on all
-those features is going to suffer trying to find ``people like this one" in
+those features is going to suffer trying to find ``people like this one'' in
 order to make a prediction.
 
 The moral to the story is that we will often need to trim our set of features,

@@ -25,11 +25,12 @@ DATA 219 Notes -- Mar. 13, 2018
 
 \section{Accessing data from databases}
 
-``Database" is a very loose term for ``a repository of information that can
-be readily accessed." When we use that term in Data Science, we mean a data
+``Database'' is a very loose term for ``a repository of information that can
+be readily accessed.'' When we use that term in Data Science, we mean a data
 source that is managed by a piece of software called a \textbf{DBMS}, or
 \textbf{database management system}. (True, a bunch of lists, dictionaries, or
-Pandas DataFrames is also ``a repository of information that can be accessed,"
+Pandas DataFrames is also ``a repository of information that can be
+accessed,''
 but when we use the term \textbf{database} we're not talking about that.)
 
 There are principally two reasons to learn how to access data from databases:
@@ -70,7 +71,7 @@ the same way: they store data in tables, and they are manipulated via SQL.
 Ever since Ted Codd invented the relational model in 1970, this organizational
 paradigm has proven to be so powerful and computationally efficient that it
 has dominated the database world. Only recently have some alternate paradigms
-gained some traction (so-called ``NoSQL" databases), but even so, the majority
+gained some traction (so-called ``NoSQL'' databases), but even so, the majority
 of the world's structured data is all in relational databases of some sort.
 
 Relational DBMS's are much more similar to each other than NoSQL systems are
@@ -93,7 +94,7 @@ separating the conceptual data from the storage implementation.
 
 \subsubsection{Interfacing to SQLite}
 
-``Connecting" to a relational database basically means establishing a
+``Connecting'' to a relational database basically means establishing a
 communication path over which you can talk SQL. In Python, this is pretty
 easy:
 
@@ -107,11 +108,11 @@ cur = con.cursor()
 % DO I really want to mess with "cursors," though, since you can just do the
 % pd.read_sql(SQL,connection) thing? (even for sqlite_master to get table
 % names?)
-A ``cursor" is kind of hard to get your head around, but if you think of a
-``placeholder" (like the blinky cursor in Spyder or a word processing
+A ``cursor'' is kind of hard to get your head around, but if you think of a
+``placeholder'' (like the blinky cursor in Spyder or a word processing
 application), you're not too far off. Imagine Google Docs, with multiple
 people simultaneously editing the same document: each one has a literal cursor
-showing ``where they are" in the document. Similarly, multiple programs can
+showing ``where they are'' in the document. Similarly, multiple programs can
 access a database at the same time, and each one has a placeholder, or cursor.
 
 What you do with a cursor is \textbf{execute an SQL command}. SQL is a new
@@ -128,11 +129,11 @@ results_list = query_results.fetchall():
 \end{Verbatim}
 
 The string inside the call to \texttt{.execute()} is called ``an embedded SQL
-statement." This means we have code in one language (SQL) ``embedded" inside
+statement.'' This means we have code in one language (SQL) ``embedded'' inside
 another (Python). Do not be alarmed at this.
 
 The \texttt{.fetchall()} command says ``okay, after carrying out this query on
-the database, go \textit{actually} load all that data into Python." You
+the database, go \textit{actually} load all that data into Python.'' You
 \textbf{don't} want to do this if the result of the query is likely to be
 large. Instead, there is a \texttt{.fetchone()} command that can get one
 result at a time, that you can use in a loop.
@@ -190,7 +191,7 @@ select max(col1) from table_name
 \normalsize
 
 \item To get only the first few rows (similar to Pandas' \texttt{.head()}
-operation) tack on a ``limit" expression:
+operation) tack on a ``limit'' expression:
 
 \footnotesize
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
@@ -198,7 +199,7 @@ select * from table_name limit 10
 \end{Verbatim}
 \normalsize
 
-\item To get only certain columns, change the ``\texttt{*}" to a
+\item To get only certain columns, change the ``\texttt{*}'' to a
 comma-separated list of column names:
 
 \footnotesize
@@ -208,7 +209,7 @@ select col1,col2,col3 from table_name limit 10
 \end{Verbatim}
 \normalsize
 
-\item To get only certain rows, add a ``where clause" after the table name:
+\item To get only certain rows, add a ``where clause'' after the table name:
 
 \footnotesize
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
@@ -221,7 +222,7 @@ select col1,col2 from table_name where col1==val1 and not col2>val2 limit 10
 (The usual boolean operations work with keywords \texttt{and}, \texttt{or},
 and \texttt{not}, and parentheses for grouping.)
 
-\item The ``\texttt{in}" keyword can be useful in a ``where clause" for
+\item The ``\texttt{in}'' keyword can be useful in a ``where clause'' for
 querying membership in a set:
 
 \scriptsize
@@ -248,7 +249,7 @@ select count(distinct col1) from table_name
 \end{Verbatim}
 \normalsize
 
-\item You can have SQLite do sorting with ``\texttt{order by}":
+\item You can have SQLite do sorting with ``\texttt{order by}'':
 \scriptsize
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 select * from table_name order by col1
@@ -259,7 +260,7 @@ select distinct col1,col2 from table_name where col3==val1 order by col2,col1 de
 As you can see, you can sort on multiple columns, and sort in reverse order
 with the \texttt{desc} keyword.
 
-\item SQL supports a ``group by" operation very much like Pandas does:
+\item SQL supports a ``group by'' operation very much like Pandas does:
 
 \scriptsize
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]

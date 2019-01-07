@@ -1,7 +1,7 @@
 
-\chapter{Correlation, NumPy}
+\chapter{Correlation, the NumPy library}
 
-\section{``Are these things correlated?"}
+\section{``Are these things correlated?''}
 
 A very common exploratory operation is to ask yourself whether two variables
 in a data set are related to each other in some way. After looking at
@@ -17,23 +17,24 @@ Here are my preferred quick-and-dirty ways.
 A quick and dirty way to tell whether two variables in a contingency table
 affect each other is to run a $\chi ^2$ test:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-    >>> import scipy.stats
-    >>> scipy.stats.chi2_contingency(my_contingency_table)
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+>>> import scipy.stats
+>>> scipy.stats.chi2_contingency(my_contingency_table)
 \end{Verbatim}
 
 For example:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-    >>> side_saber = pd.crosstab(characters.side, columns=characters.saber)
-    >>> side_saber
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+>>> side_saber = pd.crosstab(characters.side, columns=characters.saber)
+>>> side_saber
     saber  blue  green  red
     side                   
     Dark      0      0    2
     Grey      2      2    0
 
-    >>> scipy.stats.chi2_contingency(side_saber)
-    (6.0, 0.049787068367863951, 2, array([[ 0.66666667,  0.66666667,  0.66666667],
+>>> scipy.stats.chi2_contingency(side_saber)
+    (6.0, 0.049787068367863951, 2, 
+            array([[ 0.66666667,  0.66666667,  0.66666667],
             [ 1.33333333,  1.33333333,  1.33333333]]))
 \end{Verbatim}
 
@@ -56,15 +57,15 @@ do a t-test if the notches look funny; see \texttt{scipy.stats.ttest\_ind} and
 Besides visually inspecting scatterplots to spot correlations, the Pearson's
 correlation coefficient can give you a quick-and-dirty answer:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-    >>> import scipy.stats.stats
-    >>> scipy.stats.stats.pearsonr(my_var1, my_var2)
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+>>> import scipy.stats.stats
+>>> scipy.stats.stats.pearsonr(my_var1, my_var2)
 \end{Verbatim}
 
 For instance:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-    >>> scipy.stats.stats.pearsonr(men_ht,men_sat)
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+>>> scipy.stats.stats.pearsonr(men_ht,men_sat)
     (-0.080877008297474018, 0.29443331215713264)
 \end{Verbatim}
 
@@ -94,13 +95,13 @@ they in turn use NumPy.
 
 The standard NumPy import is:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 import numpy as np
 \end{Verbatim}
 
 after which you can make \textit{ndarray}s in a variety of ways:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 a = np.array(['larry','curly','moe'])    # 1-d array ("vector")
 b = np.array([[1,2,3],[8,9,10])          # 2-d array ("matrix")
 c = np.zeros(25)                         # 1-d array of all zeros
@@ -112,11 +113,11 @@ e = np.arange(5,855)                     # Like .range(), but for ndarrays
 
 \subsubsection{dtypes}
 
-Every \textit{ndarray} has a \texttt{dtype}, or ``data type," which you can
-access using the ``\texttt{.dtype}" accessor. You can also call
-``\texttt{.astype(...)}" to perform data conversion. The types we'll care most
+Every \textit{ndarray} has a \texttt{dtype}, or ``data type,'' which you can
+access using the ``\texttt{.dtype}'' accessor. You can also call
+``\texttt{.astype(...)}'' to perform data conversion. The types we'll care most
 about are \texttt{np.int32} and \texttt{np.float64} for integers and
-floating-point (``decimal") numbers, respectively.
+floating-point (``decimal'') numbers, respectively.
 
 \subsubsection{vectorization / broadcasting}
 
@@ -125,14 +126,14 @@ broadcasting operations so you can avoid writing and executing loops. For
 example, if you want to add the elements of two arrays together, instead of
 doing something like this:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 for i in range(len(m)):
     q[i] = m[i] + n[i]
 \end{Verbatim}
 
 you just write this:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 q = m + n
 \end{Verbatim}
 
@@ -143,29 +144,30 @@ any serious calculations if you can help it at all. Sometimes this requires
 rewiring your brain a bit to anticipate where you can take advantage of
 vectorized operations.
 
-Play around with this idea using operators like ``\texttt{**}" and
-``\texttt{<=}".
+Play around with this idea using operators like ``\texttt{**}'' and
+``\texttt{<=}''.
 
 In addition to operators, NumPy also provides a number of functions (called
-``\textit{ufuncs}" or ``universal functions") that work in a similar way.
+``\textit{ufuncs}'' or ``universal functions'') that work in a similar way.
 Instead of:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 for i in range(len(f)):
     g[i] = math.sqrt(f[i])
 \end{Verbatim}
 
 you just write this:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 g = np.sqrt(f)
 \end{Verbatim}
 
-Play around with ufuncs like ``\texttt{np.sin()}", and ``\texttt{np.power()}".
+Play around with ufuncs like ``\texttt{np.sin()}'', and
+``\texttt{np.power()}''.
 
 There are also many other standard functions which take an \textit{ndarray}
-and return a single result, like ``\texttt{np.max()}", ``\texttt{np.any()}",
-``\texttt{np.cumsum()}", and many, many others. \textit{Before you ever write
+and return a single result, like ``\texttt{np.max()}'', ``\texttt{np.any()}'',
+``\texttt{np.cumsum()}'', and many, many others. \textit{Before you ever write
 a loop, take a moment to consider whether it might be a good idea to browse
 the NumPy documentation and avoid it.}
 
@@ -174,7 +176,7 @@ the NumPy documentation and avoid it.}
 NumPy \textit{ndarray}s have a \texttt{.reshape()} function that lets you
 coerce a multi-dimensional array to different dimensions:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 thing = np.array([[1,2,3],[4,5,6],[7,8,9],[10,11,12]])
 print(thing)
 [[ 1  2  3]
@@ -197,7 +199,7 @@ print(thing)
 You can also perform a matrix \textbf{transpose} operation using \texttt{.T}
 (no bananas, note):
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 print(thing.T)
 [[ 1  5  9]
  [ 2  6 10]
@@ -207,14 +209,14 @@ print(thing.T)
 
 \subsubsection{Slices: warning}
 
-You can take ``slices" of an \textit{ndarray} just like you can a normal
+You can take ``slices'' of an \textit{ndarray} just like you can a normal
 Python list, using the colon syntax. Beware, though: \textit{in NumPy, these
 are \textbf{views} on the original list, not copies!} In order to make a copy,
-you must explicitly call ``\texttt{.copy()}" on the array.
+you must explicitly call ``\texttt{.copy()}'' on the array.
 
 To illustrate the possible weirdness:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 x = np.array([4,9,8,3,2])
 y = x[2:4]
 print(y)
@@ -233,7 +235,7 @@ generation. NumPy provides a super good library for this, all of which is in
 the namespace \texttt{np.random}. Just about every distribution you can think
 of is present, including:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 print(np.random.normal(10,3,5))
 [ 13.14637747   8.0170962   14.69793015   5.28517005   7.71561529]
 

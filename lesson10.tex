@@ -42,13 +42,14 @@ is at least theoretically extractable into the form we need to do our magic.
 
 \section{HTML}
 
-(Most) web pages look snazzy and colorful when you view them: the word ``code"
+(Most) web pages look snazzy and colorful when you view them: the word
+``code''
 doesn't jump immediately to mind. When you load a web page, though, what
 you're actually getting from the server you specify is a plain-text file
 written in a language called HTML, or \textbf{hypertext markup language}. It
 consists of a combination of content and formatting/structural commands (or
-``markup") to instruct the browser how to \textbf{render} the page.
-(``Rendering" a page means ``interpreting all that HTML formatting stuff and
+``markup'') to instruct the browser how to \textbf{render} the page.
+(``Rendering'' a page means ``interpreting all that HTML formatting stuff and
 actually presenting a pretty page formatted the way it specifies.)
 
 The first important thing to know about HTML is that it is
@@ -61,10 +62,10 @@ nesting.
 The basic building block of HTML is the \textbf{element}, which is delimited
 by starting and ending \textbf{tags}. Tags are key words, most of which
 indicate something structural or stylistic, enclosed in wakkas (``\texttt{<
-... >}"). The ending tag has a slash (``\texttt{/}") immediately before the
+... >}''). The ending tag has a slash (``\texttt{/}'') immediately before the
 keyword, showing that it matches the corresponding opening tag. So, for
-instance, one pair of starting and ending tags might be ``\texttt{<title>}"
-and ``\texttt{</title>}".
+instance, one pair of starting and ending tags might be ``\texttt{<title>}''
+and ``\texttt{</title>}''.
 
 Note that the entire contents of the \textit{element} is (1) the starting tag,
 (2) the ending tag, and (3) \textit{everything in between}, which could be
@@ -131,19 +132,19 @@ and then immediately destroy this page upon reading it.</p>
 \vspace{.2in}
 Lots going on here. The first way to get your bearings is to start visually
 lining up starting tags with their corresponding ending tags and perceive the
-structure. Notice that this entire page begins with ``\texttt{<html>}" and
-ends with ``\texttt{</html>}". This is in essence the ``root node" of the
-page's entire hierarchical tree. It has two immediate ``children": a
+structure. Notice that this entire page begins with ``\texttt{<html>}'' and
+ends with ``\texttt{</html>}''. This is in essence the ``root node'' of the
+page's entire hierarchical tree. It has two immediate ``children'': a
 \texttt{head} element, and a \texttt{body} element. Each of those have
 starting and ending tags as well. Inside the \texttt{head} element is a
 \texttt{title} element, \textit{etc.}
 
 As you can guess, each of these tags is interpreted by the browser to mean a
-particular kind of structure/formatting. ``\texttt{h1}" means ``top-level
-heading" which in practicality means ``render it in a large font, with some
-extra space around it." The ``\texttt{b}" element means to put something in
-boldface. The ``\texttt{table}" element means to construct a table-like
-structure, with rows (``\texttt{tr}") and cells within rows (``\texttt{td}").
+particular kind of structure/formatting. ``\texttt{h1}'' means ``top-level
+heading'' which in practicality means ``render it in a large font, with some
+extra space around it.'' The ``\texttt{b}'' element means to put something in
+boldface. The ``\texttt{table}'' element means to construct a table-like
+structure, with rows (``\texttt{tr}'') and cells within rows (``\texttt{td}'').
 \textit{Etc.} HTML is in general a big mess of things that are supposed to
 indicate structure (like \texttt{table} and \texttt{h2}) and things that
 specify specific formatting (like \texttt{i} and \texttt{u}). All of this is
@@ -157,11 +158,11 @@ tags from the example above:
 <a href="http://buildings.umwblogs.org/trinkle-hall/">Trinkle Hall</a>
 \end{Verbatim}
 
-The \texttt{a} tag stands for ``anchor" and is the most common way of
+The \texttt{a} tag stands for ``anchor'' and is the most common way of
 embedding a hyperlink (which you can click on to go to another page) in a
 document. Note that the words that will appear in the page are the
 \textbf{contents} of the element, not part of the tag itself. The tag, in
-addition to the required ``\texttt{a}" has a key/value pair where the key is
+addition to the required ``\texttt{a}'' has a key/value pair where the key is
 the string \texttt{href} and the value is the URL the user will be directed to
 if they click on the link. This key/value pair is called an
 \textbf{attribute}.
@@ -177,10 +178,10 @@ attributes, in any order.
 
 (By the way, the sharp-eyed reader may have noticed something else odd about
 the \texttt{img} example, above: an extra slash before the ending
-``\texttt{>}". This is an HTML shorthand for ``starting and ending the element
-all within a single tag, since it has no content anyway." Whenever you have
-something of the form ``\texttt{<x></x>}" you can replace it with the
-equivalent ``\texttt{<x/>}" to save typing and file size.)
+``\texttt{>}''. This is an HTML shorthand for ``starting and ending the element
+all within a single tag, since it has no content anyway.'' Whenever you have
+something of the form ``\texttt{<x></x>}'' you can replace it with the
+equivalent ``\texttt{<x/>}'' to save typing and file size.)
 
 Lastly, I'll point out that near the top of this example, there's a bunch of
 stuff which looks a bit visually jarring; it doesn't look like HTML. And it's
@@ -210,12 +211,12 @@ The whole thing, once rendered, looks something like this:
 \section{Web Developer Tools}
 
 Firefox, Chrome, and several other browsers come equipped with very
-sophisticated ``web developer tools" that let you browse the HTML, CSS, and
+sophisticated ``web developer tools'' that let you browse the HTML, CSS, and
 rendered page, and figure out what elements got rendered via which portions of
 the screen. They're very handy, and you should get into the habit of using
 them. In Firefox, they're available via the ``Tools | Web Developer | Toggle
-tools..." menu option. In Chrome, you go to the little three vertical dots,
-then choose ``More Tools | Developer Tools."
+tools...'' menu option. In Chrome, you go to the little three vertical dots,
+then choose ``More Tools | Developer Tools.''
 
 
 \section{Parsing with BeautifulSoup}
@@ -231,11 +232,11 @@ rather than have Python read it for you over the network. This just eliminates
 one more possible source of error. (Exception: if you need a Python program to
 act as a \textbf{web crawler} and read pages on demand as it discovers their
 URLs. More on that later.) Note that you can still open the page in your
-browser even after downloading it: just go to ``File | Open File..." or the
+browser even after downloading it: just go to ``File | Open File...'' or the
 equivalent operation in your browser.
 
 Once you've done this, and now have your HTML in a file called
-``\texttt{myfile.html}", then you can parse it with BeautifulSoup using:
+``\texttt{myfile.html}'', then you can parse it with BeautifulSoup using:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 from bs4 import BeautifulSoup
@@ -243,7 +244,7 @@ soup = BeautifulSoup(open("myfile.html"), "html.parser")
 \end{Verbatim}
 
 By convention, the variable for this parsed structure is called
-``\texttt{soup}". The second argument to the \texttt{BeautifulSoup} function
+``\texttt{soup}''. The second argument to the \texttt{BeautifulSoup} function
 tells it which \textbf{parser} we want to use to analyze the code; there are
 other choices here, but stick with \texttt{"html.parser"} for now.
 
@@ -253,11 +254,11 @@ One possibly useful command (though limited if your web page is large) is:
 >>> print(soup.prettify())
 \end{Verbatim}
 
-This prints out the contents of the page, but
-in a way that is ``properly" structured and indented. You may have noticed
-that the HTML file may or may not be physically indented and spaced in a way
-reflective of the structure; the parser discerns the implied structure from
-the tag sequence, and prints it how it will ``really" be seen by a browser.
+This prints out the contents of the page, but in a way that is ``properly''
+structured and indented. You may have noticed that the HTML file may or may
+not be physically indented and spaced in a way reflective of the structure;
+the parser discerns the implied structure from the tag sequence, and prints it
+how it will ``really'' be seen by a browser.
 
 At this point, I generally take one of two approaches: either I navigate the
 structure \textbf{top-down} looking for where the data I'm interested in is
@@ -266,7 +267,7 @@ situated, or I find the data by searching through the file, and use a
 
 \subsection{The top-down approach}
 
-By using ``\texttt{soup.contents}", you get the immediate descendants of
+By using ``\texttt{soup.contents}'', you get the immediate descendants of
 the root node of the HTML hierarchy. Each of these could be examined for its
 type, like this:
 
@@ -277,10 +278,10 @@ for child in soup.contents:
 <class 'bs4.element.NavigableString'>
 \end{Verbatim}
 
-So our entire document is composed of an element (misleadingly named ``Tag"
-here, but w/e) and a ``\texttt{NavigableString}" which essentially just means
-``string of literal text". For elements, it's useful to print out their
-``\texttt{.name}". For strings, it's useful to print them out verbatim. Here,
+So our entire document is composed of an element (misleadingly named ``Tag''
+here, but w/e) and a ``\texttt{NavigableString}'' which essentially just means
+``string of literal text''. For elements, it's useful to print out their
+``\texttt{.name}''. For strings, it's useful to print them out verbatim. Here,
 we see:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
@@ -360,7 +361,7 @@ syntax at the interactive console:
 \end{Verbatim}
 
 You can better see at a glance what's what. Now that I know the first
-``\texttt{p}" is element \#3 of the body, I could find that hyperlink via:
+``\texttt{p}'' is element \#3 of the body, I could find that hyperlink via:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 >>> [ x.name for x in list(body_children)[3] ]
@@ -434,7 +435,7 @@ the middle of this code:
 \normalsize
 
 Looks like the role name I want is the text under a \texttt{td} element whose
-class is ``\texttt{role}". And it looks like the percentage I want is
+class is ``\texttt{role}''. And it looks like the percentage I want is
 (*groan*) in a boldface (\texttt{b}) tag, underneath the last \texttt{td} tag
 of the row, which has no \texttt{class}.
 
@@ -447,7 +448,7 @@ trs = list(soup.find_all("tr"))
 \end{Verbatim}
 
 The variable \texttt{trs} is now a list of \textit{elements} (BeautifulSoup
-``\texttt{Tag}" objects) each of which I can examine for (say) \texttt{td}
+``\texttt{Tag}'' objects) each of which I can examine for (say) \texttt{td}
 children with a \texttt{role} \texttt{class} attribute. And you can call
 \texttt{.find\_all()} on \textit{any} tag (to search from that point in the
 hierarchy down), not just on the top-level \texttt{soup} element. So:
@@ -503,7 +504,7 @@ percs = []
 \end{Verbatim}
 
 and now we can create our DataFrame with both columns. (Note that
-``\texttt{.find()}" does the same thing as ``\texttt{.find\_all()}" except
+``\texttt{.find()}'' does the same thing as ``\texttt{.find\_all()}'' except
 that it only grabs the first matching element rather than all of them.) The
 complete code is here:
 
@@ -542,10 +543,10 @@ to restrict a search to only elements with matching attributes.
 soup.find_all("td", class_="pic")
 \end{Verbatim}
 
-\subsubsection{Using the Python ``dot" syntax}
+\subsubsection{Using the Python ``dot'' syntax}
 
 If we know the names of the tags, we can navigate a structure by using a
-Pandas-like ``dot" syntax. Check it out:
+Pandas-like ``dot'' syntax. Check it out:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 >>> soup.head.title
@@ -563,8 +564,8 @@ title
 
 \subsubsection{Accessing all attributes}
 
-In addition to treating an element (``\texttt{Tag}") as a dictionary to
-retrieve its element values, you can also use the ``\texttt{.attrs}" syntax to
+In addition to treating an element (``\texttt{Tag}'') as a dictionary to
+retrieve its element values, you can also use the ``\texttt{.attrs}'' syntax to
 get the dictionary directly:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
@@ -575,7 +576,7 @@ get the dictionary directly:
 {'class': ['pic']}
 \end{Verbatim}
 
-(As noted before, see how the value of the ``\texttt{class}" attribute is a
+(As noted before, see how the value of the ``\texttt{class}'' attribute is a
 list here.)
 
 \subsubsection{Getting just text with \texttt{.get\_text()}}

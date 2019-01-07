@@ -75,13 +75,13 @@ DATA 219 Notes -- Apr. 17, 2018
 
 \section{Feature selection}
 
-The ``curse of dimensionality" makes us inclined to actually use fewer
+The ``curse of dimensionality'' makes us inclined to actually use fewer
 features in our classifier than we have at our disposal. This is for two
 reasons:
 
 \begin{itemize}
 \itemsep.1em
-\item Many of the available features are likely to be ``noisy," meaning they
+\item Many of the available features are likely to be ``noisy,'' meaning they
 are only loosely correlated with the target feature, if at all. Including
 noisy features will make it more difficult for any classifier to separate the
 wheat from the chaff: the features which truly are predictive will get drowned
@@ -103,15 +103,15 @@ So how do we reduce the feature space? There are essentially three approaches:
 \begin{enumerate}
 \itemsep.1em
 \item \textbf{Subset selection}. We'll simply choose a subset of the original
-features and use those ``as is" (after normalizing them or one-hot-encoding
+features and use those ``as is'' (after normalizing them or one-hot-encoding
 them, of course).
-\item \textbf{Shrinkage} (a.k.a. ``\textbf{regularization}"). Especially
-popular with linear models, we can essentially ``tone down" some of the less
+\item \textbf{Shrinkage} (a.k.a. ``\textbf{regularization}''). Especially
+popular with linear models, we can essentially ``tone down'' some of the less
 important features by shrinking their coefficients towards zero.
 \item \textbf{Transforming the feature space}. In this case, we actually don't
 use the \textit{original} features at all; instead, we form a set of
 new features out of parts of the original features. This may sound weird --
-especially since our new features don't have any obvious ``meaning"; they're
+especially since our new features don't have any obvious ``meaning''; they're
 just combinations of some of the original ones -- but it can be very powerful
 and informationally efficient.
 \end{enumerate}
@@ -148,11 +148,11 @@ use. They are:
 \item none of them (just use the prior)
 \end{compactitem}
 
-The way we get the number ``$2^4$" is to reason as follows: ``each feature can
+The way we get the number ``$2^4$'' is to reason as follows: ``each feature can
 either be included, or excluded, in any feature set I choose. So for each
 of the four features, there are two independent choices (either take it or
 leave it) which leaves me with $2 \cdot 2 \cdot 2 \cdot 2$ different possible
-sets of features."
+sets of features.''
 
 The one using all of the features is most likely to overfit, and the one using
 none of them is most likely to underfit. Often the best-fitting classifier (on
@@ -164,7 +164,7 @@ So...how do we find that best-fitting classifier then?
 \subsubsection{Consider all subsets}
 
 The obvious solution is to say ``we've identified all possible subsets of
-features, let's try 'em!" And indeed we can do this if the number of features
+features, let's try 'em!'' And indeed we can do this if the number of features
 is modest. Train a classifier (whether Naive Bayes, kNN, or anything else)
 using only the features on a given set, compute the error rate, and then
 choose the set of features with the lowest error rate.
@@ -174,8 +174,8 @@ Here's some code that does just that (for Naive Bayes)\footnote{Notes: the
 categorical variables, so we can normalize one and one-hot the other. The
 \texttt{LabelBinarizer}, as we've seen is one way to one-hot variables;
 another approach is the \texttt{.get\_dummies()} method on Pandas DataFrame.
-Finally, the ``\texttt{operator}" thing is just a short way of telling Python
-``please sort this dictionary, but by value, not by key," so we can get the
+Finally, the ``\texttt{operator}'' thing is just a short way of telling Python
+``please sort this dictionary, but by value, not by key,'' so we can get the
 results back in percent-accuracy-order rather than
 alphabetical-order-of-feature-set.}:
 
@@ -284,7 +284,7 @@ other.
 \subsubsection{Sadly...}
 
 Now here's the deal. Although we might think we could declare victory with
-this ``consider all the possible subsets and choose the best" technique, it
+this ``consider all the possible subsets and choose the best'' technique, it
 turns out that except in very small cases, \textit{it's absolutely
 impossible.} Consider: what if instead of four features, we had forty?
 (Certainly not a large number of features by \textit{any} means.) We would
@@ -315,7 +315,7 @@ have long since died of heat death by the time we're finished considering
 subsets, even if we had every computer that had ever been made working
 non-stop on the problem.
 
-\subsection{``Greedy" approaches: forward \& backward selection}
+\subsection{``Greedy'' approaches: forward \& backward selection}
 
 So we have to find a way to choose a subset of features without considering
 every different possibility. The most common way to do this is to use a
@@ -328,7 +328,7 @@ time and considered further ahead, it would have made a different choice.
 (To further illustrate a greedy algorithm: imagine a chess program that always
 tried to take a piece if one was open to capture. It figures, ``hey, taking
 the opponent's pieces is a good thing, and there's a piece sitting there
-unprotected: why not take it?" Obviously such an algorithm might play well
+unprotected: why not take it?'' Obviously such an algorithm might play well
 against a newbie, but against even a modestly sophisticated player it would
 suck, since it would be easily lured into traps. Without being able to
 consider the longer-term consequences of what it's doing, it would make many
@@ -346,20 +346,20 @@ features, and see how each one does. Choose as the winner the feature that
 works the best in isolation.
 \item Now, for each of the $p-1$ remaining features, train a classifier with
 your original winner \textit{plus} the new one. Choose as the winner the
-``best"\footnote{I put ``best" in quotes here because it may well not actually
+``best''\footnote{I put ``best'' in quotes here because it may well not actually
 be the best two-feature classifier out of all possible two-feature
 classifiers, as we'll see.} \textit{two}-feature classifier.
 \item Repeat this for each of the $p-2, p-3, p-4, \dots$ remaining features,
-finding the best ``best" three-feature, four-feature, five-feature, $\dots$
+finding the best ``best'' three-feature, four-feature, five-feature, $\dots$
 classifier.
-\item Your final answer is the best of the ``best." Out of the ``best"
+\item Your final answer is the best of the ``best.'' Out of the ``best''
 one-feature, two-feature, \textit{etc.} classifiers, choose the one with the
 best performance. This is the feature set you'll declare the winner.
 \end{itemize}
 
 Two things are important to see here. First, you're training and considering a
 \textit{vastly} smaller number of classifiers than you are in the ``best
-subset" approach we did previously. For the forty feature case, you'll be
+subset'' approach we did previously. For the forty feature case, you'll be
 considering:
 
 \begin{align*}
@@ -389,7 +389,7 @@ else.
 
 \subsubsection{Backward selection}
 
-As you might have guessed, you can do this entire process ``in reverse":
+As you might have guessed, you can do this entire process ``in reverse'':
 
 \begin{itemize}
 \itemsep.1em
@@ -399,54 +399,54 @@ As you might have guessed, you can do this entire process ``in reverse":
 best performance.
 \item Now, repeatedly leave out another feature, and choose as a winner the
 best $p-2$-feature, $p-3$-feature, $p-4$-feature, $\dots$ classifier.
-\item Your final answer is the best of the ``best." Out of the ``best"
+\item Your final answer is the best of the ``best.'' Out of the ``best''
 $p-1$-feature, $p-2$-feature, \textit{etc.} classifiers, choose the one with
 the best performance. This is the feature set you'll declare the winner.
 \end{itemize}
 
 Backward selection has the same advantages and disadvantages as forward
 selection. Unsurprisingly, it will ordinarily \textit{not} produce the same
-``best" feature set that forward selection does (nor that best-subset does).
+``best'' feature set that forward selection does (nor that best-subset does).
 Often data scientists perform both forward and backward selection and then
 spend some time scrutinizing the feature sets each came up with to decide on
 their final, best feature set.
 
-\subsubsection{Evaluating classifier ``goodness"}
+\subsubsection{Evaluating classifier ``goodness''}
 
-By the way, I repeatedly referred to ``best performance" in the description
+By the way, I repeatedly referred to ``best performance'' in the description
 above. What does this mean in practice? 
 
-We know that more complex (``wiggly") classifiers will tend to overfit a
+We know that more complex (``wiggly'') classifiers will tend to overfit a
 data set. Hence we can't blindly use performance on a training set to choose
 between a four-feature classifier and a five-feature classifier, since the
 five-feature one will \textit{almost certainly win for the wrong reasons.} If
 it has more features to work with, it has more flexibility, and hence will
-surely ``wiggle" closer to the points it trains on. This could be a blessing
+surely ``wiggle'' closer to the points it trains on. This could be a blessing
 but also a curse, depending on whether it's really picking up signal or
 locking on to noise.
 
 There are two different ways of dealing with this problem in order to
-``fairly" compare classifiers of different complexities. I think of them as
+``fairly'' compare classifiers of different complexities. I think of them as
 the math-oriented and the computer-science-oriented ways:
 
 \begin{itemize}
 \itemsep.1em
 
-\item \textbf{The ``math-oriented" way.} If you use the entire data set to
+\item \textbf{The ``math-oriented'' way.} If you use the entire data set to
 train on, you can still adjust for the complexity factor by
 \textit{penalizing} more complex models in a principled way. The details are
 outside the scope of this class, but I'll throw the following buzzterms at you
 so that if you see them you'll know what category to file them under:
-w that more complex (``wiggly")
+w that more complex (``wiggly'')
 classifiers will tend to overfit a training set. Hence we can't blindly use
 the training-set 
 
-\textbf{``Mallows' $C_p$"}, \textbf{AIC}, \textbf{BIC}, and \textbf{adjusted
+\textbf{``Mallows' $C_p$''}, \textbf{AIC}, \textbf{BIC}, and \textbf{adjusted
 $R^2$}. All of these are ways of taking a model's error rate and adjusting it
 in light of how complex that model is, and therefore how likely it is to
 overfit.
 
-\item \textbf{The ``computer-science-oriented" way.} Just use a separate
+\item \textbf{The ``computer-science-oriented'' way.} Just use a separate
 training set and test set. Drr.
 
 \end{itemize}
@@ -456,11 +456,11 @@ training set and test set. Drr.
 
 For completeness, I briefly mention two other common methods of feature
 reduction. The first, most commonly used in linear regression/classification,
-goes by the general term ``\textbf{shrinkage}," and its two most common
+goes by the general term ``\textbf{shrinkage},'' and its two most common
 variants are called \textbf{ridge regression} and \textbf{lasso regression}.
-These can both be thought of as ways of ``partially including" features. Each
+These can both be thought of as ways of ``partially including'' features. Each
 of them has a parameter you can dial to control how aggressively they will
-``shrink" coefficients to zero. This helps when some of your features are
+``shrink'' coefficients to zero. This helps when some of your features are
 correlated with others, since dialing down their influence will prevent them
 from jointly dominating the prediction. The mathematics are subtle, although
 one point worth mentioning is that with lasso, feature coefficients can

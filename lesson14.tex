@@ -31,8 +31,8 @@ DATA 219 Notes -- Apr. 12, 2018
 Classification isn't the only machine learning task. Another one is called
 \textbf{association analysis}, in which the goal isn't to predict the class of
 new data items, but rather to determine which features of a data set have
-``interesting" relationships. Usually, ``interesting" means ``correlated in a
-way that can be taken advantage of."
+``interesting'' relationships. Usually, ``interesting'' means ``correlated in a
+way that can be taken advantage of.''
 
 The principles of Association Analysis are used in fields as diverse as
 bioinformatics, recommender systems, and cybersecurity intrusion detection.
@@ -45,7 +45,7 @@ placement and effective marketing campaigns.
 
 All competitive grocery stores today keep track of their customers' purchases
 as they check out. Even if they don't have a rewards program to lure customers
-into getting a store-specific ``VIP card," they still know which sets of
+into getting a store-specific ``VIP card,'' they still know which sets of
 products were bought together in a single trip to the store. Each such trip,
 consisting of multiple products being purchased, is called a
 \textbf{transaction}.
@@ -54,7 +54,7 @@ This type of association analysis relies on a huge matrix (DataFrame) of 1's
 and 0's. Each row is a transaction, and each column is a product the store
 sells. A 1 in an entry indicates that \textit{at least one} of that product
 was bought in that transaction. (We typically don't store quantities, but just
-binary information about ``did this purchase contain that item or not?")
+binary information about ``did this purchase contain that item or not?'')
 Here's one such data set:
 
 \begin{center}
@@ -85,40 +85,41 @@ Now, some terms:
 \itemsep.1em
 
 \item \textbf{itemset}: An itemset is a group of one or more items. For
-instance, ``\{apples,beer,cat\_food\}" is an itemset, as is ``\{diet\_soda\}".
+instance, ``\{apples,beer,cat\_food\}'' is an itemset, as is
+``\{diet\_soda\}''.
 
 \item \textbf{support count}: The support count for a given itemset is
 \textit{the fraction of transactions in the entire data set that contain that
-itemset.} In the sample data above, the support count for ``\{diet\_soda\}" is
+itemset.} In the sample data above, the support count for ``\{diet\_soda\}'' is
 $\frac{4}{7} = .571$, since four out of the seven transactions contained
-diet soda. The support for ``\{apples,chips\_ahoy,diapers\}" is just $\frac{2}{7}
+diet soda. The support for ``\{apples,chips\_ahoy,diapers\}'' is just $\frac{2}{7}
 = .286$.
 
 \item \textbf{association rule}: An association rule is a statement of a
 relationship between two itemsets. It looks like this: ``\{A,B\} $\Rightarrow$
-\{C\}," which means ``people who buy A and B tend to also buy C." The itemset
+\{C\},'' which means ``people who buy A and B tend to also buy C.'' The itemset
 before the arrow is called the \textbf{antecedent} and the one after it is
 called the \textbf{consequent}. Association
 rules are general correlations, not hard-and-fast mandates. Their reliability
 can be measured with the metrics below.
 
-\item \textbf{support}: An association rule's ``support" is the fraction of
+\item \textbf{support}: An association rule's ``support'' is the fraction of
 transactions in the data set that contain \textit{both} its antecedent
 \textit{and} its consequent. It's a measure of how widespread and applicable
-it is. The rule ``\{diet\_soda,apples\} $\Rightarrow$ \{beer\}" has a support of
+it is. The rule ``\{diet\_soda,apples\} $\Rightarrow$ \{beer\}'' has a support of
 just $\frac{2}{7} = .286$ in the data set above. A rule's support is always
 between 0 and 1.
 
-\item \textbf{confidence}: An association rule's ``confidence," on the other
+\item \textbf{confidence}: An association rule's ``confidence,'' on the other
 hand, is a measure of its reliability. It's \textit{the fraction of the times
 that it could apply where it's actually correct}. In terms of support, it's
 $\frac{\textrm{support(whole rule)}}{\textrm{support\_count(antecedent)}}$
-The rule ``\{diet\_soda,apples\} $\Rightarrow$ \{beer\}" has a support of
+The rule ``\{diet\_soda,apples\} $\Rightarrow$ \{beer\}'' has a support of
 $\frac{2}{4} = .5$ in the data set above, since out of the four times that
 diet soda and apples were purchased together, beer was also purchased in two
 of them. A rule's confidence is always between 0 and 1.
 
-\item \textbf{lift}: An association rule's ``lift" is a numerical measure of
+\item \textbf{lift}: An association rule's ``lift'' is a numerical measure of
 how much predictive power it has. The key concept is that we want to know how
 likely the consequent is to be satisfied when the antecedent is satisfied 
 \textit{relative to how likely the consequent is to be satisfied anyway.}
@@ -195,9 +196,10 @@ We have five items in our store, all of which have different priori
 probabilities of being purchased (about 60\% of all transactions have bananas,
 80\% have pizza, \textit{etc.}) but we've ensured that in addition to the
 purely random ones, we've got a solid \textit{thousand} transactions with both
-bacon and eggs. This should guarantee that ``\{bacon\} $\Rightarrow$ \{eggs\}"
+bacon and eggs. This should guarantee that ``\{bacon\} $\Rightarrow$
+\{eggs\}''
 comes out to be a meaningful association.\footnote{``...and \{eggs\}
-$\Rightarrow$ \{bacon\} too, right?" you ask. Well, not necessarily, or at
+$\Rightarrow$ \{bacon\} too, right?'' you ask. Well, not necessarily, or at
 least not as strong: since 70\% of the random transactions have eggs anyway,
 and only 10\% of them have bacon, we're going to get a lot of bacon-less
 egg-full transactions, which will dial down the confidence of that
@@ -227,8 +229,9 @@ itemsets = apriori(baskets, min_support=0.1, use_colnames=True)
 \end{center}
 
 This uses the so-called \textbf{apriori algorithm}. It takes place in two
-steps: first, generate all itemsets, and compute their ``support," but only
-those for a certain minimum support level (in this case, 0.1). The ``but only"
+steps: first, generate all itemsets, and compute their ``support,'' but only
+those for a certain minimum support level (in this case, 0.1). The ``but
+only''
 phrase is for simple combinatorics reasons: if you think about it, the number
 of possible itemsets is rather large if we have many columns. In fact, if we
 have $N$ columns, there are $2^N$ different itemsets!\footnote{Sample numbers:
@@ -296,9 +299,9 @@ association rules involving those item sets:
 \end{center}
 \normalsize
 
-As expected, ``\{bacon\} $\Rightarrow$ \{eggs\}" has a very high confidence
+As expected, ``\{bacon\} $\Rightarrow$ \{eggs\}'' has a very high confidence
 (and support, and lift), as do rules of the form ``\{bacon + various other
-stuff\} $\Rightarrow$ \{eggs\}." Even in this synthetic case, however, the
+stuff\} $\Rightarrow$ \{eggs\}.'' Even in this synthetic case, however, the
 lift values aren't all that high numerically, so don't expect them to be.
 
 

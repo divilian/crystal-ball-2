@@ -42,12 +42,12 @@ This is a good first attempt. Notice two assumptions/limitations, though:
 
 \begin{enumerate}
 \item We're assuming that the relationship between the two variables is
-\textit{linear} --- namely, that ``the first value times a constant" is a good
+\textit{linear} --- namely, that ``the first value times a constant'' is a good
 estimate for the second value. In reality, of course, the relationship is
 often more complex: it might be better modeled as the \textit{square} of the
-first value, for instance, or ``$e$ to the" first value, or the cube root of
+first value, for instance, or ``$e$ to the'' first value, or the cube root of
 the first value, \textit{etc.}
-\item We're assuming that the ``zero point" for the two variables coincide:
+\item We're assuming that the ``zero point'' for the two variables coincide:
 in other words, a zero for one value would on average roughly correspond to a
 zero for the other. In the above case, we're assuming that a person who got a
 0 on the SAT would have, on average, a 0 GPA. If this isn't appropriate, we
@@ -68,9 +68,9 @@ value boils down to:
 and we have to figure out values for $\alpha$, $\beta$, and $\sigma$.
 
 \vspace{.1in}
-My approach: identify a ``high-ish" value of the first variable, and estimate
+My approach: identify a ``high-ish'' value of the first variable, and estimate
 the roughly-on-average corresponding value of the second variable. Then do the
-same for a ``low-ish" value. Then, plug those into the familiar $y=mx+b$
+same for a ``low-ish'' value. Then, plug those into the familiar $y=mx+b$
 formula (or, in our case, $y=\alpha x + \beta$) you learned in middle school
 and solve for the slope and intercept.
 
@@ -122,7 +122,7 @@ num_hrs = np.random.normal(50,20,200).clip(0,100)
 score = num_hrs * 333333 + 26666666 + np.random.normal(0,10000000,200)
 \end{Verbatim}
 
-(The ``\texttt{.clip()}" makes sure all the \texttt{num\_hrs} values are
+(The ``\texttt{.clip()}'' makes sure all the \texttt{num\_hrs} values are
 between 0 and 100.)
 
 This looks pretty decent:
@@ -168,7 +168,7 @@ Patriots       746         634
 
 \subsubsection{Completely correlated categorical variables}
 
-Now let's add a ``\texttt{party\_color}" categorical variable that gives the
+Now let's add a ``\texttt{party\_color}'' categorical variable that gives the
 associated color of each voter's political party (blue for Democrats and red
 for Republicans). Since this is perfectly correlated with \texttt{party}, we
 can generate another vector from scratch with the same setup. The
@@ -186,7 +186,8 @@ includes the second argument in every position where the first is
 current example, we're saying ``for every place that the \texttt{party} vector
 has a \texttt{\textquotesingle Democrat\textquotesingle } value, put
 \texttt{\textquotesingle blue\textquotesingle } in this new vector you're
-making for me, and put \texttt{\textquotesingle red\textquotesingle } everywhere else."
+making for me, and put \texttt{\textquotesingle red\textquotesingle }
+everywhere else.''
 
 We thus (obviously) get perfect correlation:
 
@@ -203,7 +204,7 @@ Republican     0  920
 
 \subsubsection{Somewhat correlated categorical variables}
 
-Finally, let's create a ``\texttt{gun\_owner}" categorical variable which has
+Finally, let's create a ``\texttt{gun\_owner}'' categorical variable which has
 the value \texttt{True} or \texttt{False} for each voter: it should be true
 for roughly 44\% of Republicans and for 20\% of Democrats. For this, we can go
 back to our friend \texttt{np.where()}:
@@ -218,7 +219,7 @@ This time, our second and third arguments to \texttt{np.where()} are
 \textit{vectors themselves}. We're saying, ``in every position where
 \texttt{party} has a \texttt{\textquotesingle Democrat\textquotesingle }, use the corresponding value from our
 random vector that is 80\% \texttt{false}s. Otherwise, use the corresponding
-value from a different random vector that is 56\% \texttt{false}s."
+value from a different random vector that is 56\% \texttt{false}s.''
 
 Checking, we do get the desired correlation:
 
@@ -239,7 +240,7 @@ Republican    505    415
 Histograms are a great tool for seeing the distribution of a numerical,
 univariate sample. One problem with them, though, is that a data set doesn't
 uniquely determine a histogram: instead, we must specify parameters such as
-the bin size and the ``alignment" of the bins (\textit{i.e.}, where exactly
+the bin size and the ``alignment'' of the bins (\textit{i.e.}, where exactly
 the breaks occur), and the resulting display is colored by those choices.
 
 Consider this simple data set (from Janert, 2010):
@@ -261,8 +262,8 @@ plt.hist(data, bins=[0,1,2,3,4])
 \end{center}
 
 Our interpretation would probably be: ``looks like the values occur pretty
-uniformly throughout the range 1-3." But if we shifted our bin alignment to be
-on the ``halves" (0.5, 1.5, 2.5, ...), we get this:
+uniformly throughout the range 1-3.'' But if we shifted our bin alignment to be
+on the ``halves'' (0.5, 1.5, 2.5, ...), we get this:
 
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true]
 plt.hist(data, bins=[-.5,0.5,1.5,2.5,3.5,4.5])
@@ -273,7 +274,7 @@ plt.hist(data, bins=[-.5,0.5,1.5,2.5,3.5,4.5])
 \end{center}
 
 Now we may be liable to think: ``it looks like a steeply-peaked distribution
-with most values right near the center value of 2."
+with most values right near the center value of 2.''
 
 \vspace{.2in}
 Yet the data is the same!
@@ -284,7 +285,7 @@ Histograms have a couple other problems as well:
 \begin{itemize}
 \itemsep.1em
 \item They inherently lose information, since by definition data points with
-specific, precise values are munged into ``the nearest bin."
+specific, precise values are munged into ``the nearest bin.''
 \item They don't handle outliers very well. A single outlier way outside the
 normal range forces us to either (a) include a lot of empty cells in the
 middle, or (b) choose an unreasonably wide bin width that doesn't work for the
@@ -296,21 +297,21 @@ One solution to these problems is a more advanced technique called
 
 \subsection{Kernels}
 
-A ``kernel" is defined as a single, strongly-peaked function that has an area
+A ``kernel'' is defined as a single, strongly-peaked function that has an area
 under its curve of exactly 1. Normally (no pun intended!) we will use a
 \textit{Gaussian kernel}, which means ``a bell curve a la the normal
-distribution." 
+distribution.'' 
 
 One thing we have to decide is the \textit{width} of this kernel --- which in
 our case essentially means ``the standard deviation of the normal
-distribution we're using." This is kind of like having to choose the bin width
+distribution we're using.'' This is kind of like having to choose the bin width
 for histograms, but in practice it turns out not to 
 
-To form a KDE, we place a ``copy" of this kernel at each data point, and then
+To form a KDE, we place a ``copy'' of this kernel at each data point, and then
 add up all the kernel contributions to make a smooth curve.
 
 There are several different ways to do this with Python packages. The Seaborn
-library has a good ``\texttt{kdeplot()}" function. Using straight SciPy, we
+library has a good ``\texttt{kdeplot()}'' function. Using straight SciPy, we
 can call the \texttt{gaussian\_kde()} function and pass it the bandwidth as a
 second argument. This returns a function that can be used to evaluate the KDE
 at any data point. (Read that sentence again: a function that returns a
@@ -328,7 +329,7 @@ plt.plot(x_vals,kde(x_vals))
 \end{Verbatim}
 
 Choosing a larger kernel width effectively smooths out the KDE more, making
-each point ``fuzzier" with respect to its actual position. Choosing a narrower
+each point ``fuzzier'' with respect to its actual position. Choosing a narrower
 kernel width focuses each data point's contribution more at its actual value,
 which makes the plot choppier.
 
@@ -342,9 +343,9 @@ which makes the plot choppier.
 \end{figure}
 
 In practice, it's another parameter to play with. If the data follows a smooth
-distribution, you can use a wider bandwidth which will ``blur" each data point
+distribution, you can use a wider bandwidth which will ``blur'' each data point
 more and give a more intuitive view of the general distribution
-characteristics. If the distribution is more ``wiggly," though, you need a
+characteristics. If the distribution is more ``wiggly,'' though, you need a
 narrower bandwidth to see all the relevant detail.
 
 Like most things in Data Science (and in life), there's no one true

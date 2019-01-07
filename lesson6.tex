@@ -78,7 +78,7 @@ you information on some related aspect of a common phenomenon. Imagine if you
 found a data source giving vote totals for various political candidates, and a
 different data source documenting the financial donations that their campaigns
 received. An obvious question would be: ``to what extent do a candidate's
-contributions relate to his/her vote count?" This kind of analysis is only
+contributions relate to his/her vote count?'' This kind of analysis is only
 possible if the two data sets can be merged in a coherent way, so that the
 vote totals for a candidate are properly associated with the contributions to
 that same candidate's campaign.
@@ -93,8 +93,8 @@ are from different data sets entirely.
 
 The basic idea is that in order to meaningfully merge two DataFrames, one (or
 more) columns in the first table must be logically linked to one (or more)
-columns in the second. ``Logically linked" usually means ``having the same
-values in them." For example, consider these two DataFrames from a data source
+columns in the second. ``Logically linked'' usually means ``having the same
+values in them.'' For example, consider these two DataFrames from a data source
 like IMDB:
 
 \pagebreak
@@ -125,8 +125,8 @@ Star Wars       Lucas                  1977
  
 There are clearly questions we'd like to ask which involve both DataFrames
 together, rather than each in isolation. For instance, ``have actor salaries
-been going up over time?" or ``how often have various actors worked with
-specific directors?"
+been going up over time?'' or ``how often have various actors worked with
+specific directors?''
 
 Merging here is simple: we simply identify \textit{the common column} which
 unites rows from the two tables. Clearly, it's the film title: we know that
@@ -141,7 +141,7 @@ foreign key relationship is supposed to suggest that for every row in the
 \texttt{actors} table, its \texttt{film} value \textit{will} appear in one row
 of the \texttt{movies} table (namely, in that row's \texttt{title} column.)
 
-To ``join" these two DataFrames all in one fell swoop, we execute a command
+To ``join'' these two DataFrames all in one fell swoop, we execute a command
 like this:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
@@ -151,10 +151,10 @@ actors_movies = pd.merge(actors,movies,left_on="film",right_on="title")
 This produces a \textit{new} DataFrame that contains (1) all the columns of
 the two, and (2) a row for each pair of original rows that match on their
 movie title. Notice we had to specify \textit{two} arguments (besides the
-table names) to \texttt{pd.merge()}: ``\texttt{left\_on}" (for the name of the
-merging column in the first DataFrame) and ``\texttt{right\_on}" (for the
+table names) to \texttt{pd.merge()}: ``\texttt{left\_on}'' (for the name of the
+merging column in the first DataFrame) and ``\texttt{right\_on}'' (for the
 second). If these two columns had the same name, we could just specify a
-single argument called ``\texttt{on}" for the two.
+single argument called ``\texttt{on}'' for the two.
 
 \vspace{.2in}
 Here's what \texttt{actors\_movies} will look like:
@@ -190,7 +190,7 @@ which has the expected result.
 
 \vspace{.2in}
 \item The default merge operation (as we did above) is sometimes called an
-``\textbf{inner join}". This means that \textit{if there is no corresponding
+``\textbf{inner join}''. This means that \textit{if there is no corresponding
 match for a row in one of the DataFrames, there will be no associated row in
 the result.} This is normally what we want. In the movies example, if we don't
 have a row in the \texttt{movies} table for a particular film, then we don't
@@ -200,8 +200,8 @@ the actors in that film in the resulting merged DataFrame.
 Sometimes, we want to make sure that every row in the left (or right, or
 both) DataFrame appears in the result \textit{at least once}, though, with
 corresponding null values if necessary. We can do this by specifying
-"\texttt{left}", "\texttt{right}", or "\texttt{outer}" as the value of the
-``\texttt{how}" argument to \texttt{pd.merge()}:
+\texttt{'left'}, \texttt{'right'}, or \texttt{'outer'} as the value of the
+\texttt{'how'} argument to \texttt{pd.merge()}:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 df = pd.merge(votes,contributions,left_on=['first_name','last_name'],
@@ -226,8 +226,8 @@ Bullock         1964   Gravity                77
 \end{Verbatim}
 
 Then the resulting DataFrame would need to have two columns named
-``\texttt{year}", with different meanings. Pandas solves this by renaming the
-conflicting columns with a ``\texttt{\_x}" or ``\texttt{\_y}" suffix,
+``\texttt{year}'', with different meanings. Pandas solves this by renaming the
+conflicting columns with a ``\texttt{\_x}'' or ``\texttt{\_y}'' suffix,
 corresponding to the left/right tables in the join:
 
 \footnotesize
@@ -240,11 +240,12 @@ DiCaprio   1974     Inception  59                  Inception  Nolan      2010
 \end{Verbatim}
 \normalsize
 
-(which, of course, you can rename at will via ``\texttt{actors\_movies.columns}".)
+(which, of course, you can rename at will via
+``\texttt{actors\_movies.columns}''.)
 
-\item Finally, the above examples have all featured ``one-to-many" relationships
+\item Finally, the above examples have all featured ``one-to-many'' relationships
 between the two tables. (\textit{Many} actors star in \textit{one} movie.) But
-sometimes we have a ``many-to-many" relationship. Consider the following
+sometimes we have a ``many-to-many'' relationship. Consider the following
 example:
 
 \small
@@ -292,7 +293,7 @@ potentially end up with a lot of rows in our result.
 
 Btw, notice that poor \texttt{Wendell} was left out of the merged DataFrame
 entirely, since his costume did not have any accessories. We can include him
-by doing a ``right join" (or full ``outer join"):
+by doing a ``right join'' (or full ``outer join''):
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 pd.merge(costumes,children,on="costume",how="outer")
@@ -312,11 +313,11 @@ pd.merge(costumes,children,on="costume",how="outer")
 \end{enumerate}
 
 \pagebreak
-\subsection{``By the way...why?"}
+\subsection{``By the way...why?''}
 
 At this point you may be asking, ``if we just have to merge the DataFrames to
 do our analysis, why were they stored that way in the first place? Why not
-just have everything in one big CSV file?"
+just have everything in one big CSV file?''
 
 The answer has to do with \textit{redundancy of information}. Consider the
 merged \texttt{actors\_movies} table. It's not the most compact way of
@@ -342,9 +343,9 @@ most appropriate for storage and for communication to other potential users.
 Analysts will proceed to unnormalize select parts of it in order to perform
 certain analyses.
 
-\section{``Tidy" data}
+\section{``Tidy'' data}
 
-The term ``tidy" to describe a data set has sprung into prominence recently as
+The term ``tidy'' to describe a data set has sprung into prominence recently as
 a result of the excellent paper by Hadley Wickham (of R fame) who neatly
 captured the aspects of various data formatting choices that make life
 problematic for the analyst. 
@@ -358,12 +359,12 @@ variable for one object. For example: 5'6", female, 390 feet, Kylo Ren.
 \item \textbf{observation} -- a particular measurement that comprises all the
 information necessary to interpret that measurement. For example: Jeff's
 weight was 165 lbs., Jenny's golf score at Field \& Cross Links in the rain
-was 88. (In the first example, ``all the information necessary" includes
-``Jeff" and ``165"; in the second, it includes ``Jenny", ``Field \& Cross
-Links", ``rainy", and ``88".)
+was 88. (In the first example, ``all the information necessary'' includes
+``Jeff'' and ``165''; in the second, it includes ``Jenny'', ``Field \& Cross
+Links'', ``rainy'', and ``88''.)
 \item \textbf{observational unit} -- a collection of all the observations of a
-particular type. (``Golf performances" would be an observational unit,
-separate from a ``golfers" unit which contains information about golfers
+particular type. (``Golf performances'' would be an observational unit,
+separate from a ``golfers'' unit which contains information about golfers
 themselves, not their particular performances.)
 \end{compactitem}
 
@@ -371,7 +372,7 @@ themselves, not their particular performances.)
 The rule is: a data set is considered \textbf{tidy} if and only if:
 \begin{compactenum}
 \item Each observational unit is in its own table. (This is essentially
-the same as ``normalized," from the previous section.)
+the same as ``normalized,'' from the previous section.)
 \item In each table, each observation forms a row.
 \item In each table, each column header is a variable, and the column contains
 values.
@@ -393,7 +394,7 @@ and rectifying them. Here's one:
 \normalsize
 
 The problem here is that \textit{the column headings are actually values, not
-variables}. Think about it: ``\texttt{\$10-20k}" isn't the name of a variable
+variables}. Think about it: ``\texttt{\$10-20k}'' isn't the name of a variable
 which might have actual values, but the value (range) itself of some variable.
 
 Two questions: (1) What would the variable be for these column values? Answer:
@@ -416,12 +417,12 @@ which gives us the tidy version:
 3                   Catholic     <$10k        418
     ...
 \end{Verbatim}
-(Sometimes you'll hear the terms ``wide" and ``long" to refer to the untidy
+(Sometimes you'll hear the terms ``wide'' and ``long'' to refer to the untidy
 and tidy formats in this sort of example, respectively.)
 
 \vspace{.1in}
-By the way, the inverse operation of ``melt" is often called
-``\textbf{pivot}". To reverse the above transformation in Pandas, you should
+By the way, the inverse operation of ``melt'' is often called
+``\textbf{pivot}''. To reverse the above transformation in Pandas, you should
 use:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]

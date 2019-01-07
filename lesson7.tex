@@ -28,7 +28,7 @@ DATA 219 Notes -- Feb. 20, 2018
 One of the most common categories of information you'll ever deal with are
 those dealing with various aspects \textit{time}. It turns out this is
 considerably more complex than you might think at first. For one thing, the
-English word ``time" can mean several different things -- a point in time
+English word ``time'' can mean several different things -- a point in time
 (3:05pm on Feb.~20, 2018), an abstract wall clock time (3:05pm), a duration of
 time (2 and a half hours), \textit{etc.} For another, the clock and calendar
 systems that humans have devised are just plain weird. (Why does it go from
@@ -57,8 +57,8 @@ the stuff we need:
 \texttt{microseconds}. Anything else is ambiguous.)
 
     Don't think of the \texttt{timedelta} object you create as being
-intrinsically ``in" any particular unit -- just think of it as an ``amount of
-time," which could be expressed in any units.
+intrinsically ``in'' any particular unit -- just think of it as an ``amount of
+time,'' which could be expressed in any units.
 
     \texttt{timedelta}s can be positive or negative, and you can add or
 subtract them to/from each other.
@@ -92,9 +92,9 @@ False
     You can also compare dates with comparison operators like \texttt{<} and
 \texttt{>=}.
 
-\item \textbf{The \texttt{time} type.} A ``time," by itself, represents an
+\item \textbf{The \texttt{time} type.} A ``time,'' by itself, represents an
 abstract wall clock time, independent of any particular day. It doesn't mean
-``9am this morning" but rather ``9am's in general."
+``9am this morning'' but rather ``9am's in general.''
     \begin{itemize}
     \itemsep.1em
     \item \texttt{start\_of\_class = datetime.time(hours=14, minute=0)}
@@ -123,12 +123,12 @@ history}. Creation options include:
 or \texttt{date} objects, accordingly.
 
 \item Oh, and one more thing...I should add that there's such a thing as a
-``\texttt{timestamp}", which in Python isn't a class, but simply a word
+``\texttt{timestamp}'', which in Python isn't a class, but simply a word
 describing a \texttt{float} value. A timestamp is -- get this -- \textit{the
 number of seconds that have elapsed since the stroke of midnight Jan.~1, 1970
 UTC} (Coordinated Universal Time -- the Greenwich Mean
 Timezone).\footnote{That particular instant in time is sometimes called ``The
-Epoch." It's an arbitrary reference point, but was chosen in part to be
+Epoch.'' It's an arbitrary reference point, but was chosen in part to be
 approximately equal to Stephen's original birthday.} This will occasionally
 come up, since even though it's gibberish to humans, it is extremely easy to
 work with mathematically.
@@ -165,7 +165,7 @@ computer to automatically do so is somewhat of a challenge.
 \subsubsection{Parsing with \texttt{.strptime()}}
 
 The \texttt{date}, \texttt{time}, and \texttt{datetime} classes all have a
-(somewhat clunky) method called ``\texttt{.strptime()}" that you can call,
+(somewhat clunky) method called ``\texttt{.strptime()}'' that you can call,
 passing (1) a string representing a date, time, or datetime, and (2) a
 formatting string telling the method how to interpret it. This is best seen
 through an example:
@@ -178,10 +178,10 @@ start_of_class = datetime.datetime.strptime(my_string, "%m/%d/%Y %H:%M")
 2018-02-20 14:00:00
 \end{Verbatim}
 
-This example demonstrates a full ``round-trip" operation: we started with a
+This example demonstrates a full ``round-trip'' operation: we started with a
 \texttt{string}, parsed it into a \texttt{datetime}, and then printed it back
 to the screen as a \texttt{string}. Note that the format of the printout
-didn't match the format of ``\texttt{my\_string}"; this is okay. What matters
+didn't match the format of ``\texttt{my\_string}''; this is okay. What matters
 internally to our program is that our date \& time objects \textit{represent}
 the right things, not that they are printed in certain ways.
 
@@ -213,14 +213,14 @@ ones (others are in the docs):
 
 You have to be really careful here and just go slow. Examine the date and/or
 time input that you have in your data set, and work out which bits of info,
-combined with which literal characters (like ``\texttt{/}" and ``\texttt{:}"
+combined with which literal characters (like ``\texttt{/}'' and ``\texttt{:}''
 in the example above), appear in which order.
 
 \subsubsection{Formatting with \texttt{.strftime()}}
 
-Complementarily to \texttt{.strptime()} is ``\texttt{.strftime()}". (Note that
-the ``p" stands for ``\textbf{p}arse," while
-the ``f" stands for ``\textbf{f}ormat.") This is the reverse operation: given
+Complementarily to \texttt{.strptime()} is ``\texttt{.strftime()}''. (Note that
+the ``p'' stands for ``\textbf{p}arse,'' while
+the ``f'' stands for ``\textbf{f}ormat.'') This is the reverse operation: given
 a \texttt{date}, \texttt{time}, or \texttt{datetime} \textit{object}, spit it
 out as a string of characters. This isn't used nearly as often, but it
 occasionally is, and it's useful to know as a translation mechanism.

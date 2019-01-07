@@ -12,7 +12,7 @@ we'll use this semester (scikit-learn, NumPy, SciPy, Pandas, Matplotlib,
 
 \textbf{Note:} make sure to get Python \textbf{3.*}, not \textbf{2.*}!! (They
 are \textit{not} mutually compatible.) The number(s) after the dot don't
-matter so much. But before the dot \textit{must} be a \textbf{``3"}.
+matter so much. But before the dot \textit{must} be a \textbf{``3''}.
 
 Don't worry: all the stuff you learned using Python Jupyter Notebooks still
 applies! The only difference is that using an IDE like Spyder is not
@@ -42,7 +42,7 @@ creating your own \texttt{.py} files directly.
     \item Pandas Series \& DataFrames
         \begin{compactitem}
         \itemsep.1em
-        \item The ``index"
+        \item The ``index''
         \item \texttt{.iloc} vs. \texttt{.loc} vs. neither
         \item Single ints/labels vs. slices vs. lists
         \item Queries
@@ -55,7 +55,7 @@ creating your own \texttt{.py} files directly.
 \subsection{Multi-list iteration}
 
 Suppose you have:
-%\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+%\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
     episode7 = [ 9, 6, 10, 10, 9, 10, 10, 10 ]
     episode8 = [ 9, 7,  4,  8, 8, 10, 10,  7 ]
 %\end{Verbatim}
@@ -65,14 +65,14 @@ viewer gave the two movies.
 \begin{enumerate}
 \itemsep.1em
 \item One way to do it (caveman style):
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 avgSW = []
 for i in range(len(episode7)):
     avgSW.append((episode7[i]+episode8[i])/2)
 \end{Verbatim}
 
 \item Another way to do it (modern idiomatic Python):
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 avgSW = []
 for e7, e8 in zip(episode7, episode8):
     avgSW.append((e7+e8)/2)
@@ -86,8 +86,8 @@ for e7, e8 in zip(episode7, episode8):
 Sometimes you can run into trouble when trying to update a Pandas DataFrame.
 For instance, take this DataFrame:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-    >>> print(characters)
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+>>> print(characters)
                            rank  saber   side
     name                                     
     Darth Vader       Sith Lord    red   Dark
@@ -100,8 +100,8 @@ For instance, take this DataFrame:
 
 This query works just fine:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-    >>> characters.loc['Kylo Ren':'Rey']['rank']
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+>>> characters.loc['Kylo Ren':'Rey']['rank']
     name
     Kylo Ren    Apprentice
     Rey         Apprentice
@@ -109,8 +109,8 @@ This query works just fine:
 \end{Verbatim}
 
 so naturally you'd think you could do this:
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-    >>> characters.loc['Kylo Ren':'Rey']['rank'] = 'Jedi'
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+>>> characters.loc['Kylo Ren':'Rey']['rank'] = 'Jedi'
 \end{Verbatim}
 
 Alas, no: \texttt{A value is trying to be set on a copy of a slice from a
@@ -118,8 +118,8 @@ DataFrame.}
 
 The solution is to use this syntax:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-    >>> characters.loc['Kylo Ren':'Rey','rank'] = 'Jedi'
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+>>> characters.loc['Kylo Ren':'Rey','rank'] = 'Jedi'
 \end{Verbatim}
 
 (Your mileage may vary.)
@@ -131,12 +131,12 @@ You can do a quick and dirty contingency table in Pandas using
 \texttt{.value\_counts()} (possibly in conjunction with \texttt{.groupby()}):
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-    >>> characters.side.value_counts()
+>>> characters.side.value_counts()
     Light    4
     Dark     2
     Name: side, dtype: int64
 
-    >>> characters.groupby('rank').side.value_counts()
+>>> characters.groupby('rank').side.value_counts()
     rank         side 
     Apprentice   Dark     1
                  Light    1
@@ -151,7 +151,7 @@ The \texttt{pd.crosstab()} function is a bit easier on the eyes, though, and
 can compute margins:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-    >>> side_saber = pd.crosstab(characters.side, columns=characters.saber, 
+>>> side_saber = pd.crosstab(characters.side, columns=characters.saber, 
                                                              margins=True)
     saber  blue  green  red  All
     side                        
@@ -162,7 +162,7 @@ can compute margins:
 
 Get overall percentages with:
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-    >>> side_saber / side_saber.loc['All']['All'] * 100
+>>> side_saber / side_saber.loc['All']['All'] * 100
     saber       blue      green        red         All
     side                                              
     Dark    0.000000   0.000000  33.333333   33.333333
@@ -172,7 +172,7 @@ Get overall percentages with:
 
 or by column by doing:
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-    >>> side_saber / side_saber.loc['All'] * 100
+>>> side_saber / side_saber.loc['All'] * 100
     saber   blue  green    red         All
     side                                  
     Dark     0.0    0.0  100.0   33.333333
@@ -182,7 +182,7 @@ or by column by doing:
 
 By rows is a bit trickier:
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-    >>> side_saber.div(side_saber['All'],axis=0) * 100
+>>> side_saber.div(side_saber['All'],axis=0) * 100
     saber       blue      green         red    All
     side                                          
     Dark    0.000000   0.000000  100.000000  100.0
@@ -198,14 +198,14 @@ By rows is a bit trickier:
 \pagebreak
 \subsection{Notched boxplots}
 
-You can add the argument ``\texttt{notch=True}" to
-``\texttt{aDataFrame.boxplot()}" to get a ``notched" boxplot. This visually
+You can add the argument ``\texttt{notch=True}'' to
+``\texttt{aDataFrame.boxplot()}'' to get a ``notched'' boxplot. This visually
 indicates whether or not there is a stat sig diff between groups, based on
 \textit{whether the notched areas overlap}:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-    >>> students.boxplot('sat',by='gender',notch=True)
-    >>> students.boxplot('height',by='gender',notch=True)
+>>> students.boxplot('sat',by='gender',notch=True)
+>>> students.boxplot('height',by='gender',notch=True)
 \end{Verbatim}
 
 \begin{center}
