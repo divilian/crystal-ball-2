@@ -1,41 +1,5 @@
-\documentclass[12pt]{article}
 
-\addtolength{\textwidth}{.8in}
-\addtolength{\hoffset}{-.4in}
-\addtolength{\textheight}{1in}
-\addtolength{\voffset}{-1in}
-
-\usepackage{wasysym}
-\usepackage{multicol}
-\usepackage{amsfonts}
-\usepackage{graphicx}
-\usepackage{hyperref}
-\usepackage{enumerate}
-\usepackage{parskip}
-\usepackage{paralist}
-\usepackage{upquote} % to convert funny quotes to straight quotes
-\setlength{\parindent}{15pt}
-\pagestyle{empty}
-
-\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
-
-\begin{document}
-
-\begin{center}
-\begin{Large}
-DATA 219 Notes -- Jan. 25, 2018
-\end{Large}
-\end{center}
-
-\section{Administuff}
-
-\begin{compactitem}
-
-\item Ink it in: \textbf{DataFest: Penn State, April 13-15}! Details
-forthcoming. I'll need a firm yes-or-no from everyone by class time on
-\textbf{Thursday February 8th.}
-
-\end{compactitem}
+\chapter{Synthetic data sets, JSON}
 
 \section{Generating synthetic data sets}
 
@@ -55,7 +19,7 @@ arrays according to several statistical distributions. Suppose you wanted to
 create a data set with two \textit{uncorrelated} variables. You'd just
 generate two arrays, one at a time:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 heights = np.random.normal(65, 8, 100)
 sat_scores = np.random.normal(1400, 350, 100)
 \end{Verbatim}
@@ -69,7 +33,7 @@ If two variables are \textit{completely} correlated, then one is simply a
 direct (linear) function of the other. That's easy to accomplish by creating
 only \textit{one} randomly, and then using it to compute the other:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 weights_lbs = np.random.normal(150, 30, 100)
 weights_kg = weights_lbs / 2.2
 \end{Verbatim}
@@ -86,7 +50,7 @@ noise}. ``Noise'' is a somewhat misleading word that's used in a variety of
 statistical situations: here it means ``other (linearly additive) influences
 that affect the second variable besides just the value of the first.'' To wit:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 sat_scores = np.random.normal(1400, 350, 100)
 gpas = sat_scores * (2.5 / 1400) + np.random.normal(0, 1, 100)
 \end{Verbatim}
@@ -99,9 +63,9 @@ Notice that the second component of \texttt{gpas} is a normally distributed
 NumPy provides a way to generate a categorical data set with certain
 frequencies, through its \texttt{np.random.choice()} function:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-np.random.choice(['Steelers','Redskins','Giants'])
-'Redskins'
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+>>> np.random.choice(['Steelers','Redskins','Giants'])
+    'Redskins'
 \end{Verbatim}
 
 Useful arguments include:
@@ -117,10 +81,10 @@ must sum to 1, and NumPy dumbly will not normalize it for you.)
 \end{compactitem}
 
 A more complicated example:
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-np.random.choice(['Steelers','Redskins','Giants'], size=10, p=[.3,.6,.1])
-['Redskins' 'Redskins' 'Giants' 'Redskins' 'Redskins' 'Steelers' 'Redskins'
- 'Steelers' 'Redskins' 'Giants']
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
+>>> np.random.choice(['Steelers','Redskins','Giants'], size=10, p=[.3,.6,.1])
+    ['Redskins' 'Redskins' 'Giants' 'Redskins' 'Redskins' 'Steelers' 'Redskins'
+     'Steelers' 'Redskins' 'Giants']
 \end{Verbatim}
 
 \section{JSON}
@@ -157,7 +121,7 @@ treat in the ordinary way.
 In Python, we have the \texttt{json} package, which you can import like any
 other:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
     import json
 \end{Verbatim}
 
@@ -179,7 +143,7 @@ So, for instance, to load a file \texttt{info.json} into a Python object
 called ``\textit{my\_stuff}'':
 
 \small
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
     with open('info.json','r') as f:
         my_stuff = json.load(f)
 \end{Verbatim}
@@ -188,7 +152,7 @@ called ``\textit{my\_stuff}'':
 We could parse and access the Luke Skywalker file just like this:
 
 \small
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
     with open('luke.json','r') as f:
         luke = json.load(f)
     print(luke['lightsaber color'])
