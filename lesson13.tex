@@ -1,39 +1,17 @@
 
-\documentclass[12pt]{article}
+\chapter{ML classifiers: kNN}
 
-\addtolength{\textwidth}{.8in}
-\addtolength{\hoffset}{-.4in}
-\addtolength{\textheight}{1in}
-\addtolength{\voffset}{-1in}
+Let's return to the ML classification problem, for which Na\"{i}ve Bayes and
+Friends from Lesson~\ref{ch:naiveBayes} are so far our only solution.
 
-\usepackage{amsmath}
-\usepackage{graphicx}
-\usepackage{upquote} % to convert funny quotes to straight quotes
-\usepackage{amsfonts}
-\usepackage{multicol}
-\usepackage{paralist}
-\setlength{\parindent}{15pt}
-
-\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
-
-
-\begin{document}
-
-\begin{center}
-\begin{Large}
-DATA 219 Notes -- Apr. 5, 2018
-\end{Large}
-\end{center}
-
-\section{k-Nearest Neighbors classifiers}
-
-Another common approach to the ML classification problem is sort of at the
-opposite extreme from Naive Bayes. Instead of very generally assuming that
-each of the features is an independent and separate indicator of a data
-point's class, the \textbf{kNN} (for ``$k$-nearest neighbors'') algorithm
-assumes that a point's features are very much bound together. In order to
-classify a point, a kNN classifier finds the \textit{closest} training points
-to it, and predicts the class that those points suggest (majority rules).
+In some ways the technique in this lesson is at the opposite extreme from
+Na\"{i}ve Bayes. Instead of very generally assuming that each of the features
+is an independent and separate indicator of a data point's class (as the
+``Na\"{i}ve Bayes assumption'' did) the \textbf{kNN} (for
+\textbf{``\textit{k}-nearest neighbors''}) algorithm assumes that a point's
+features are very much bound together. In order to classify a point, a kNN
+classifier finds the \textit{closest} training points to it, and predicts the
+class that those points suggest (majority rules).
 
 The parameter $k$ in kNN is simply the number of ``closest training points''
 we'll consider. It is nearly always an odd number, so that in the two-class
@@ -113,8 +91,7 @@ You can use \texttt{np.where()} function to create one-hot vectors, or, use
 the scikit-learn package's helpful ``\texttt{LabelBinarizer.fit\_transform}
 function:
 
-\small
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 from sklearn.preprocessing import LabelBinarizer
 lb = LabelBinarizer()
 lightsaber = lb.fit_transform(df.lightsaber)
@@ -123,19 +100,17 @@ lightsaber = lb.fit_transform(df.lightsaber)
 
 Careful: although this function takes a Series, it returns a NumPy array:
 
-\small
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 >>> print(df.lightsaber.head())
-0      red
-1     blue
-2      red
-3    green
-
+    0      red
+    1     blue
+    2      red
+    3    green
 >>> lb.fit_transform(df.lightsaber)[0:4]
-array([[0, 0, 1],
-       [1, 0, 0],
-       [0, 0, 1],
-       [0, 1, 0]])
+    array([[0, 0, 1],
+           [1, 0, 0],
+           [0, 0, 1],
+           [0, 1, 0]])
 \end{Verbatim}
 \normalsize
 
@@ -147,18 +122,17 @@ You'll have to stick all your transformed variables back together with
 Let's use the scikit-learn library to compare 3-NN with Naive Bayes. First, we
 load the data and split it randomly into training and test sets:
 
-\small
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 w = pd.read_csv("warriors.csv")
 train = w.sample(frac=.7)
 test = w.drop(train.index)
 \end{Verbatim}
 \normalsize
 
+\vspace{-.05in}
 Next, we one-hot encode the features (all of which are categorical):
-
-\small
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\vspace{-.1in}
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 def one_hot_this_puppy(df):
     lb = LabelBinarizer()
     lightsaber = lb.fit_transform(df.lightsaber)
@@ -172,10 +146,11 @@ test_features = one_hot_this_puppy(test)
 \end{Verbatim}
 \normalsize
 
+\vspace{-.05in}
 We'll call scikit-learn's Naive Bayes implementation:
+\vspace{-.15in}
 
-\small
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 from sklearn.naive_bayes import MultinomialNB
 naive_bayes = MultinomialNB()
 naive_bayes.fit(train_features,train.type.as_matrix())
@@ -183,10 +158,11 @@ nb_predictions = naive_bayes.predict(test_features)
 \end{Verbatim}
 \normalsize
 
+\vspace{-.05in}
 and its KNN implementation:
+\vspace{-.15in}
 
-\small
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 from sklearn.neighbors import KNeighborsClassifier
 knn = KNeighborsClassifier(n_neighbors=3)
 knn.fit(train_features, train.type.as_matrix())
@@ -194,28 +170,27 @@ knn_predictions = knn.predict(test_features)
 \end{Verbatim}
 \normalsize
 
+\vspace{-.05in}
 Finally, print the results:
+\vspace{-.15in}
 
-\small
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 >>> print("Naive Bayes got {:.2f}% correct.".format(
-    sum(nb_predictions == test.type)/len(test)*100))
+        sum(nb_predictions == test.type)/len(test)*100))
 >>> print("kNN(3) got {:.2f}% correct.".format(
-    sum(knn_predictions == test.type)/len(test)*100))
-
-Naive Bayes got 79.00% correct.
-kNN(3) got 86.33% correct.
+        sum(knn_predictions == test.type)/len(test)*100))
+    Naive Bayes got 79.00% correct.
+    kNN(3) got 86.33% correct.
 \end{Verbatim}
 \normalsize
 
 Pretty close, but for this data set, 3-NN has the edge.
-\pagebreak
 
+\pagebreak
 It's also illustrative to examine \textit{which} points Naive Bayes called
 correctly but 3-NN missed, and vice versa.
 
-\footnotesize
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 nb_right = []
 knn_right = []
 for i in range(len(nb_predictions)):
@@ -223,7 +198,6 @@ for i in range(len(nb_predictions)):
         nb_right.append(i)
     if nb_predictions[i] != test.type.iloc[i] == knn_predictions[i]:
         knn_right.append(i)
-
 nb_right_examples = test.iloc[nb_right]
 knn_right_examples = test.iloc[knn_right]
 
@@ -233,9 +207,8 @@ knn_right_examples = test.iloc[knn_right]
 >>> print(knn_right_examples)
 \end{Verbatim}
 
-\scriptsize
 \begin{multicols}{2}
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=none]
 Naive Bayes got these right:
     beard  height  demeanor lightsaber  type
 7      no  medium      calm      green  Jedi
@@ -251,7 +224,7 @@ Naive Bayes got these right:
 909    no   short  menacing      green  Jedi
 \end{Verbatim}
 \columnbreak
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=none]
 kNN got these right:
     beard  height  demeanor lightsaber  type
 1      no   short      calm       blue  Sith
@@ -300,8 +273,7 @@ easy answer to this, and that it varies widely by data set and in fact even by
 the training set chosen.
 
 Here's some code to try all (odd) values of $k$ between 1 and 301:
-\small
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 corrects_train = []
 corrects_test = []
 for k in np.arange(1,301,2):
@@ -314,30 +286,36 @@ for k in np.arange(1,301,2):
 \end{Verbatim}
 \normalsize
 
-The plot looks like this:
+The resulting plot is in Figure~\ref{fig:varyingK}. The performance on the
+training data is \textit{usually} better, as expected, although you'll see
+some values of $k$ here in the 80-100 range where paradoxically that's not
+true. More importantly, you'll notice that the line shows no simple pattern.
+Very low numbers are good, and then performance tails off...but then it goes
+back up again when $k$ is around 100 or so. Moreover, \textit{the apparent
+optimal choice of k depends on the training set.}
 
-\begin{center}
+\begin{figure}
+\centering
 \includegraphics[width=0.9\textwidth]{k_vs_performance.pdf}
-\end{center}
+\caption{Correct classification rate as a function of $k$.}
+\label{fig:varyingK}
+\end{figure}
 
-The performance on the training data is \textit{usually} better, as expected,
-although you'll see some values of $k$ here in the 80-100 range where
-paradoxically that's not true. More importantly, you'll notice that the line
-shows no simple pattern. Very low numbers are good, and then performance tails
-off...but then it goes back up again when $k$ is around 100 or so. Moreover,
-\textit{the apparent optimal choice of k depends on the training set.} Here
-are some more results from the same code, with different randomly-chosen
-training sets:
+Figure~\ref{fig:varyingTrainingSet} has some more results from the same code,
+with different randomly-chosen training sets. We see some similarities here,
+but by no means perfect uniformity. This is because a kNN classifier is a
+high-variance classifier (especially for low $k$), as described in the next
+section.
 
-\begin{center}
+\begin{figure}
+\centering
 \includegraphics[width=0.31\textwidth]{k_vs_performance1.pdf}
 \includegraphics[width=0.31\textwidth]{k_vs_performance2.pdf}
 \includegraphics[width=0.31\textwidth]{k_vs_performance3.pdf}
-\end{center}
+\caption{Correct classification rate vs.~$k$, for different training sets.}
+\label{fig:varyingTrainingSet}
+\end{figure}
 
-We see some similarities here, but by no means perfect uniformity. This is
-because a kNN classifier is a high-variance classifier (especially for low
-$k$), as described in the next section.
 
 \section{The ``Bias-Variance Tradeoff''}
 
