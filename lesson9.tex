@@ -1,37 +1,13 @@
-\documentclass[12pt]{article}
 
-\addtolength{\textwidth}{.8in}
-\addtolength{\hoffset}{-.4in}
-\addtolength{\textheight}{1in}
-\addtolength{\voffset}{-1in}
-
-\usepackage{amsmath}
-\usepackage{graphicx}
-\usepackage{upquote} % to convert funny quotes to straight quotes
-\usepackage{amsfonts}
-\usepackage{paralist}
-\setlength{\parindent}{15pt}
-
-\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
-
-
-\begin{document}
-
-\begin{center}
-\begin{Large}
-DATA 219 Notes -- Mar. 13, 2018
-\end{Large}
-\end{center}
-
-\section{Accessing data from databases}
+\chapter{Accessing databases}
 
 ``Database'' is a very loose term for ``a repository of information that can
 be readily accessed.'' When we use that term in Data Science, we mean a data
 source that is managed by a piece of software called a \textbf{DBMS}, or
 \textbf{database management system}. (True, a bunch of lists, dictionaries, or
 Pandas DataFrames is also ``a repository of information that can be
-accessed,''
-but when we use the term \textbf{database} we're not talking about that.)
+accessed,'' but when we use the term \textbf{database} we're not talking about
+that.)
 
 There are principally two reasons to learn how to access data from databases:
 
@@ -50,7 +26,7 @@ which will manage the sheer size and scope for us, and work with it a little
 at a time.
 \end{itemize}
 
-\subsection{Two kinds of databases}
+\section{Two kinds of databases}
 
 There are essentially two kinds of databases in the world:
 \textbf{relational}, and \textbf{NoSQL}.
@@ -83,7 +59,7 @@ others store objects and binary data; some store information as a graph
 proven to be a flexible, broadly-applicable query language that many different
 vendors have adopted and which suits many data needs.
 
-\subsection{SQLite}
+\section{SQLite}
 
 SQLite is a really slim, trim RDBMS that stores all of its data in a single
 file. When you work with SQLite (or any RDBMS), though, you don't think in
@@ -92,13 +68,13 @@ file(s) in some strange format is invisible to you as the user of the data,
 and this is in fact one of the great powers of the relational model:
 separating the conceptual data from the storage implementation.
 
-\subsubsection{Interfacing to SQLite}
+\subsection{Interfacing to SQLite}
 
 ``Connecting'' to a relational database basically means establishing a
 communication path over which you can talk SQL. In Python, this is pretty
 easy:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 import sqlite3
 
 con = sqlite3.connect('my_local_file')
@@ -123,9 +99,9 @@ you can do in SQL is much more restricted, and hence the language is easier to
 learn.
 
 Here's the general paradigm:
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 query_results = cur.execute("YOUR SQL STATEMENT GOES HERE")
-results_list = query_results.fetchall():
+results_list = query_results.fetchall()
 \end{Verbatim}
 
 The string inside the call to \texttt{.execute()} is called ``an embedded SQL
@@ -138,25 +114,25 @@ the database, go \textit{actually} load all that data into Python.'' You
 large. Instead, there is a \texttt{.fetchone()} command that can get one
 result at a time, that you can use in a loop.
 
-\subsubsection{Browsing the tables}
+\subsection{Browsing the tables}
 
 How do we know what tables exist in the database? We can run this command:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 query_results = cur.execute("SELECT name FROM sqlite_master WHERE type='table'")
 print(query_results.fetchall())
 \end{Verbatim}
 
 to find out.
 
-\subsubsection{Inhaling an entire table}
+\subsection{Inhaling an entire table}
 
 Once we've got the names of the tables, we often won't even need the
 \texttt{cur} object any more, since Pandas provides a short cut. Suppose we
 want to read an entire table into a DataFrame. \textit{If the data is small
 enough to load into memory}, we can do this with a one-liner:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 df = pd.read_sql("select * from table_name", con)
 \end{Verbatim}
 
@@ -168,7 +144,7 @@ with code like the above, get all the table names, read each one into a
 DataFrame, and continue in Pandas Land, forgetting all about SQLite. Now, you
 can leverage all the knowledge you've learned up to this point. Bingo!
 
-\subsubsection{(Slightly) more complex SQL}
+\subsection{(Slightly) more complex SQL}
 
 Because the data is sometimes too large to do this, though, it's worth
 learning a little SQL so you can make the RDBMS do some of the heavy lifting,
@@ -184,7 +160,7 @@ returning the entire result, use \texttt{count(*)}, \texttt{max()},
 \texttt{min()}, \textit{etc.}:
 
 \footnotesize
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=lines]
 select count(*) from table_name
 select max(col1) from table_name
 \end{Verbatim}
@@ -194,7 +170,7 @@ select max(col1) from table_name
 operation) tack on a ``limit'' expression:
 
 \footnotesize
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=lines]
 select * from table_name limit 10
 \end{Verbatim}
 \normalsize
@@ -203,7 +179,7 @@ select * from table_name limit 10
 comma-separated list of column names:
 
 \footnotesize
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=lines]
 select col1 from table_name
 select col1,col2,col3 from table_name limit 10
 \end{Verbatim}
@@ -212,7 +188,7 @@ select col1,col2,col3 from table_name limit 10
 \item To get only certain rows, add a ``where clause'' after the table name:
 
 \footnotesize
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=lines]
 select * from table_name where col1==val1
 select col2 from table_name where col1==val1 and col2>val2
 select col1,col2 from table_name where col1==val1 and not col2>val2 limit 10
@@ -226,9 +202,10 @@ and \texttt{not}, and parentheses for grouping.)
 querying membership in a set:
 
 \scriptsize
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=lines]
 select * from table_name where col1 in (val1,val2)
-select col1,col2 from table_name where col1==val1 and not col2 in (val1,val2,val3) limit 10
+select col1,col2 from table_name where col1==val1 and
+            not col2 in (val1,val2,val3) limit 10
 \end{Verbatim}
 \normalsize
 
@@ -236,24 +213,26 @@ select col1,col2 from table_name where col1==val1 and not col2 in (val1,val2,val
 functionality) use the word \texttt{distinct} before the column names:
 
 \scriptsize
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=lines]
 select distinct * from table_name
-select col1,col2 from table_name where not col1 in (val1,val2,val3) or col2!=val4 limit 5
+select col1,col2 from table_name where not col1 in (val1,val2,val3) or
+            col2!=val4 limit 5
 \end{Verbatim}
 \normalsize
 
 The \texttt{distinct} option is useful in conjunction with \texttt{count()}:
 \scriptsize
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=lines]
 select count(distinct col1) from table_name
 \end{Verbatim}
 \normalsize
 
 \item You can have SQLite do sorting with ``\texttt{order by}'':
 \scriptsize
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=lines]
 select * from table_name order by col1
-select distinct col1,col2 from table_name where col3==val1 order by col2,col1 desc limit 5
+select distinct col1,col2 from table_name where col3==val1
+            order by col2,col1 desc limit 5
 \end{Verbatim}
 \normalsize
 
@@ -263,18 +242,20 @@ with the \texttt{desc} keyword.
 \item SQL supports a ``group by'' operation very much like Pandas does:
 
 \scriptsize
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=lines]
 select col1,count(*) from table_name group by col1
-select col1,max(col2) from table_name where col3==val1 group by col2 order by col1 desc limit 5
+select col1,max(col2) from table_name where col3==val1 group by col2
+            order by col1 desc limit 5
 \end{Verbatim}
 \normalsize
 
 \item Finally, to do a merge/join operation, use the \texttt{join} keyword:
 
 \scriptsize
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=lines]
 select * from table_1 join table_2 on col1==col2
-select col1,col2 from table_1 join table_2 on table_1.x==table_2.q where col3>val1 limit 5
+select col1,col2 from table_1 join table_2 on table_1.x==table_2.q
+            where col3>val1 limit 5
 \end{Verbatim}
 \normalsize
 
