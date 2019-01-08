@@ -44,38 +44,12 @@
 %
 %
 
-\documentclass[12pt]{article}
 
-\addtolength{\textwidth}{.8in}
-\addtolength{\hoffset}{-.4in}
-\addtolength{\textheight}{1in}
-\addtolength{\voffset}{-1in}
+\chapter{Feature selection}
 
-\usepackage{amsmath}
-\usepackage{graphicx}
-\usepackage{upquote} % to convert funny quotes to straight quotes
-\usepackage{amsfonts}
-\usepackage{multicol}
-\usepackage{paralist}
-\usepackage{icomma}  % no spaces after commas
-\setlength{\parindent}{15pt}
-
-\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
-
-
-\begin{document}
-
-\begin{center}
-\begin{Large}
-DATA 219 Notes -- Apr. 17, 2018
-\end{Large}
-\end{center}
-
-\section{Feature selection}
-
-The ``curse of dimensionality'' makes us inclined to actually use fewer
-features in our classifier than we have at our disposal. This is for two
-reasons:
+The ``curse of dimensionality'' (p.~\pageref{sec:curse}) makes us inclined to
+actually use fewer features in our classifier than we have at our disposal.
+This is for two reasons:
 
 \begin{itemize}
 \itemsep.1em
@@ -117,9 +91,9 @@ and informationally efficient.
 I'll say much more about the first of these, since the latter two require some
 more advanced math.
 
-\subsection{Subset selection}
+\section{Subset selection}
 
-Let's say we have four features available in our original data set (call them
+Let's say we have four features in our original data set (call them
 $F_0,F_1,F_2, \textrm{and} F_3$, to stick with Python's numbering
 convention.) As stated above, we may not want to actually use all four. So
 which ones could we use?
@@ -159,7 +133,7 @@ ones.
 
 So...how do we find that best-fitting classifier then?
 
-\subsubsection{Consider all subsets}
+\subsection{Consider all subsets}
 
 The obvious solution is to say ``we've identified all possible subsets of
 features, let's try 'em!'' And indeed we can do this if the number of features
@@ -167,7 +141,8 @@ is modest. Train a classifier (whether Naive Bayes, kNN, or anything else)
 using only the features on a given set, compute the error rate, and then
 choose the set of features with the lowest error rate.
 
-Here's some code that does just that (for Naive Bayes)\footnote{Notes: the
+Figure~\ref{fig:allSubsetsCode} (p.~\pageref{fig:allSubsetsCode}) contains
+some code that does just that (for Na\"{i}ve Bayes)\footnote{Notes: the
 \texttt{is\_numeric\_dtype()} function distinguishes between numeric and
 categorical variables, so we can normalize one and one-hot the other. The
 \texttt{LabelBinarizer}, as we've seen is one way to one-hot variables;
@@ -175,16 +150,23 @@ another approach is the \texttt{.get\_dummies()} method on Pandas DataFrame.
 Finally, the ``\texttt{operator}'' thing is just a short way of telling Python
 ``please sort this dictionary, but by value, not by key,'' so we can get the
 results back in percent-accuracy-order rather than
-alphabetical-order-of-feature-set.}:
+alphabetical-order-of-feature-set.}. The output I got when I ran this was:
 
-\pagebreak
-\begin{center}
-\line(1,0){400}
-\end{center}
-\scriptsize
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-import numpy as np
-import pandas as pd
+beard,height,lightsaber: 93.87
+beard,demeanor,height,lightsaber: 93.40
+beard,demeanor,lightsaber: 93.20
+beard,lightsaber: 90.00
+demeanor,height,lightsaber: 90.00
+height,lightsaber: 90.00
+demeanor,lightsaber: 90.00
+lightsaber: 90.00
+beard,demeanor,height: 85.80
+beard,height: 85.60
+\end{Verbatim}
+
+\begin{figure}
+\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=single]
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.naive_bayes import MultinomialNB
 from pandas.api.types import is_numeric_dtype
@@ -230,7 +212,6 @@ scores = {}
 for feature_set in feature_sets:
     train_features = prepare_this_puppy(train,feature_set)
     test_features = prepare_this_puppy(test,feature_set)
-
     naive_bayes = MultinomialNB()
     naive_bayes.fit(train_features,train.type.as_matrix())
     nb_predictions = naive_bayes.predict(test_features)
@@ -242,34 +223,10 @@ sorted_scores = sorted(scores.items(), key=operator.itemgetter(1), reverse=True)
 for feature_set, score in sorted_scores[:10]:
     print("{}: {:.2f}".format(','.join(sorted(feature_set)),score))
 \end{Verbatim}
-\normalsize
-\begin{center}
-\line(1,0){400}
-\end{center}
+\caption{Trying all possible feature subsets with Na\"{i}ve Bayes.}
+\label{fig:allSubsetsCode}
+\end{figure}
 
-\pagebreak
-The output I got when I ran this was:
-
-\begin{center}
-\line(1,0){400}
-\end{center}
-\footnotesize
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-beard,height,lightsaber: 93.87
-beard,demeanor,height,lightsaber: 93.40
-beard,demeanor,lightsaber: 93.20
-beard,lightsaber: 90.00
-demeanor,height,lightsaber: 90.00
-height,lightsaber: 90.00
-demeanor,lightsaber: 90.00
-lightsaber: 90.00
-beard,demeanor,height: 85.80
-beard,height: 85.60
-\end{Verbatim}
-\normalsize
-\begin{center}
-\line(1,0){400}
-\end{center}
 
 By a hair, the feature set that excludes \texttt{demeanor} but includes
 everything else did the best, with 93.87\% accuracy. Right behind it was the
@@ -279,7 +236,7 @@ this artificial data set, all of the features \textit{were} pretty indicative
 of Jediness/Sithness, and they all \textit{were} fairly independent of each
 other.
 
-\subsubsection{Sadly...}
+\subsection{Sadly...}
 
 Now here's the deal. Although we might think we could declare victory with
 this ``consider all the possible subsets and choose the best'' technique, it
@@ -296,14 +253,16 @@ a \textit{thousand} different classifiers on our training data \textit{every
 second}, here's how long it would take:
 
 \footnotesize
+\begin{adjustwidth}{-10pt}{10pt}
 \begin{align*}
 1,099,511,627,776 \times 
     \frac{1\ \textrm{second}}{1000\ \textrm{classifiers}} \times
     \frac{1\ \textrm{minute}}{60\ \textrm{seconds}} \times
     \frac{1\ \textrm{hour}}{60\ \textrm{minutes}} \times
     \frac{1\ \textrm{day}}{24\ \textrm{hours}} \times
-    \frac{1\ \textrm{year}}{365\ \textrm{days}} = 34.9\ \textrm{years}
+    \frac{1\ \textrm{year}}{365\ \textrm{days}} = \textrm{\textbf{34.9\ years}}
 \end{align*}
+\end{adjustwidth}
 
 \normalsize
 Ouch. You probably haven't even been alive for that long. And obviously the
@@ -313,7 +272,7 @@ have long since died of heat death by the time we're finished considering
 subsets, even if we had every computer that had ever been made working
 non-stop on the problem.
 
-\subsection{``Greedy'' approaches: forward \& backward selection}
+\section{``Greedy'' approaches}
 
 So we have to find a way to choose a subset of features without considering
 every different possibility. The most common way to do this is to use a
@@ -333,11 +292,12 @@ consider the longer-term consequences of what it's doing, it would make many
 decisions that looked good in the near-term but which would soon be revealed
 as dumb.)
 
-\subsubsection{Forward selection}
+\subsection{Forward selection}
 
-The most common greedy algorithm used for feature selection is simply this:
+The most common greedy algorithm used for feature selection is called
+\textbf{forward selection}:
 
-\begin{itemize}
+\begin{enumerate}
 \itemsep.1em
 \item Train $p$ different one-feature classifiers, where $p$ is the number of
 features, and see how each one does. Choose as the winner the feature that
@@ -353,7 +313,7 @@ classifier.
 \item Your final answer is the best of the ``best.'' Out of the ``best''
 one-feature, two-feature, \textit{etc.} classifiers, choose the one with the
 best performance. This is the feature set you'll declare the winner.
-\end{itemize}
+\end{enumerate}
 
 Two things are important to see here. First, you're training and considering a
 \textit{vastly} smaller number of classifiers than you are in the ``best
@@ -385,11 +345,12 @@ two-feature classifier, you might well choose $F_4$ and $F_{39}$ instead of
 $F_{26}$, which was a great solo artist but didn't pair up as well with anyone
 else.
 
-\subsubsection{Backward selection}
+\subsection{Backward selection}
 
-As you might have guessed, you can do this entire process ``in reverse'':
+As you might have guessed, you can do this entire process ``in reverse,''
+which is appropriately called \textbf{backward selection}:
 
-\begin{itemize}
+\begin{enumerate}
 \itemsep.1em
 \item Start by including \textit{every} feature (instead of none of them).
 \item Train $p$ different $p-1$-feature classifiers, each of which
@@ -400,7 +361,7 @@ best $p-2$-feature, $p-3$-feature, $p-4$-feature, $\dots$ classifier.
 \item Your final answer is the best of the ``best.'' Out of the ``best''
 $p-1$-feature, $p-2$-feature, \textit{etc.} classifiers, choose the one with
 the best performance. This is the feature set you'll declare the winner.
-\end{itemize}
+\end{enumerate}
 
 Backward selection has the same advantages and disadvantages as forward
 selection. Unsurprisingly, it will ordinarily \textit{not} produce the same
@@ -409,7 +370,7 @@ Often data scientists perform both forward and backward selection and then
 spend some time scrutinizing the feature sets each came up with to decide on
 their final, best feature set.
 
-\subsubsection{Evaluating classifier ``goodness''}
+\subsection{Evaluating classifier ``goodness''}
 
 By the way, I repeatedly referred to ``best performance'' in the description
 above. What does this mean in practice? 
@@ -449,8 +410,7 @@ training set and test set. Drr.
 
 \end{itemize}
 
-\small
-\subsection{Shrinkage}
+\section{Shrinkage}
 
 For completeness, I briefly mention two other common methods of feature
 reduction. The first, most commonly used in linear regression/classification,
@@ -466,7 +426,7 @@ actually be reduced all the way to \textit{zero}, which effectively eliminates
 them and performs a kind of feature selection as in the previous section.
 (Ridge regression does not have this property.)
 
-\subsection{Transforming the feature space}
+\section{Transforming the feature space}
 
 Finally, one of the coolest approaches to reducing the feature space is to
 \textit{transform it into a different set of dimensions}. This may sound
