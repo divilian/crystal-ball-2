@@ -1,32 +1,8 @@
 % ADD SKLEARN STUFF (SEE JEDISCIKIT.PY)
 % INCLUDING ONE-HOT ENCODING
 
-\documentclass[12pt]{article}
 
-\addtolength{\textwidth}{.8in}
-\addtolength{\hoffset}{-.4in}
-\addtolength{\textheight}{1in}
-\addtolength{\voffset}{-1in}
-
-\usepackage{amsmath}
-\usepackage{graphicx}
-\usepackage{upquote} % to convert funny quotes to straight quotes
-\usepackage{amsfonts}
-\usepackage{paralist}
-\setlength{\parindent}{15pt}
-
-\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
-
-
-\begin{document}
-
-\begin{center}
-\begin{Large}
-DATA 219 Notes -- Mar. 22, 2018
-\end{Large}
-\end{center}
-
-\section{Machine Learning (ML) classifiers}
+\chapter{Machine Learning classifiers}
 
 For some folks, the coolest and most exciting parts of Data Science are the
 under-the-hood techniques for doing prediction and analytics. We'll look at a
@@ -62,25 +38,25 @@ labeled data as a set of \textbf{test data}. We sort of pretend we don't know
 the answers for the test data, feed them to the algorithm which has been
 trained on the \textit{training} points, and then score how well it did.
 
-One of the simplest (and quickest to compute) classifiers around is called the
+One of the simplest (and quickest) classifiers around is called the
 \textbf{Naive Bayes classifier}, for reasons which will become apparent. In
 some ways, it's the rock-bottom, no-frills default algorithm for
 classification. One reason it's important is that it's simple and actually
 works surprisingly (even embarrassingly) well in many cases. Another reason is
-that even when it doesn't turn out in the end to have the best performance,
+that even when it doesn't turn out to have the best performance,
 it's still a \textbf{baseline} which other algorithms' performance can be
 compared to. A researcher might report: ``our whiz-bang algorithm X got 89.4\%
 of examples correct on this test set, compared with 83.7\% for straightforward
 Naive Bayes.''
 
-\subsection{Background: Probability}
+\section{Background: Probability}
 
 Probability theory is an area of mathematics that deals with
 \textit{quantifying uncertainty}. We may not be sure that something is going
 to happen, but we want to be precise about \textit{how} sure we are, given
 everything else we may know.
 
-\subsubsection{Terms}
+\subsection{Terms}
 
 Some terms: an \textbf{outcome} is something that may (or may not) happen.
 This varies widely depending on the domain: a child that's born may or may not
@@ -100,11 +76,11 @@ outcomes}. This will vary depending on what's under consideration; it might be
 \{ male, female \} in one case and \{ red, blonde, brunette, bald, other \} in
 another case.
 
-We'll also use the notation $\overline{\cdot}$ to mean ``any outcome
-\textit{except} something.'' For instance, $\overline{\textrm{red}}$ means
-``the train passenger had a hair color \textit{other than} red.''
+We'll also use the notation $\overline{\phantom{xx}}$ (overbar) to mean ``any
+outcome \textit{except} something.'' For instance, $\overline{\textrm{red}}$
+means ``the train passenger had a hair color \textit{other than} red.''
 
-\subsubsection{Probability measures}
+\subsection{Probability measures}
 
 A \textbf{probability measure} is a function that tells us intuitively how
 likely an outcome is to occur. We'll use the simple notation ``P($\cdot$)'' for
@@ -120,7 +96,7 @@ or bald) = .6, P(any hardcover book) = .08. We'll say that P($\Omega$) will be
 1: after all, \textit{something} has to happen, even if it's ``the customer
 didn't buy anything,'' an outcome to which we'll assign a probability.
 
-\subsubsection{``Joint'' probability}
+\subsection{``Joint'' probability}
 
 Very commonly, we'll be considering the likelihood that two different events
 \textit{both} occur. For instance, perhaps we're interested in the probability
@@ -139,7 +115,7 @@ how to compute the joint probability from the individual ones, though (yet).
 
 Finally, note that P(A,B) is the same thing as P(B,A).
 
-\subsubsection{``Conditional'' probability}
+\subsection{``Conditional'' probability}
 
 Another notion we'll use a great deal is \textbf{conditional} probability,
 written with a vertical bar like P(red $| \overline{\textrm{female}}$). This
@@ -173,7 +149,7 @@ Finally, note that P(A$|$B) is \textbf{\textit{not}} the same thing as
 P(B$|$A). In general, these are very different numbers. Work out the pinterest
 example further in your head to see why.
 
-\subsubsection{The relationship between joint and conditional}
+\subsection{The relationship between joint and conditional}
 
 Mathematically, here's how these two concepts are related. If A and B are two
 events, then:
@@ -198,7 +174,7 @@ P(\textrm{pinterest} | \textrm{male}) &= \frac{P(\textrm{male},
                     &= \frac{.04}{.15} = .267 \\
 \end{align*}
 
-\subsubsection{Bayes' Rule}
+\subsection{Bayes' Rule}
 
 Knowing how joint and conditional probabilities are related, and knowing that
 P(A,B) = P(B,A), we can derive the following law:
@@ -213,7 +189,7 @@ This is called \textbf{Bayes' Rule} (sometimes \textbf{Bayes' Law} or
 Bayes. It is one of the most influential (and controversial, actually)
 statements in statistics and even all of mathematics.
 
-\subsubsection{Independence}
+\subsection{Independence}
 
 We need one more background concept before we attack Naive Bayes Classifiers,
 and that is the \textbf{independence} of events.
@@ -300,7 +276,7 @@ we have the \textit{joint} event ``bearded, short, menacing, and red,'' what's
 the \textit{conditional} probability of them being a Jedi (or Sith)? If we
 estimate the first as .8 and the second as .2, we won't sound the alarm.
 
-\subsection{Using Bayes' rule}
+\section{Using Bayes' rule}
 
 With Bayes' rule, we can rewrite these as:
 
@@ -367,7 +343,7 @@ indicative of Jedi-ness (which we hope), then they certainly \textit{do} vary
 together. But the Naive Bayes classifier says ``aw heck, let's just throw
 caution to the wind and see how things work out.''
 
-\subsection{A numerical example}
+\section{A numerical example}
 
 Let's work out the numerical answer (numerator only) for the training data
 listed earlier. First, we consider \textit{only} the five \texttt{Jedi} rows,
@@ -395,7 +371,7 @@ P(\textrm{red} \ |\ \textrm{Sith}) \cdot P(\textrm{Sith}) = \\
 \frac{5}{10} = .0064\\
 \end{align*}
 
-\subsubsection{Throw away the denominator}
+\subsection{Throw away the denominator}
 
 These are the two numerators. To get true probabilities, we have to divide by
 the denominators, of course. But the nice thing is: \textit{the denominators
@@ -414,7 +390,7 @@ Sith: sound the alarm.''
 How can we automate this in Python? Let's assume that our data is in a Pandas
 DataFrame, as shown above. Now imagine writing this function:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 def predict(beard, height, demeanor, lightsaber):
     ...
 \end{Verbatim}
@@ -422,13 +398,13 @@ def predict(beard, height, demeanor, lightsaber):
 This function takes as input a test (unlabeled) point and returns a prediction
 for it: either the word ``Jedi'' or the word ``Sith.''
 
-\pagebreak    % remove this next time I teach the class
 
 We'll do most of the work outside the function, actually. We'll read in the
 file and then pre-compute all the probabilities that we'll need for our
 calculations. If you think it through, the calculations above imply the need
 for the following probabilities:
 
+\pagebreak
 \begin{itemize}
 \itemsep.1em
 \item $P(label)$ for every one of the target labels (these are the ``priors'')
@@ -467,7 +443,7 @@ $P(\textrm{no}|\textrm{Sith})$\footnote{Recall that ``\texttt{yes}'' and
 These are all straightforward to compute with Pandas. First, we read the file
 into a DataFrame (called ``\texttt{w}'' for ``warriors''):
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 import numpy as np
 import pandas as pd
 w = pd.read_csv("warriors.csv")
@@ -477,7 +453,7 @@ I find it convenient to create a dictionary, called something like
 ``\texttt{probs}'' to store all the probabilities. To compute the priors, all
 we have to do is figure out what fraction of the rows go with each label:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 probs = {}
 probs['Jedi'] = len(w[w.type=='Jedi'])/len(w)
 probs['Sith'] = len(w[w.type=='Sith'])/len(w)
@@ -488,7 +464,7 @@ For the conditionals like ``$P(\textrm{calm}|\textrm{Sith})$'', we ask:
 fraction also have \texttt{calm} labels? That boils down to this:
 
 \footnotesize
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 probs['calm|Sith'] = (len(w[(w.type=='Sith') & (w.demeanor=='calm')]) /
     len(w[(w.type=='Sith')]))
 \end{Verbatim}
@@ -499,13 +475,17 @@ that we're repeating a lot of very similar code here, and making slight edits
 to each one, and that there's a better, more general way. You're right. Stay
 tuned for the next section.)
 
-\pagebreak
 
 Now for the actual \texttt{predict()} function. All we have to do is multiply
 everything out per the above equations and see which of the two numerators is
-greater.
+greater. The result is in Figure~\ref{fig:predictFunc}. Easy peasy. Note that
+we don't use the \texttt{w} variable inside this function at all. We've
+already computed all the \texttt{probs}, and once we've done that, the
+DataFrame and the data itself ceases to matter. We run the function just by
+passing it the values derived from our spycam:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{figure}
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 def predict(beard, height, demeanor, lightsaber):
     jediness = (probs[beard+"|Jedi"] *
                 probs[height+"|Jedi"] *
@@ -522,22 +502,19 @@ def predict(beard, height, demeanor, lightsaber):
     else:
         return "Sith"
 \end{Verbatim}
+\caption{Our Naive Bayes ML \texttt{predict} function.}
+\label{fig:predictFunc}
+\end{figure}
 
-Easy peasy. Note that we don't use the \texttt{w} variable inside this
-function at all. We've already computed all the \texttt{probs}, and once we've
-done that, the DataFrame and the data itself ceases to matter. We run the
-function just by passing it the values derived from our spycam:
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 >>> predict("yes","tall","calm","blue")
-'Jedi'
-
+    'Jedi'
 >>> predict("no","tall","menacing","red")
-'Sith'
+    'Sith'
 \end{Verbatim}
 
 
-\subsection{Estimating confidence}
+\section{Estimating confidence}
 
 Our \texttt{predict()} function, as written, just gives a binary answer:
 either \texttt{Sith} or \texttt{Jedi}. It may be useful to know \textit{how
@@ -565,7 +542,7 @@ So let's enhance our \texttt{predict()} function to return a list of
 .5 to 1, meaning ``only 50\% confident in our prediction'' all the way to
 ``absolutely 100\% confident in our prediction.'' To wit:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 def predict(beard, height, demeanor, lightsaber):
     ...
     if jediness > sithness:
@@ -576,12 +553,11 @@ def predict(beard, height, demeanor, lightsaber):
 
 Taking it for a spin:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 >>> predict("no","tall","menacing","red")
-['Sith', 0.9760957241941071]
-
+    ['Sith', 0.9760957241941071]
 >>> predict("yes","tall","menacing","blue")
-['Jedi', 0.7298292697172792]
+    ['Jedi', 0.7298292697172792]
 \end{Verbatim}
 
 We're incredibly confident that our beardless, tall, menacing, red-wielder is
@@ -589,7 +565,7 @@ a Sith, but not nearly so confident that our bearded, tall, menacing
 blue-wielder is a Jedi.
 
 \vspace{.2in}
-\subsection{Coding it more generally}
+\section{Coding it more generally}
 
 The above calculation of the probabilities left something to be desired, since
 it was hardcoded and repetitive. We can improve on this by writing our code in
@@ -597,13 +573,8 @@ a more general way, rather than explicitly referring to problem-specific names
 like \texttt{'Jedi'} and \texttt{'demeanor'} and \texttt{'blue'}. Here's one
 way to do all the calculations:
 
-\pagebreak
 
-\begin{center}
-\line(1,0){400}
-\end{center}
-\footnotesize
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 df = pd.read_csv("...")
 
 probs = {}
@@ -618,10 +589,6 @@ for label in df[target].drop_duplicates():
                 len(df[(df[target] == label) & (df[feature] == value)]) / 
                     len(df[df[target] == label]))
 \end{Verbatim}
-\normalsize
-\begin{center}
-\line(1,0){400}
-\end{center}
 
 Here's we're assuming (1) the last column of the DataFrame is the target, and
 (2) all the values in the columns are unique (\textit{e.g.}, that we won't
@@ -634,17 +601,13 @@ of taking exactly four parameters named ``\texttt{beard}'',
 ``\texttt{demeanor}'', \textit{etc.}, it will take a \textit{list} of
 parameter values, so that it can be called like this:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-predict(['yes','tall','menacing','blue'])
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+>>> predict(['yes','tall','menacing','blue'])
 \end{Verbatim}
 
 Here's one implementation of the function:
 
-\begin{center}
-\line(1,0){400}
-\end{center}
-\footnotesize
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 def predict(values):
     scores = []
     top_prob = 0
@@ -659,16 +622,12 @@ def predict(values):
             top_answer = label
     return [ top_answer, top_prob / sum(scores) ]
 \end{Verbatim}
-\normalsize
-\begin{center}
-\line(1,0){400}
-\end{center}
 
 We use the variable \texttt{scores} to keep a list of the numerators for each
 target label: this is only necessary to compute the confidence level in the
 result.
 
-\subsection{Measuring performance}
+\section{Measuring performance}
 
 So how well does this classifier work? This depends on how we measure its
 ``goodness.'' Commonly, we'll simply ask, ``what percentage of the time is it
@@ -679,7 +638,7 @@ As we know, we can't test a classifier's performance on the data it's trained
 on and expect to get anything accurate. So we'll need to split our data into a
 training set and a test set. This can be done easily in Pandas with:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 complete_data_set = pd.read_csv("warriors.csv")
 train = complete_data_set.sample(frac=.7)
 test = complete_data_set.drop(train.index)
@@ -698,7 +657,7 @@ to compute our accuracy. All we need to do is iterate through the
 \texttt{test} set, passing each row to \texttt{predict()} and seeing whether
 we get the correct answer:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 num_correct = 0
 for i in range(len(test)):
     row = test.iloc[i]
@@ -713,11 +672,11 @@ print("We got " + str(num_correct/len(test)*100) +
 We get a different answer every time we run our program, since it will choose
 a different training/test split in each case.
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 We got 82.63% correct on the test data.
 \end{Verbatim}
 
-\subsection{Numerical/continuous variables}
+\section{Numerical/continuous variables}
 
 In all the examples above, we had categorical features. Computing something
 like ``$P(\textrm{calm}|\textrm{Jedi})$'' is thus just a matter of counting the
@@ -763,22 +722,20 @@ Our Gaussian Naive Bayes assumption will be that \textit{for each class, the
 \texttt{Jedi} rows, and calculate their \texttt{height}s' mean and standard
 deviation, we get:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 >>> warriors[warriors.type=='Jedi'].height.mean()
-64.0571428571429
-
+    64.0571428571429
 >>> warriors[warriors.type=='Jedi'].height.std()
-9.661931704216865
+    9.661931704216865
 \end{Verbatim}
 
 Performing the same calculation for the \texttt{Sith} rows gives us:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 >>> warriors[warriors.type=='Sith'].height.mean()
-68.3902173913043
-
+    68.3902173913043
 >>> warriors[warriors.type=='Sith'].height.std()
-9.319673312968604
+    9.319673312968604
 \end{Verbatim}
 
 Looks like Sith Lords are a bit taller than Jedi in general, and slightly less
@@ -790,7 +747,7 @@ inches. We'll need to know the value of the density at $x$=69 for both our
 estimated Jedi and estimated Sith distributions. Using the SciPy library, we
 can get ``frozen'' density functions for each distribution:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 import scipy.stats
 jedi_height = scipy.stats.norm(64.0571428571429, 9.661931704216865)
 sith_height = scipy.stats.norm(68.3902173913043, 9.319673312968604)
@@ -799,12 +756,11 @@ sith_height = scipy.stats.norm(68.3902173913043, 9.319673312968604)
 and then, to calculate the densities, we just call \texttt{.pdf()} on those
 objects:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 >>> jedi_height.pdf(69)
-0.036230663486274517
-
+    0.036230663486274517
 >>> sith_height.pdf(69)
-0.042717943988373371
+    0.042717943988373371
 \end{Verbatim}
 
 Not surprisingly, the Sith number comes out a fair bit higher, since according
@@ -826,13 +782,13 @@ density function at any point, \texttt{.ppf()} to get quantile,
 statistical things like moments, confidence intervals, differential entropy,
 survival functions, \textit{etc.} See the documentation for details.
 
-\subsubsection{Incorporating into the classifier}
+\subsection{Incorporating into the classifier}
 
 Let's add this feature to our classifier. First, the not-so-generally-coded
 version, which had lines like this:
 
 \footnotesize
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 probs['tall|Sith'] = (len(w[(w.type=='Sith') & (w.demeanor=='tall')]) /
     len(w[(w.type=='Sith')]))
 \end{Verbatim}
@@ -841,7 +797,7 @@ probs['tall|Sith'] = (len(w[(w.type=='Sith') & (w.demeanor=='tall')]) /
 Since \texttt{height} is now numeric, we need to replace all those
 height-related lines with code like this:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 sith_heights = w[w.type == 'Sith'].height
 sith_height = scipy.stats.norm(sith_heights.mean(),sith_heights.std())
 jedi_heights = w[w.type == 'Jedi'].height
@@ -851,10 +807,7 @@ jedi_height = scipy.stats.norm(jedi_heights.mean(),jedi_heights.std())
 ``\texttt{sith\_height}'' is now our frozen distribution function. In 
 \texttt{predict()}, then, we simply use it as another multiplier:
 
-\begin{center}
-\line(1,0){400}
-\end{center}
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 def predict(beard, height, demeanor, lightsaber):
     jediness = (probs[beard+"|Jedi"] *
                 probs[demeanor+"|Jedi"] *
@@ -873,9 +826,6 @@ def predict(beard, height, demeanor, lightsaber):
     else:
         return "Sith"
 \end{Verbatim}
-\begin{center}
-\line(1,0){400}
-\end{center}
 
 Notice we've removed the ``\texttt{probs[height+"|Jedi"]}'' lines,
 since they're no longer applicable: \texttt{height} is numeric now. Instead,
@@ -887,12 +837,11 @@ code, we need to intelligently distinguish between numeric and categorical
 columns. This can be done via the \texttt{.dtype} accessor on a DataFrame
 column:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 >>> print(w.lightsaber.dtype)
-dtype('O')
-
+    dtype('O')
 >>> print(w.height.dtype)
-dtype('float64')
+    dtype('float64')
 \end{Verbatim}
 
 (The ``\texttt{O}'' stands for ``object,'' which is Pandas' non-intuitive way of
@@ -904,11 +853,7 @@ function which more intelligently detects any numeric type (ints, floats,
 
 Our generic implementation begins with:
 
-\begin{center}
-\line(1,0){400}
-\end{center}
-\footnotesize
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 probs = {}
 densities = {}
 target = df.columns[-1]
@@ -917,10 +862,6 @@ numeric_features = [ c for c in df.columns[:-1]
 categorical_features = [ c for c in df.columns[:-1]
     if not np.issubdtype(df[c].dtype, np.number) ]
 \end{Verbatim}
-\begin{center}
-\line(1,0){400}
-\end{center}
-\normalsize
 
 We're creating a \texttt{densities} dictionary, somewhat similar to our
 \texttt{probs} dictionary, to store feature-specific information for our
@@ -930,11 +871,7 @@ will store frozen density functions.
 
 We now populate \texttt{densities} (and \texttt{probs}):
 
-\begin{center}
-\line(1,0){400}
-\end{center}
-\footnotesize
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 for label in df[target].drop_duplicates():
     rows_with_this_label = df[df[target] == label]
     probs[label] = len(rows_with_this_label)/len(df)
@@ -948,10 +885,6 @@ for label in df[target].drop_duplicates():
                 len(df[(df[target] == label) & (df[feature] == value)]) / 
                     len(df[df[target] == label]))
 \end{Verbatim}
-\normalsize
-\begin{center}
-\line(1,0){400}
-\end{center}
 
 Our generic \texttt{predict()} function needs to be adjusted somewhat, since
 if we just pass a list of values, we can't tell \textit{which} feature a
@@ -959,11 +892,7 @@ numeric value is supposed to go with. There are various ways to solve this,
 but we'll choose to pass a key/value pair string here (like
 \texttt{"height=69.3"}):
 
-\footnotesize
-\begin{center}
-\line(1,0){400}
-\end{center}
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 def predict(values):
     scores = []
     top_prob = 0
@@ -985,23 +914,18 @@ def predict(values):
             top_answer = label
     return [ top_answer, top_prob / sum(scores) ]
 \end{Verbatim}
-\begin{center}
-\line(1,0){400}
-\end{center}
-\normalsize
 
 And we call it like this:
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 >>> predict(['yes','height=65','menacing','blue'])
-['Jedi', 0.85863336769968801]
-
+    ['Jedi', 0.85863336769968801]
 >>> predict(['yes','height=85','menacing','blue'])
-['Jedi', 0.72742228657164021]
+    ['Jedi', 0.72742228657164021]
 \end{Verbatim}
 
 How's this thing do?
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 We got 82.33% correct on the test data.
 \end{Verbatim}
 
