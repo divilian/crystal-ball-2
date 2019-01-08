@@ -1,29 +1,5 @@
-\documentclass[12pt]{article}
 
-\addtolength{\textwidth}{.8in}
-\addtolength{\hoffset}{-.4in}
-\addtolength{\textheight}{1in}
-\addtolength{\voffset}{-1in}
-
-\usepackage{amsmath}
-\usepackage{graphicx}
-\usepackage{upquote} % to convert funny quotes to straight quotes
-\usepackage{amsfonts}
-\usepackage{paralist}
-\setlength{\parindent}{15pt}
-
-\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
-
-
-\begin{document}
-
-\begin{center}
-\begin{Large}
-DATA 219 Notes -- Mar. 20, 2018
-\end{Large}
-\end{center}
-
-\section{Screen scraping}
+\chapter{Screen scraping}
 
 Welcome to the worst of all possible worlds\footnote{Actually, the
 \textit{second}-worst; the very worst is when the data you seek isn't even in
@@ -71,13 +47,21 @@ Note that the entire contents of the \textit{element} is (1) the starting tag,
 (2) the ending tag, and (3) \textit{everything in between}, which could be
 text in addition to other elements.
 
-\vspace{.2in}
-\pagebreak
-Here's a very simple, but complete, example:
+\subsection{An example HTML file}
 
-\line(1,0){400}
-\scriptsize
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+Figure~\ref{fig:allAboutStephen} shows a very simple, but complete, example.
+Lots going on there. The first way to get your bearings is to start visually
+lining up starting tags with their corresponding ending tags and perceive the
+structure. Notice that this entire page begins with ``\texttt{<html>}'' and
+ends with ``\texttt{</html>}''. This is in essence the ``root node'' of the
+page's entire hierarchical tree. It has two immediate ``children'': a
+\texttt{head} element, and a \texttt{body} element. Each of those have
+starting and ending tags as well. Inside the \texttt{head} element is a
+\texttt{title} element, \textit{etc.}
+
+\begin{figure}
+\centering
+\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=lines]
 <html>
 <head>
     <title>All About Stephen</title>
@@ -126,18 +110,9 @@ and then immediately destroy this page upon reading it.</p>
 </body>
 </html>
 \end{Verbatim}
-\line(1,0){400}
-\normalsize
-
-\vspace{.2in}
-Lots going on here. The first way to get your bearings is to start visually
-lining up starting tags with their corresponding ending tags and perceive the
-structure. Notice that this entire page begins with ``\texttt{<html>}'' and
-ends with ``\texttt{</html>}''. This is in essence the ``root node'' of the
-page's entire hierarchical tree. It has two immediate ``children'': a
-\texttt{head} element, and a \texttt{body} element. Each of those have
-starting and ending tags as well. Inside the \texttt{head} element is a
-\texttt{title} element, \textit{etc.}
+\caption{A sample HTML page.}
+\label{fig:allAboutStephen}
+\end{figure}
 
 As you can guess, each of these tags is interpreted by the browser to mean a
 particular kind of structure/formatting. ``\texttt{h1}'' means ``top-level
@@ -150,11 +125,12 @@ indicate structure (like \texttt{table} and \texttt{h2}) and things that
 specify specific formatting (like \texttt{i} and \texttt{u}). All of this is
 eminently look-up-able online.
 
+\pagebreak
 Some starting tags (not ending) contain additional information called
 \textbf{attributes}. You can see this with the \texttt{a} and \texttt{img}
-tags from the example above:
+tags from the example:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=lines]
 <a href="http://buildings.umwblogs.org/trinkle-hall/">Trinkle Hall</a>
 \end{Verbatim}
 
@@ -167,7 +143,7 @@ the string \texttt{href} and the value is the URL the user will be directed to
 if they click on the link. This key/value pair is called an
 \textbf{attribute}.
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=lines]
 <img src="http://clipart.com/prof.jpg" width=200 />
 \end{Verbatim}
 
@@ -187,7 +163,7 @@ Lastly, I'll point out that near the top of this example, there's a bunch of
 stuff which looks a bit visually jarring; it doesn't look like HTML. And it's
 not. I'm referring to this:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=lines]
     <style>
         img { width:150px; }
         td { border-width:1px; }
@@ -227,18 +203,18 @@ like to analyze, and the goal is to sift through all this HTML and CSS crapola
 looking for it and extracting it. To help us with this task is a Python
 library called BeautifulSoup.
 
-I generally recommend \textbf{downloading} the web page you want to parse
-rather than have Python read it for you over the network. This just eliminates
-one more possible source of error. (Exception: if you need a Python program to
-act as a \textbf{web crawler} and read pages on demand as it discovers their
-URLs. More on that later.) Note that you can still open the page in your
-browser even after downloading it: just go to ``File | Open File...'' or the
-equivalent operation in your browser.
+I generally recommend first \textit{downloading} the web page you want to
+parse rather than having Python read it for you over the network. This
+eliminates one more possible source of error. (Exception: if you need a Python
+program to act as a \textbf{web crawler} and read pages on demand as it
+discovers their URLs. More on that later.) Note that you can still open the
+page in your browser even after downloading it: just go to ``File | Open
+File...'' or the equivalent operation in your browser.
 
 Once you've done this, and now have your HTML in a file called
 ``\texttt{myfile.html}'', then you can parse it with BeautifulSoup using:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 from bs4 import BeautifulSoup
 soup = BeautifulSoup(open("myfile.html"), "html.parser")
 \end{Verbatim}
@@ -250,7 +226,7 @@ other choices here, but stick with \texttt{"html.parser"} for now.
 
 One possibly useful command (though limited if your web page is large) is:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 >>> print(soup.prettify())
 \end{Verbatim}
 
@@ -271,11 +247,13 @@ By using ``\texttt{soup.contents}'', you get the immediate descendants of
 the root node of the HTML hierarchy. Each of these could be examined for its
 type, like this:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-for child in soup.contents:
-    print(type(child))
-<class 'bs4.element.Tag'>
-<class 'bs4.element.NavigableString'>
+\vspace{-.1in}
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
+>>> for child in soup.contents:
+        print(type(child))
+
+    <class 'bs4.element.Tag'>
+    <class 'bs4.element.NavigableString'>
 \end{Verbatim}
 
 So our entire document is composed of an element (misleadingly named ``Tag''
@@ -284,68 +262,73 @@ here, but w/e) and a ``\texttt{NavigableString}'' which essentially just means
 ``\texttt{.name}''. For strings, it's useful to print them out verbatim. Here,
 we see:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\vspace{-.1in}
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 >>> soup.contents[0].name
-'html'
+    'html'
 >>> soup.contents[1]
-'\n'
+    '\n'
 \end{Verbatim}
 
 So the first child is the entire \texttt{html} element in all its embedded
 glory, and this is followed by a single, pesky newline. Now you know.
 
 Drilling down another level, we see:
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+
+\vspace{-.1in}
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 >>> html_children = soup.contents[0]
-for child in html_children:
-    print(type(child))
-<class 'bs4.element.NavigableString'>
-<class 'bs4.element.Tag'>
-<class 'bs4.element.NavigableString'>
-<class 'bs4.element.Tag'>
-<class 'bs4.element.NavigableString'>
+>>> for child in html_children:
+        print(type(child))
+    <class 'bs4.element.NavigableString'>
+    <class 'bs4.element.Tag'>
+    <class 'bs4.element.NavigableString'>
+    <class 'bs4.element.Tag'>
+    <class 'bs4.element.NavigableString'>
 \end{Verbatim}
 
 Two tags, with three strings interleaved. Let's examine them:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\vspace{-.1in}
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 >>> html_children.contents[0]
-'\n'
+    '\n'
 >>> html_children.contents[1].name
-'head'
+    'head'
 >>> html_children.contents[2]
-'\n'
+    '\n'
 >>> html_children.contents[3].name
-'body'
+    'body'
 >>> html_children.contents[4]
-'\n'
+    '\n'
 \end{Verbatim}
 
 You're starting to see a pattern: a lot of the strings are just newline
 characters that split up the HTML text file and make it more readable. What we
 really care about is the content under the tags. Let's dig one deeper:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\vspace{-.1in}
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 >>> head_children = html_children.contents[1].contents
 >>> head_children[0]
-'\n'
+    '\n'
 >>> head_children[1].name
-'title'
+    'title'
 >>> head_children[2]
-'\n'
+    '\n'
 >>> head_children[3].name
-'style'
+    'style'
 >>> head_children[4]
-'\n'
+    '\n'
 \end{Verbatim}
 
     Okay, you get the idea. We can drill down to whatever level we want just
 by following the appropriate children. To get the title of the page, we could
 do:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 >>> head_children[1].contents[0]
-'All About Stephen'
+    'All About Stephen'
 \end{Verbatim}
 
 (This is because the second element (element \#1) of the \texttt{head} element
@@ -355,22 +338,22 @@ About Stephen'}.)
 Sometimes a quicker method to find your way through the forest is to use this
 syntax at the interactive console:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 >>> [ x.name for x in body_children ]
-[None, 'h1', None, 'p', None, 'p', None, 'h2', None, 'table', None]
+    [None, 'h1', None, 'p', None, 'p', None, 'h2', None, 'table', None]
 \end{Verbatim}
 
 You can better see at a glance what's what. Now that I know the first
 ``\texttt{p}'' is element \#3 of the body, I could find that hyperlink via:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 >>> [ x.name for x in list(body_children)[3] ]
-[ None, 'a', None, 'b', None, 'u', None]
+    [ None, 'a', None, 'b', None, 'u', None]
 \end{Verbatim}
 
 and grab it via:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 dat_hyperlink =  list(list(body_children)[3])[1]
 \end{Verbatim}
 
@@ -378,7 +361,7 @@ BeautifulSoup lets you access the attributes of an HTML element by treating
 the element as a dictionary. Pretty cool. I can snag the actual link, then,
 with:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 >>> dat_hyperlink['href']
 'http://buildings.umwblogs.org/trinkle-hall/'
 \end{Verbatim}
@@ -406,10 +389,11 @@ To find my way through the forest, I search through the HTML with developer
 tools, locating one of the pieces of data I know is there. For instance, the
 number \texttt{50}, which I can see on the page is one of the percentages.
 When I click on this (or just search for it in a text file), I find myself in
-the middle of this code:
+the middle of the code in Figure~\ref{fig:bottomUpSearch}.
 
-\footnotesize
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{figure}[ht]
+\centering
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=lines]
 ...
 <table border=2 cellpadding=15>
 <tr><td class="pic"><img src="a.jpg"></td>
@@ -432,6 +416,11 @@ the middle of this code:
 </tr>
 ...
 \end{Verbatim}
+\caption{Using a bottom-up approach -- locating the text ``\texttt{50}'' in
+the HTML file and getting one's bearings regarding where it is in relation to
+other elements.}
+\label{fig:bottomUpSearch}
+\end{figure}
 \normalsize
 
 Looks like the role name I want is the text under a \texttt{td} element whose
@@ -443,7 +432,7 @@ BeautifulSoup's \texttt{.find\_all()} method makes this slightly less of a
 headache. To quickly grab all the \texttt{tr} elements in the document, I can
 do this:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 trs = list(soup.find_all("tr"))
 \end{Verbatim}
 
@@ -453,7 +442,7 @@ children with a \texttt{role} \texttt{class} attribute. And you can call
 \texttt{.find\_all()} on \textit{any} tag (to search from that point in the
 hierarchy down), not just on the top-level \texttt{soup} element. So:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 roles = []
 trs = soup.find_all("tr")
 for tr in trs:
@@ -475,7 +464,7 @@ found one of the desired \texttt{td} attributes. How do we then get the text
 under it? Just call \texttt{.get\_text()} on it, and then append it to the
 list. This creates my desired list of roles that we can stick in my DataFrame.
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
             ...
             roles.append(td.get_text())
 \end{Verbatim}
@@ -486,7 +475,7 @@ and second, we need to go inside that to retrieve the percentage from the
 embedded boldface tag. Adding this to our \texttt{for} loop almost gets us
 there:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 percs = []
 ...
     the_bold = tds[-1].find("b")
@@ -496,7 +485,7 @@ percs = []
 although we'd like to also strip that percentage sign off and convert it to an
 actual numeric value, so we'll do this instead:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 percs = []
 ...
     the_bold = tds[-1].find("b")
@@ -506,11 +495,10 @@ percs = []
 and now we can create our DataFrame with both columns. (Note that
 ``\texttt{.find()}'' does the same thing as ``\texttt{.find\_all()}'' except
 that it only grabs the first matching element rather than all of them.) The
-complete code is here:
+complete code is shown in Figure~\ref{fig:getRolesComplete}.
 
-\line(1,0){400}
-\footnotesize
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{figure}[ht]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 roles = []
 percs = []
 
@@ -525,8 +513,11 @@ for tr in trs:
 
 df = pd.DataFrame({'role':roles, 'perc':percs})[['role','perc']]
 \end{Verbatim}
-\normalsize
-\line(1,0){400}
+\caption{The complete code example to screen scrape the roles and percentages
+from the web page in Figure~\ref{fig:allAboutStephen}
+(p.~\pageref{fig:allAboutStephen}).}
+\label{fig:getRolesComplete}
+\end{figure}
 
 \subsection{Other bs4 features}
 
@@ -539,7 +530,7 @@ searching the tree. Here are a few.
 \texttt{class\_} (note the trailing underscore!) parameters that can be used
 to restrict a search to only elements with matching attributes.
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 soup.find_all("td", class_="pic")
 \end{Verbatim}
 
@@ -548,18 +539,15 @@ soup.find_all("td", class_="pic")
 If we know the names of the tags, we can navigate a structure by using a
 Pandas-like ``dot'' syntax. Check it out:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 >>> soup.head.title
-<title>All About Stephen</title>
-
+    <title>All About Stephen</title>
 >>> soup.head.name
-title
-
+    title
 >>> soup.head.title.string
-'All About Stephen'
-
+    'All About Stephen'
 >>> soup.body.table.td.img['src']
-'a.jpg'
+    'a.jpg'
 \end{Verbatim}
 
 \subsubsection{Accessing all attributes}
@@ -568,12 +556,11 @@ In addition to treating an element (``\texttt{Tag}'') as a dictionary to
 retrieve its element values, you can also use the ``\texttt{.attrs}'' syntax to
 get the dictionary directly:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 >>> soup.body.find("a").attrs
-{'href': 'http://buildings.umwblogs.org/trinkle-hall/'}
-
+    {'href': 'http://buildings.umwblogs.org/trinkle-hall/'}
 >>> soup.body.find("td").attrs
-{'class': ['pic']}
+    {'class': ['pic']}
 \end{Verbatim}
 
 (As noted before, see how the value of the ``\texttt{class}'' attribute is a
@@ -586,9 +573,9 @@ powerful than just extracting the contents of a single plain text element
 underneath an element. It can also be used to get \textit{all the text} from
 that point down in the hierarchy, ignoring all tags. Check it out:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 >>> soup.body.find("p").get_text()
-'Deep in the bowels of Trinkle Hall resides a\ncarbon-based life form
+    'Deep in the bowels of Trinkle Hall resides a\ncarbon-based life form
 known to outsiders only as Stephen. This\nmysterious being fulfills several
 roles not widely known to\nhumankind.'
 \end{Verbatim}
@@ -598,7 +585,7 @@ roles not widely known to\nhumankind.'
 You can pass a \textit{list} to \texttt{.find\_all()} to match more than one
 type of tag in a search:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 soup.find_all(["td", "th", "p"])
 \end{Verbatim}
 
@@ -606,7 +593,7 @@ And if you know how to use \textbf{regular expressions} (outside the scope of
 this class) you can use them as arguments to \texttt{.find\_all()} and
 friends:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 soup.find_all(re.compile("^q"))
 soup.find_all(re.compile("r"))
 soup.find_all(re.compile("s$"))
@@ -620,7 +607,7 @@ respectively.)
 Finally, if you're familiar with CSS selector syntax, you can do all that jazz
 by calling the \texttt{.select()} method:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 soup.select("div#master, tr td.data")
 \end{Verbatim}
 
