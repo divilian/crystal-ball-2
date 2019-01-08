@@ -1,18 +1,3 @@
-\documentclass[12pt]{article}
-
-\addtolength{\textwidth}{.8in}
-\addtolength{\hoffset}{-.4in}
-\addtolength{\textheight}{1in}
-\addtolength{\voffset}{-1in}
-
-\usepackage{amsmath}
-\usepackage{graphicx}
-\usepackage{upquote} % to convert funny quotes to straight quotes
-\usepackage{amsfonts}
-\usepackage{paralist}
-\setlength{\parindent}{15pt}
-
-\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
 
 % what a log is
 % identities (turn multiplicative things into additive things)
@@ -37,15 +22,7 @@
 %     expected value of exp, and power-law...doesn't exist!
 % animal example
 
-\begin{document}
-
-\begin{center}
-\begin{Large}
-DATA 219 Notes -- Mar. 1, 2018
-\end{Large}
-\end{center}
-
-\section{Review of logarithms}
+\chapter{Using logarithms}
 
 Recall that the logarithm is the inverse operation of exponentiation. What is
 $10^3$? 1,000. So what is the log of 1,000? 3. It's really that simple.
@@ -88,13 +65,14 @@ One property of logarithms that is extremely important to know is this:
 \begin{align*}
 \log(xy) = \log(x) + \log(y)
 \end{align*}
+
 Thus logarithms effectively \textit{turn multiplications into additions}. One
 practical implication of this truth is leveraged in natural language
 processing systems: we often find ourselves multiplying minuscule quantities
-(very close to zero) and as we multiply these, we get closer and closer to
-zero to the point where Python doesn't have enough precision to calculate a
-precise number that low. But by dealing with logarithms, we're adding instead
-of multiplying and avoid that problem completely.
+(very close to zero). As we multiply these, we get closer and closer to zero,
+and eventually Python doesn't have enough precision to even represent a number
+that low. But by dealing with logarithms, we're adding instead of multiplying
+and avoid that problem completely.
 
 A natural consequence of the above property is this one:
 \begin{align*}
@@ -110,17 +88,17 @@ have a \textbf{log-log plot}.
 
 Why would we do this? There are three reasons:
 \begin{enumerate}
-\itemsep.1em
-\item It reins in large variations in the data. If some of our data points are
-orders of magnitude larger than others, the detail of the smaller points gets
-completely swamped in trying to plot the larger points. Plotting
+\itemsep1em
+\item \textbf{It reins in large variations in the data.} If some of our data
+points are orders of magnitude larger than others, the detail of the smaller
+points gets completely swamped in trying to plot the larger points. Plotting
 orders-of-magnitude instead of raw values solves this problem, though you have
 to remember you did this when interpreting the plot!
 
 Here's a (fictitious) example of some American and British celebrities, and
 their total Instagram ``likes'':
 \footnotesize
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 plt.plot(uk, linestyle='None', color="red", marker=".", label="UK")
 plt.plot(us, linestyle='None', color="green", marker=".", label="US")
 plt.yscale('log')
@@ -128,47 +106,60 @@ plt.legend()
 plt.show()
 \end{Verbatim}
 \normalsize
-\begin{center}
-\includegraphics[width=0.7\textwidth]{rein1.pdf}
-\end{center}
 
-This plot has limited use, because there are a few uber-celebrities (Justin
-Bieber, \textit{etc.}) who have far more ``likes'' than anyone else. Hence
-most people are crushed against the bottom of the plot and we can't (say)
-compare the UK people with the US people easily.
+\begin{figure}[ht]
+\centering
+\includegraphics[width=1\textwidth]{rein1.pdf}
+\caption{A regular (non-logarithmic) plot of celebrity ``likes.''}
+\label{fig:rein1}
+\end{figure}
+
+The scatterplot is shown in Figure~\ref{fig:rein1}. It has limited use,
+because there are a few uber-celebrities (Justin Bieber, \textit{etc.}) who
+have far more ``likes'' than anyone else. Hence most people are crushed
+against the bottom of the plot and we can't (say) compare the UK people with
+the US people easily.
 
 We can dramatically improve the readability and analyze-ability by plotting
 the $y$ axis on a log scale. Just add this line before \texttt{plt.show()}:
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 plt.yscale('log')
 \end{Verbatim}
 
-and voila:
+and voila, Figure~\ref{fig:rein2}. It's imperative that when you do this,
+however, you remember that the $y$-axis no longer represents number-of-likes,
+but log-number-of-likes.
 
-\begin{center}
-\includegraphics[width=0.7\textwidth]{rein2.pdf}
-\end{center}
+\begin{figure}[ht]
+\centering
+\includegraphics[width=1\textwidth]{rein2.pdf}
+\caption{A logarithmic plot of the same data from Figure~\ref{fig:rein1}.}
+\label{fig:rein2}
+\end{figure}
 
-It's imperative that when you do this, you remember that the $y$-axis no
-longer represents number-of-likes, but log-number-of-likes.
+\pagebreak
 
-\item A semi-log plot shows relative (multiplicative) changes instead of
-absolute (additive) changes. Consider this (ordinary linear, not semi-log)
-plot of a fictional company's stock price over time:
-\begin{center}
+\item \textbf{A semi-log plot shows \textbf{relative} (multiplicative) changes
+instead of \textbf{absolute} (additive) changes.} Consider
+Figure~\ref{fig:stock1}, whose (ordinary, not logarithmic) plot depicts a
+fictional company's stock price over time. Two significant events occurred in
+this company's history: one in April 2015 and the other in March 2017. Both
+caused the stock's value to jump. Question: would you rather have bought stock
+immediately before event A and sold it immediately after, or done the same
+before/after B?
+
+\begin{figure}[ht]
+\centering
 \includegraphics[width=0.8\textwidth]{stock1.pdf}
-\end{center}
+\caption{A regular (non-logarithmic) plot of a company's stock price.}
+\label{fig:stock1}
+\end{figure}
 
-Two significant events occurred in this company's history: one in April 2015
-and the other in March 2017. Both caused the stock's value to jump. Question:
-would you rather have bought stock immediately before event A and sold it
-immediately after, or done the same before/after B?
-
-On this linear plot, it may look like event B is the better bet: after all, it
-looks like the jump was higher. But this is an \textit{absolute} distance: in
-other words, the total number of dollars per share jumped higher for event B.
-But for something like an investment, you actually don't care about this
-absolute number, but the \textit{relative} number. 
+From Figure~\ref{fig:stock1}, it may look like event B is the better bet:
+after all, it looks like the jump was higher. But this is an \textit{absolute}
+distance: in other words, the total number of dollars per share jumped higher
+for event B. But for something like an investment, you actually don't care
+about this absolute number, but the \textit{relative} number. 
 
 Look carefully at event A: before the jump, the stock was selling at about \$5
 per share, and afterwards, at about \$15. This means that if you timed this
@@ -181,24 +172,26 @@ you'd have sold it for \$$1000 \times \frac{110}{90} = $\$1222. Nice, but not
 nearly the windfall of event A.
 
 For this reason, stocks and other investments are nearly always shown on a
-semi-log plot, like so:
-\begin{center}
-\includegraphics[width=0.8\textwidth]{stock2.pdf}
-\end{center}
-
-This has the advantage that \textit{same-size increases on the (log) $y$ axis
-correspond to identical \textit{relative} (multiplicative) increases of the
-stock.} In other words, if the stock rises an inch somewhere on the plot, and
-it rises an inch somewhere else, these represent equal gains for investors
-\textit{no matter how high the stock value is in absolute terms.} Such is the
-magic of logs.
+semi-log plot, like the one in Figure~\ref{fig:stock2}. it has the advantage
+that \textit{same-size increases on the (log) $y$ axis correspond to identical
+\textit{relative} (multiplicative) increases of the stock.} In other words, if
+the stock rises an inch somewhere on the plot, and it rises an inch somewhere
+else, these represent equal gains for investors \textit{no matter how high the
+stock value is in absolute terms.} Such is the magic of logs.
 
 In this example, you can easily see from the semi-log plot that event A was a
 bigger windfall for investors than event B.
 
-\item They reveal exponential and power-law relationships. This requires a
-little math to understand. Suppose we have two variables, $x$ and $y$, and
-they are related according to something like this:
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.8\textwidth]{stock2.pdf}
+\caption{A semi-logarithmic plot of a company's stock price.}
+\label{fig:stock2}
+\end{figure}
+\pagebreak
+\item \textbf{It reveals exponential and power-law relationships.} This
+requires a little math to understand. Suppose we have two variables, $x$ and
+$y$, and they are related according to something like this:
 \begin{align*}
 y = p \cdot e^{qx}
 \end{align*}
@@ -206,11 +199,15 @@ where $p$ and $q$ are just numbers. For example,
 \begin{align*}
 y = 5.2 \cdot e^{2.96 x}
 \end{align*}
+
 Now if we plot $x$ vs $y$ on a standard plot, we get a curvy exponential
 function that is very difficult for the human eye to distinguish from other
-curvy functions. But suppose we plot not $y$, but $\log y$? Using our
+curvy functions. But suppose we plot not $y$, but the \textit{logarithm} of
+$y$? 
+
+Let's take the natural log ($\ln$) of both sides of the equation. Using our
 properties from above, we get:
-\small
+
 \begin{align*}
 \ln y &= \ln (5.2 \cdot e^{2.96 x}) \\
 &= \ln(5.2) + \ln(e^{2.96 x}) \\
@@ -227,8 +224,8 @@ growth or decay: any time that \textit{the rate of increase of a quantity}
 proportional to \textit{the quantity itself} (the number of existing rabbits),
 we have exponential growth. And any time that the rate of \textit{de}crease of
 a quantity (like the number of mechanical parts that wear out) is proportional
-to the quantity itself (the number of machines we own), we have exponential
-decay.
+to the quantity itself (the total number of mechanical parts owned by the
+company), we have exponential decay.
 
 Another important kind of relationship is often mistaken for exponential
 growth, but is emphatically \textit{not}. It's called a ``power-law''
@@ -243,7 +240,6 @@ y = 3.9 \cdot x^{-2.45}
 \end{align*}
 
 Again, some math: if we take the logarithm of both sides, we get:
-\small
 \begin{align*}
 \ln y &= \ln (3.9 \cdot x^{-2.45}) \\
 \ln y &= \ln (3.9) + \ln (x^{-2.45}) \\
@@ -258,15 +254,20 @@ mentally substituting your letter of choice for $\ln x$ and another letter of
 your choice for $\ln y$. Now you have a plain old linear equation with a slope
 of -2.45 and an intercept of 1.361.)
 
-To see how the logarithmic plots reveal this, consider the following synthetic
-data set, where the blue points are linear in $x$, the red points are
-exponential, and the green points are power-law (with an exponent of 6):
+To see how the logarithmic plots reveal this, consider
+Figure~\ref{fig:straightLines}, each of which is a plot of the same three
+synthetic data sets. The blue points are linear in $x$, the red points are
+exponential, and the green points are power-law (with an exponent of 6).
 
-\begin{center}
-\includegraphics[width=0.3\textwidth]{logplots1.pdf}
-\includegraphics[width=0.3\textwidth]{logplots2.pdf}
-\includegraphics[width=0.3\textwidth]{logplots3.pdf}
-\end{center}
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.6\textwidth]{logplots1.pdf}
+\includegraphics[width=0.6\textwidth]{logplots2.pdf}
+\includegraphics[width=0.6\textwidth]{logplots3.pdf}
+\caption{A linear, semi-log, and log-log plot of the same three data sets:
+blue (linear), red (exponential), and green (power-law).}
+\label{fig:straightLines}
+\end{figure}
 
 In the linear plot, the blue points can be seen to be a straight line. In the
 semi-log plot, the red points are. In the log-log plot, the green points are.
