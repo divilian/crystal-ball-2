@@ -1,31 +1,5 @@
 
-\documentclass[12pt]{article}
-
-\addtolength{\textwidth}{.8in}
-\addtolength{\hoffset}{-.4in}
-\addtolength{\textheight}{1in}
-\addtolength{\voffset}{-1in}
-
-\usepackage{amsmath}
-\usepackage{graphicx}
-\usepackage{upquote} % to convert funny quotes to straight quotes
-\usepackage{amsfonts}
-\usepackage{multicol}
-\usepackage{paralist}
-\setlength{\parindent}{15pt}
-
-\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
-
-
-\begin{document}
-
-\begin{center}
-\begin{Large}
-DATA 219 Notes -- Apr. 12, 2018
-\end{Large}
-\end{center}
-
-\section{Association Analysis}
+\chapter{Association Analysis}
 
 Classification isn't the only machine learning task. Another one is called
 \textbf{association analysis}, in which the goal isn't to predict the class of
@@ -40,7 +14,7 @@ be employed to detect which sets of products tend to be bought together. This
 information is useful, for instance, to retailers who seek optimal product
 placement and effective marketing campaigns.
 
-\subsection{Market basket analysis}
+\section{Market basket analysis}
 
 All competitive grocery stores today keep track of their customers' purchases
 as they check out. Even if they don't have a rewards program to lure customers
@@ -136,25 +110,15 @@ it doesn't have high confidence, then the trend it signifies isn't super
 reliable, and we need to be aware of that. And if it doesn't have high lift,
 then its antecedent doesn't tell us a whole lot that we didn't already know.
 
-\subsection{Implementation: the \texttt{mlxtend} library}
+\section{Implementation: the \texttt{mlxtend} library}
 
 Surprisingly, \texttt{scikit-learn} doesn't seem to have an association
 analysis implementation out of the box. (At least, Stephen couldn't find one.)
 There is one in the open source \texttt{mlxtend} library, though, by Sebastian
 Raschka \& friends.
 
-Let's take it for a spin. First, we'll generate a synthetic data set with a
-known association:
-
-\vspace{-.15in}
-\begin{center}
-\line(1,0){400}
-\end{center}
-\footnotesize
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-import pandas as pd
-import numpy as np
-
+\begin{figure}
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 eggs = []
 bacon = []
 bananas = []
@@ -185,47 +149,36 @@ transactions = pd.DataFrame({
     'pizza':pizza,
     'coffee':coffee})
 \end{Verbatim}
-\vspace{-.2in}
-\begin{center}
-\line(1,0){400}
-\end{center}
-\normalsize
+\caption{Generating synthetic transactions.}
+\label{fig:genBaskets}
+\end{figure}
 
-We have five items in our store, all of which have different priori
-probabilities of being purchased (about 60\% of all transactions have bananas,
-80\% have pizza, \textit{etc.}) but we've ensured that in addition to the
-purely random ones, we've got a solid \textit{thousand} transactions with both
-bacon and eggs. This should guarantee that ``\{bacon\} $\Rightarrow$
-\{eggs\}''
-comes out to be a meaningful association.\footnote{``...and \{eggs\}
-$\Rightarrow$ \{bacon\} too, right?'' you ask. Well, not necessarily, or at
-least not as strong: since 70\% of the random transactions have eggs anyway,
-and only 10\% of them have bacon, we're going to get a lot of bacon-less
-egg-full transactions, which will dial down the confidence of that
-association. But let's wait and see what \texttt{mlxtend} says.}
-\pagebreak
+Let's take it for a spin. First, we'll generate a synthetic data set with a
+known association. (See Figure~\ref{fig:genBaskets}.) We have five items in
+our store, all of which have different priori probabilities of being purchased
+(about 60\% of all transactions have bananas, 80\% have pizza, \textit{etc.})
+but we've ensured that in addition to the purely random ones, we've got a
+solid \textit{thousand} transactions with both bacon and eggs. This should
+guarantee that ``\{bacon\} $\Rightarrow$ \{eggs\}'' comes out to be a
+meaningful association.\footnote{``...and \{eggs\} $\Rightarrow$ \{bacon\}
+too, right?'' you ask. Well, not necessarily, or at least not as strong: since
+70\% of the random transactions have eggs anyway, and only 10\% of them have
+bacon, we're going to get a lot of bacon-less egg-full transactions, which
+will dial down the confidence of that association. But let's wait and see what
+\texttt{mlxtend} says.}
+
 Okay, let's analyze. First, just for giggles, let's shuffle the data frame's
 rows so they're in a random order (not strictly necessary, but just on
-principle):
+principle) and then let \texttt{mlxtend} do its work:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 transactions = transactions.sample(frac=1)
-\end{Verbatim}
 
-and now let \texttt{mlxtend} do its work:
-\begin{center}
-\line(1,0){400}
-\end{center}
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
 from mlxtend.frequent_patterns import apriori
 from mlxtend.frequent_patterns import association_rules
 
 itemsets = apriori(baskets, min_support=0.1, use_colnames=True)
 \end{Verbatim}
-\vspace{-.3in}
-\begin{center}
-\line(1,0){400}
-\end{center}
 
 This uses the so-called \textbf{apriori algorithm}. It takes place in two
 steps: first, generate all itemsets, and compute their ``support,'' but only
@@ -245,58 +198,45 @@ itemsets it needs to consider.
 
 \vspace{.1in}
 Let's print out the ten itemsets with the greatest support:
-\footnotesize
-\begin{center}
-\line(1,0){400}
-\end{center}
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 >>> itemsets.sort_values('support',ascending=False).head(10)
-   support                itemsets
-  0.816000                  [eggs]
-  0.801667                 [pizza]
-  0.650667           [eggs, pizza]
-  0.593333               [bananas]
-  0.486000         [bananas, eggs]
-  0.475333        [bananas, pizza]
-  0.401667                 [bacon]
-  0.387667  [bananas, eggs, pizza]
-  0.380667           [bacon, eggs]
-  0.316000          [bacon, pizza]
+
+       support                itemsets
+      0.816000                  [eggs]
+      0.801667                 [pizza]
+      0.650667           [eggs, pizza]
+      0.593333               [bananas]
+      0.486000         [bananas, eggs]
+      0.475333        [bananas, pizza]
+      0.401667                 [bacon]
+      0.387667  [bananas, eggs, pizza]
+      0.380667           [bacon, eggs]
+      0.316000          [bacon, pizza]
 \end{Verbatim}
-\normalsize
-\vspace{.3in}
-\pagebreak
+
 Not surprisingly, the one-item itemsets feature prominently in the list, with
 eggs on the very top since not only did all of the first 1000 transactions had
 eggs, but about 70\% of the others did as well.
 
-\vspace{.1in}
 And now, the second step: generate (and compute stats on) all possible
 association rules involving those item sets:
-\begin{center}
-\line(1,0){400}
-\end{center}
-\small
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 >>> rules = association_rules(itemsets)
 >>> rules.sort_values('confidence',ascending=False).head(10)
 
-             antecedants consequents  support  confidence      lift 
-                 (bacon)      (eggs) 0.375000    0.953390  1.192731 
-          (pizza, bacon)      (eggs) 0.302333    0.947753  1.185680 
-        (bananas, bacon)      (eggs) 0.228333    0.947441  1.185289 
- (pizza, bananas, bacon)      (eggs) 0.183333    0.940171  1.176194 
-         (coffee, bacon)      (eggs) 0.116000    0.938005  1.173485 
-         (coffee, bacon)     (pizza) 0.102667    0.830189  1.036872 
-          (eggs, coffee)     (pizza) 0.193667    0.812587  1.014889 
-                 (bacon)     (pizza) 0.319000    0.811017  1.012927 
-        (bananas, bacon)     (pizza) 0.195000    0.809129  1.010569 
-           (eggs, bacon)     (pizza) 0.302333    0.806222  1.006939 
+                 antecedants consequents  support  confidence      lift 
+                     (bacon)      (eggs) 0.375000    0.953390  1.192731 
+              (pizza, bacon)      (eggs) 0.302333    0.947753  1.185680 
+            (bananas, bacon)      (eggs) 0.228333    0.947441  1.185289 
+     (pizza, bananas, bacon)      (eggs) 0.183333    0.940171  1.176194 
+             (coffee, bacon)      (eggs) 0.116000    0.938005  1.173485 
+             (coffee, bacon)     (pizza) 0.102667    0.830189  1.036872 
+              (eggs, coffee)     (pizza) 0.193667    0.812587  1.014889 
+                     (bacon)     (pizza) 0.319000    0.811017  1.012927 
+            (bananas, bacon)     (pizza) 0.195000    0.809129  1.010569 
+               (eggs, bacon)     (pizza) 0.302333    0.806222  1.006939 
 \end{Verbatim}
-\begin{center}
-\line(1,0){400}
-\end{center}
-\normalsize
 
 As expected, ``\{bacon\} $\Rightarrow$ \{eggs\}'' has a very high confidence
 (and support, and lift), as do rules of the form ``\{bacon + various other
