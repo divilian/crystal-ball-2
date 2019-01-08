@@ -1,51 +1,4 @@
 
-% PUT this before day 14 (i.e., do feature selection before assoc analysis)
-
-%Reducing the feature space
-%
-%The curse of dimensionality, among other things, makes us want to use fewer
-%features than we have.
-%
-%Question: which ones should we use?
-%
-%Two basic approaches: feature selection, and dimensionality reduction.
-%
-%Feature selection:
-%
-%    Subset selection -- find and use a subset of the features "as is".
-%
-%        - "best subset": try all possible subsets of features. Computationally
-%        intractable.
-%
-%        - "forward/backward selection": greedy algorithm starting with none,
-%        or all, and adding/removing best-looking one at each phase.
-%
-%    (Mostly for linear regression): Shrinkage/regularization -- use all the
-%    predictors, but shrink some towards zero (possibly all the way). Ridge and
-%    lasso.
-%
-%
-%Evaluating goodness-of-fit: 
-%
-%    1) "Mallows' Cp", AIC, BIC, adjusted R-squared (remember: usual R^2 is
-%    1-RSS/TSS.) Various ways of penalizing a more complicated model.
-%
-%    2) Use a training/test split.
-%
-%
-%
-%Dimensionality reduction:
-%
-%    Need linear algebra. "Principal Components" is a common technique, which
-%    transforms original features into a new set of orthogonal features, and
-%    orders them in decreasing order of how much variance is explained.
-%    ("projection")
-%
-%
-%Warning: "the percentage of variance explained"s do not add up to 100\%.
-%
-%
-
 \documentclass[12pt]{article}
 
 \addtolength{\textwidth}{.8in}
@@ -59,7 +12,6 @@
 \usepackage{amsfonts}
 \usepackage{multicol}
 \usepackage{paralist}
-\usepackage{icomma}  % no spaces after commas
 \setlength{\parindent}{15pt}
 
 \renewcommand*{\thefootnote}{\fnsymbol{footnote}}
@@ -69,420 +21,287 @@
 
 \begin{center}
 \begin{Large}
-DATA 219 Notes -- Apr. 17, 2018
+DATA 219 Notes -- Apr. 12, 2018
 \end{Large}
 \end{center}
 
-\section{Feature selection}
+\section{Association Analysis}
 
-The ``curse of dimensionality'' makes us inclined to actually use fewer
-features in our classifier than we have at our disposal. This is for two
-reasons:
+Classification isn't the only machine learning task. Another one is called
+\textbf{association analysis}, in which the goal isn't to predict the class of
+new data items, but rather to determine which features of a data set have
+``interesting'' relationships. Usually, ``interesting'' means ``correlated in a
+way that can be taken advantage of.''
+
+The principles of Association Analysis are used in fields as diverse as
+bioinformatics, recommender systems, and cybersecurity intrusion detection.
+Another common application is \textbf{market basket analysis}, in which it can
+be employed to detect which sets of products tend to be bought together. This
+information is useful, for instance, to retailers who seek optimal product
+placement and effective marketing campaigns.
+
+\subsection{Market basket analysis}
+
+All competitive grocery stores today keep track of their customers' purchases
+as they check out. Even if they don't have a rewards program to lure customers
+into getting a store-specific ``VIP card,'' they still know which sets of
+products were bought together in a single trip to the store. Each such trip,
+consisting of multiple products being purchased, is called a
+\textbf{transaction}.
+
+This type of association analysis relies on a huge matrix (DataFrame) of 1's
+and 0's. Each row is a transaction, and each column is a product the store
+sells. A 1 in an entry indicates that \textit{at least one} of that product
+was bought in that transaction. (We typically don't store quantities, but just
+binary information about ``did this purchase contain that item or not?'')
+Here's one such data set:
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+diet\_soda & apples & beer & chips\_ahoy & diapers & cat\_food \\
+\hline
+0 & 1 & 0 & 0 & 0 & 0 \\
+1 & 1 & 0 & 0 & 0 & 1 \\
+1 & 1 & 1 & 0 & 1 & 0 \\
+0 & 0 & 1 & 1 & 1 & 0 \\
+1 & 1 & 0 & 1 & 1 & 0 \\
+1 & 1 & 1 & 1 & 1 & 1 \\
+0 & 0 & 0 & 0 & 0 & 1 \\
+. & . & . & . & . & . \\
+\hline
+\end{tabular}
+\end{center}
+
+The first customer in this set just ran into the store to grab a bag of
+apples, while the second one bought some Diet Coke, an apple, and a couple
+bags of cat food, \textit{etc.}
+
+\vspace{.1in}
+Now, some terms:
 
 \begin{itemize}
 \itemsep.1em
-\item Many of the available features are likely to be ``noisy,'' meaning they
-are only loosely correlated with the target feature, if at all. Including
-noisy features will make it more difficult for any classifier to separate the
-wheat from the chaff: the features which truly are predictive will get drowned
-out by those that merely clutter the picture.
 
-\item Even for those features which do contain substantive, reliable
-information about the target, it's not likely that they're all
-\textit{independent} of each other. If (say) five of our twenty features each
-furnished some unique and meaningful information about what the target label
-is likely to be, that sounds great...but it's more likely that some (or even
-all) of these five are correlated with each other, and hence contain
-overlapping information. We'll get a better-performing classifier if we
-avoid giving it redundant features that contain pesky noise to boot.
+\item \textbf{itemset}: An itemset is a group of one or more items. For
+instance, ``\{apples,beer,cat\_food\}'' is an itemset, as is
+``\{diet\_soda\}''.
 
+\item \textbf{support count}: The support count for a given itemset is
+\textit{the fraction of transactions in the entire data set that contain that
+itemset.} In the sample data above, the support count for ``\{diet\_soda\}'' is
+$\frac{4}{7} = .571$, since four out of the seven transactions contained
+diet soda. The support for ``\{apples,chips\_ahoy,diapers\}'' is just $\frac{2}{7}
+= .286$.
+
+\item \textbf{association rule}: An association rule is a statement of a
+relationship between two itemsets. It looks like this: ``\{A,B\} $\Rightarrow$
+\{C\},'' which means ``people who buy A and B tend to also buy C.'' The itemset
+before the arrow is called the \textbf{antecedent} and the one after it is
+called the \textbf{consequent}. Association
+rules are general correlations, not hard-and-fast mandates. Their reliability
+can be measured with the metrics below.
+
+\item \textbf{support}: An association rule's ``support'' is the fraction of
+transactions in the data set that contain \textit{both} its antecedent
+\textit{and} its consequent. It's a measure of how widespread and applicable
+it is. The rule ``\{diet\_soda,apples\} $\Rightarrow$ \{beer\}'' has a support of
+just $\frac{2}{7} = .286$ in the data set above. A rule's support is always
+between 0 and 1.
+
+\item \textbf{confidence}: An association rule's ``confidence,'' on the other
+hand, is a measure of its reliability. It's \textit{the fraction of the times
+that it could apply where it's actually correct}. In terms of support, it's
+$\frac{\textrm{support(whole rule)}}{\textrm{support\_count(antecedent)}}$
+The rule ``\{diet\_soda,apples\} $\Rightarrow$ \{beer\}'' has a support of
+$\frac{2}{4} = .5$ in the data set above, since out of the four times that
+diet soda and apples were purchased together, beer was also purchased in two
+of them. A rule's confidence is always between 0 and 1.
+
+\item \textbf{lift}: An association rule's ``lift'' is a numerical measure of
+how much predictive power it has. The key concept is that we want to know how
+likely the consequent is to be satisfied when the antecedent is satisfied 
+\textit{relative to how likely the consequent is to be satisfied anyway.}
+Quantitatively, it's $\frac{\textrm{confidence(whole
+rule)}}{\textrm{support(consequent)}}$. A rule's lift is always \textit{between 1 and
+$\infty$.} A lift of 1 means it's essentially useless: knowing the antecedent
+is true doesn't really make the consequent any more likely.
 \end{itemize}
 
-So how do we reduce the feature space? There are essentially three approaches:
+If we crunch all the numbers, we want to look for association rules with high
+support, high confidence, and high lift. Which of those three end up being
+the greatest priority depends somewhat on the application. If a rule doesn't
+have high support, it doesn't come up much, so it may not be super useful. If
+it doesn't have high confidence, then the trend it signifies isn't super
+reliable, and we need to be aware of that. And if it doesn't have high lift,
+then its antecedent doesn't tell us a whole lot that we didn't already know.
 
-\begin{enumerate}
-\itemsep.1em
-\item \textbf{Subset selection}. We'll simply choose a subset of the original
-features and use those ``as is'' (after normalizing them or one-hot-encoding
-them, of course).
-\item \textbf{Shrinkage} (a.k.a. ``\textbf{regularization}''). Especially
-popular with linear models, we can essentially ``tone down'' some of the less
-important features by shrinking their coefficients towards zero.
-\item \textbf{Transforming the feature space}. In this case, we actually don't
-use the \textit{original} features at all; instead, we form a set of
-new features out of parts of the original features. This may sound weird --
-especially since our new features don't have any obvious ``meaning''; they're
-just combinations of some of the original ones -- but it can be very powerful
-and informationally efficient.
-\end{enumerate}
+\subsection{Implementation: the \texttt{mlxtend} library}
 
-I'll say much more about the first of these, since the latter two require some
-more advanced math.
+Surprisingly, \texttt{scikit-learn} doesn't seem to have an association
+analysis implementation out of the box. (At least, Stephen couldn't find one.)
+There is one in the open source \texttt{mlxtend} library, though, by Sebastian
+Raschka \& friends.
 
-\subsection{Subset selection}
+Let's take it for a spin. First, we'll generate a synthetic data set with a
+known association:
 
-Let's say we have four features available in our original data set (call them
-$F_0,F_1,F_2, \textrm{and} F_3$, to stick with Python's numbering
-convention.) As stated above, we may not want to actually use all four. So
-which ones could we use?
-
-It turns out we have $2^4$ (which is 16) choices of different feature sets to
-use. They are:
-
-\begin{compactitem}
-\item all four
-\item just $F_0,F_1$ and $F_2$
-\item just $F_0,F_1$ and $F_3$
-\item just $F_0$ and $F_1$
-\item just $F_0,F_2$ and $F_3$
-\item just $F_0$ and $F_2$
-\item just $F_0$ and $F_3$
-\item just $F_0$
-\item just $F_1,F_2$ and $F_3$
-\item just $F_1$ and $F_3$
-\item just $F_1$ and $F_2$
-\item just $F_1$
-\item just $F_2$ and $F_3$
-\item just $F_2$
-\item just $F_3$
-\item none of them (just use the prior)
-\end{compactitem}
-
-The way we get the number ``$2^4$'' is to reason as follows: ``each feature can
-either be included, or excluded, in any feature set I choose. So for each
-of the four features, there are two independent choices (either take it or
-leave it) which leaves me with $2 \cdot 2 \cdot 2 \cdot 2$ different possible
-sets of features.''
-
-The one using all of the features is most likely to overfit, and the one using
-none of them is most likely to underfit. Often the best-fitting classifier (on
-new data! not the original training data) will be one of the intermediate
-ones.
-
-So...how do we find that best-fitting classifier then?
-
-\subsubsection{Consider all subsets}
-
-The obvious solution is to say ``we've identified all possible subsets of
-features, let's try 'em!'' And indeed we can do this if the number of features
-is modest. Train a classifier (whether Naive Bayes, kNN, or anything else)
-using only the features on a given set, compute the error rate, and then
-choose the set of features with the lowest error rate.
-
-Here's some code that does just that (for Naive Bayes)\footnote{Notes: the
-\texttt{is\_numeric\_dtype()} function distinguishes between numeric and
-categorical variables, so we can normalize one and one-hot the other. The
-\texttt{LabelBinarizer}, as we've seen is one way to one-hot variables;
-another approach is the \texttt{.get\_dummies()} method on Pandas DataFrame.
-Finally, the ``\texttt{operator}'' thing is just a short way of telling Python
-``please sort this dictionary, but by value, not by key,'' so we can get the
-results back in percent-accuracy-order rather than
-alphabetical-order-of-feature-set.}:
-
-\pagebreak
+\vspace{-.15in}
 \begin{center}
 \line(1,0){400}
 \end{center}
-\scriptsize
+\footnotesize
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-import numpy as np
 import pandas as pd
-from sklearn.preprocessing import LabelBinarizer
-from sklearn.naive_bayes import MultinomialNB
-from pandas.api.types import is_numeric_dtype
+import numpy as np
 
-w = pd.read_csv("warriors_extra.csv")
+eggs = []
+bacon = []
+bananas = []
+pizza = []
+coffee = []
 
-train = w.sample(frac=.7)
-test = w.drop(train.index)
+NUM_PTS1 = 1000
+NUM_PTS2 = 2000
 
-# Given a DataFrame and a set of column headings to include, return a NumPy
-# matrix with all these features prepared and concatenated. "Prepared" means:
-# (1) for categorical variables, one-hot them, and (2) for numeric variables,
-# compute their Z-scores.
-def prepare_this_puppy(df, include):
-    lb = LabelBinarizer()
-    prepared_features = []
-    for feature in include:
-        if is_numeric_dtype(df[feature].dtype):
-            thing = df[feature]-df[feature].mean()/df[feature].std()
-            prepared_features.append(np.array([thing.as_matrix()]).transpose())
-        else:
-            prepared_features.append(lb.fit_transform(df[feature]))
-    return np.concatenate(prepared_features, axis=1)
+for _ in range(NUM_PTS1):
+    eggs.append(1)
+    bacon.append(1)
+    bananas.append(np.random.choice([1,0],p=[.6,.4]))
+    pizza.append(np.random.choice([1,0],p=[.8,.2]))
+    coffee.append(np.random.choice([1,0],p=[.3,.7]))
 
-feature_sets = [
-    {'lightsaber','beard','height','demeanor'},
-    {'lightsaber','beard','height'},
-    {'lightsaber','beard','demeanor'},
-    {'lightsaber','beard'},
-    {'lightsaber','height','demeanor'},
-    {'lightsaber','height'},
-    {'lightsaber','demeanor'},
-    {'lightsaber'},
-    {'beard','height','demeanor'},
-    {'beard','height'},
-    {'beard','demeanor'},
-    {'beard'},
-    {'height','demeanor'},
-    {'height'},
-    {'demeanor'}]
-scores = {}
+for _ in range(NUM_PTS2):
+    eggs.append(np.random.choice([1,0],p=[.7,.3]))
+    bacon.append(np.random.choice([1,0],p=[.1,.9]))
+    bananas.append(np.random.choice([1,0],p=[.6,.4]))
+    pizza.append(np.random.choice([1,0],p=[.8,.2]))
+    coffee.append(np.random.choice([1,0],p=[.3,.7]))
 
-for feature_set in feature_sets:
-    train_features = prepare_this_puppy(train,feature_set)
-    test_features = prepare_this_puppy(test,feature_set)
-
-    naive_bayes = MultinomialNB()
-    naive_bayes.fit(train_features,train.type.as_matrix())
-    nb_predictions = naive_bayes.predict(test_features)
-    scores[tuple(feature_set)] = round(
-        sum(nb_predictions == test.type)/len(test)*100,2)
-
-import operator
-sorted_scores = sorted(scores.items(), key=operator.itemgetter(1), reverse=True)
-for feature_set, score in sorted_scores[:10]:
-    print("{}: {:.2f}".format(','.join(sorted(feature_set)),score))
+transactions = pd.DataFrame({
+    'eggs':eggs,
+    'bacon':bacon,
+    'bananas':bananas,
+    'pizza':pizza,
+    'coffee':coffee})
 \end{Verbatim}
-\normalsize
+\vspace{-.2in}
 \begin{center}
 \line(1,0){400}
 \end{center}
+\normalsize
 
+We have five items in our store, all of which have different priori
+probabilities of being purchased (about 60\% of all transactions have bananas,
+80\% have pizza, \textit{etc.}) but we've ensured that in addition to the
+purely random ones, we've got a solid \textit{thousand} transactions with both
+bacon and eggs. This should guarantee that ``\{bacon\} $\Rightarrow$
+\{eggs\}''
+comes out to be a meaningful association.\footnote{``...and \{eggs\}
+$\Rightarrow$ \{bacon\} too, right?'' you ask. Well, not necessarily, or at
+least not as strong: since 70\% of the random transactions have eggs anyway,
+and only 10\% of them have bacon, we're going to get a lot of bacon-less
+egg-full transactions, which will dial down the confidence of that
+association. But let's wait and see what \texttt{mlxtend} says.}
 \pagebreak
-The output I got when I ran this was:
+Okay, let's analyze. First, just for giggles, let's shuffle the data frame's
+rows so they're in a random order (not strictly necessary, but just on
+principle):
 
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+transactions = transactions.sample(frac=1)
+\end{Verbatim}
+
+and now let \texttt{mlxtend} do its work:
 \begin{center}
 \line(1,0){400}
 \end{center}
-\footnotesize
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-beard,height,lightsaber: 93.87
-beard,demeanor,height,lightsaber: 93.40
-beard,demeanor,lightsaber: 93.20
-beard,lightsaber: 90.00
-demeanor,height,lightsaber: 90.00
-height,lightsaber: 90.00
-demeanor,lightsaber: 90.00
-lightsaber: 90.00
-beard,demeanor,height: 85.80
-beard,height: 85.60
+from mlxtend.frequent_patterns import apriori
+from mlxtend.frequent_patterns import association_rules
+
+itemsets = apriori(baskets, min_support=0.1, use_colnames=True)
+\end{Verbatim}
+\vspace{-.3in}
+\begin{center}
+\line(1,0){400}
+\end{center}
+
+This uses the so-called \textbf{apriori algorithm}. It takes place in two
+steps: first, generate all itemsets, and compute their ``support,'' but only
+those for a certain minimum support level (in this case, 0.1). The ``but
+only''
+phrase is for simple combinatorics reasons: if you think about it, the number
+of possible itemsets is rather large if we have many columns. In fact, if we
+have $N$ columns, there are $2^N$ different itemsets!\footnote{Sample numbers:
+if we have 100 different items for sale in our store -- certainly not a very
+large number at all -- we'll have 1,267,650,600,228,229,401,496,703,205,376
+different itemsets to consider. This is far, far more than the number of atoms
+in the universe.} The apriori algorithm is smart about not evaluating them
+all, because it uses an easy trick: in order for an itemset to have greater
+than (say) .1 support, \textit{all of its subsets} must also have at least
+that much support. This lets apriori whittle down greatly the number of
+itemsets it needs to consider.
+
+\vspace{.1in}
+Let's print out the ten itemsets with the greatest support:
+\footnotesize
+\begin{center}
+\line(1,0){400}
+\end{center}
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+>>> itemsets.sort_values('support',ascending=False).head(10)
+   support                itemsets
+  0.816000                  [eggs]
+  0.801667                 [pizza]
+  0.650667           [eggs, pizza]
+  0.593333               [bananas]
+  0.486000         [bananas, eggs]
+  0.475333        [bananas, pizza]
+  0.401667                 [bacon]
+  0.387667  [bananas, eggs, pizza]
+  0.380667           [bacon, eggs]
+  0.316000          [bacon, pizza]
 \end{Verbatim}
 \normalsize
+\vspace{.3in}
+\pagebreak
+Not surprisingly, the one-item itemsets feature prominently in the list, with
+eggs on the very top since not only did all of the first 1000 transactions had
+eggs, but about 70\% of the others did as well.
+
+\vspace{.1in}
+And now, the second step: generate (and compute stats on) all possible
+association rules involving those item sets:
 \begin{center}
 \line(1,0){400}
 \end{center}
-
-By a hair, the feature set that excludes \texttt{demeanor} but includes
-everything else did the best, with 93.87\% accuracy. Right behind it was the
-full feature set. (If we ran this multiple times, with different training set
-choices, our results would vary somewhat.) This isn't too surprising, since in
-this artificial data set, all of the features \textit{were} pretty indicative
-of Jediness/Sithness, and they all \textit{were} fairly independent of each
-other.
-
-\subsubsection{Sadly...}
-
-Now here's the deal. Although we might think we could declare victory with
-this ``consider all the possible subsets and choose the best'' technique, it
-turns out that except in very small cases, \textit{it's absolutely
-impossible.} Consider: what if instead of four features, we had forty?
-(Certainly not a large number of features by \textit{any} means.) We would
-have had:
-\begin{align*}
-2^{40} = 1,099,511,627,776
-\end{align*}
-
-or over a trillion different possible sets of features. Even if we could train
-a \textit{thousand} different classifiers on our training data \textit{every
-second}, here's how long it would take:
-
-\footnotesize
-\begin{align*}
-1,099,511,627,776 \times 
-    \frac{1\ \textrm{second}}{1000\ \textrm{classifiers}} \times
-    \frac{1\ \textrm{minute}}{60\ \textrm{seconds}} \times
-    \frac{1\ \textrm{hour}}{60\ \textrm{minutes}} \times
-    \frac{1\ \textrm{day}}{24\ \textrm{hours}} \times
-    \frac{1\ \textrm{year}}{365\ \textrm{days}} = 34.9\ \textrm{years}
-\end{align*}
-
-\normalsize
-Ouch. You probably haven't even been alive for that long. And obviously the
-situation gets worse the greater the number of features. If we had merely 100
-features (also not an unreasonably large number at all), the universe will
-have long since died of heat death by the time we're finished considering
-subsets, even if we had every computer that had ever been made working
-non-stop on the problem.
-
-\subsection{``Greedy'' approaches: forward \& backward selection}
-
-So we have to find a way to choose a subset of features without considering
-every different possibility. The most common way to do this is to use a
-\textbf{greedy algorithm}, which means a procedure that finishes computing
-quickly because it repeatedly takes (possibly non-optimal) shortcuts. More
-precisely, a greedy algorithm always chooses \textit{the immediately
-best-looking option} and goes with it, ignoring the fact that if it took more
-time and considered further ahead, it would have made a different choice.
-
-(To further illustrate a greedy algorithm: imagine a chess program that always
-tried to take a piece if one was open to capture. It figures, ``hey, taking
-the opponent's pieces is a good thing, and there's a piece sitting there
-unprotected: why not take it?'' Obviously such an algorithm might play well
-against a newbie, but against even a modestly sophisticated player it would
-suck, since it would be easily lured into traps. Without being able to
-consider the longer-term consequences of what it's doing, it would make many
-decisions that looked good in the near-term but which would soon be revealed
-as dumb.)
-
-\subsubsection{Forward selection}
-
-The most common greedy algorithm used for feature selection is simply this:
-
-\begin{itemize}
-\itemsep.1em
-\item Train $p$ different one-feature classifiers, where $p$ is the number of
-features, and see how each one does. Choose as the winner the feature that
-works the best in isolation.
-\item Now, for each of the $p-1$ remaining features, train a classifier with
-your original winner \textit{plus} the new one. Choose as the winner the
-``best''\footnote{I put ``best'' in quotes here because it may well not actually
-be the best two-feature classifier out of all possible two-feature
-classifiers, as we'll see.} \textit{two}-feature classifier.
-\item Repeat this for each of the $p-2, p-3, p-4, \dots$ remaining features,
-finding the best ``best'' three-feature, four-feature, five-feature, $\dots$
-classifier.
-\item Your final answer is the best of the ``best.'' Out of the ``best''
-one-feature, two-feature, \textit{etc.} classifiers, choose the one with the
-best performance. This is the feature set you'll declare the winner.
-\end{itemize}
-
-Two things are important to see here. First, you're training and considering a
-\textit{vastly} smaller number of classifiers than you are in the ``best
-subset'' approach we did previously. For the forty feature case, you'll be
-considering:
-
-\begin{align*}
-\textrm{forward selection}&: 40 + 39 + 38 + \dots + 1 = 780\ \textrm{classifiers}\\
-\textrm{best subset}&: 2^{40} = 1,099,511,627,776\ \textrm{classifiers}\\
-\end{align*}
-
-The time it will take to do this has gone from 35 years to .78
-\textit{seconds}. Not bad.
-
-The second thing to recognize is that we are \textit{not} by any means
-guaranteed to get the best possible set of features this way. In fact, we
-almost certainly won't. To see this, you have to realize that the feature that
-looks the best of all in isolation might \textit{not} be one of the
-\textit{pair} of features that works best as a pair. And this phenomenon
-continues every iteration of our forward selection loop.
-
-This can seem weird at first: if feature $F_{26}$ gives us the best
-one-feature classifier of all forty, shouldn't feature $F_{26}$ plus another
-one be the best \textit{two}-feature classifier? The answer is not
-necessarily. Much of the reason why has to do with the overlap between
-features -- recall that they will almost certainly contain redundant
-information among them, and so if you knew from the outset that you wanted a
-two-feature classifier, you might well choose $F_4$ and $F_{39}$ instead of
-$F_{26}$, which was a great solo artist but didn't pair up as well with anyone
-else.
-
-\subsubsection{Backward selection}
-
-As you might have guessed, you can do this entire process ``in reverse'':
-
-\begin{itemize}
-\itemsep.1em
-\item Start by including \textit{every} feature (instead of none of them).
-\item Train $p$ different $p-1$-feature classifiers, each of which
-\textit{leaves out} one feature. Choose as the winner the one with the
-best performance.
-\item Now, repeatedly leave out another feature, and choose as a winner the
-best $p-2$-feature, $p-3$-feature, $p-4$-feature, $\dots$ classifier.
-\item Your final answer is the best of the ``best.'' Out of the ``best''
-$p-1$-feature, $p-2$-feature, \textit{etc.} classifiers, choose the one with
-the best performance. This is the feature set you'll declare the winner.
-\end{itemize}
-
-Backward selection has the same advantages and disadvantages as forward
-selection. Unsurprisingly, it will ordinarily \textit{not} produce the same
-``best'' feature set that forward selection does (nor that best-subset does).
-Often data scientists perform both forward and backward selection and then
-spend some time scrutinizing the feature sets each came up with to decide on
-their final, best feature set.
-
-\subsubsection{Evaluating classifier ``goodness''}
-
-By the way, I repeatedly referred to ``best performance'' in the description
-above. What does this mean in practice? 
-
-We know that more complex (``wiggly'') classifiers will tend to overfit a
-data set. Hence we can't blindly use performance on a training set to choose
-between a four-feature classifier and a five-feature classifier, since the
-five-feature one will \textit{almost certainly win for the wrong reasons.} If
-it has more features to work with, it has more flexibility, and hence will
-surely ``wiggle'' closer to the points it trains on. This could be a blessing
-but also a curse, depending on whether it's really picking up signal or
-locking on to noise.
-
-There are two different ways of dealing with this problem in order to
-``fairly'' compare classifiers of different complexities. I think of them as
-the math-oriented and the computer-science-oriented ways:
-
-\begin{itemize}
-\itemsep.1em
-
-\item \textbf{The ``math-oriented'' way.} If you use the entire data set to
-train on, you can still adjust for the complexity factor by
-\textit{penalizing} more complex models in a principled way. The details are
-outside the scope of this class, but I'll throw the following buzzterms at you
-so that if you see them you'll know what category to file them under:
-w that more complex (``wiggly'')
-classifiers will tend to overfit a training set. Hence we can't blindly use
-the training-set 
-
-\textbf{``Mallows' $C_p$''}, \textbf{AIC}, \textbf{BIC}, and \textbf{adjusted
-$R^2$}. All of these are ways of taking a model's error rate and adjusting it
-in light of how complex that model is, and therefore how likely it is to
-overfit.
-
-\item \textbf{The ``computer-science-oriented'' way.} Just use a separate
-training set and test set. Drr.
-
-\end{itemize}
-
 \small
-\subsection{Shrinkage}
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+>>> rules = association_rules(itemsets)
+>>> rules.sort_values('confidence',ascending=False).head(10)
 
-For completeness, I briefly mention two other common methods of feature
-reduction. The first, most commonly used in linear regression/classification,
-goes by the general term ``\textbf{shrinkage},'' and its two most common
-variants are called \textbf{ridge regression} and \textbf{lasso regression}.
-These can both be thought of as ways of ``partially including'' features. Each
-of them has a parameter you can dial to control how aggressively they will
-``shrink'' coefficients to zero. This helps when some of your features are
-correlated with others, since dialing down their influence will prevent them
-from jointly dominating the prediction. The mathematics are subtle, although
-one point worth mentioning is that with lasso, feature coefficients can
-actually be reduced all the way to \textit{zero}, which effectively eliminates
-them and performs a kind of feature selection as in the previous section.
-(Ridge regression does not have this property.)
+             antecedants consequents  support  confidence      lift 
+                 (bacon)      (eggs) 0.375000    0.953390  1.192731 
+          (pizza, bacon)      (eggs) 0.302333    0.947753  1.185680 
+        (bananas, bacon)      (eggs) 0.228333    0.947441  1.185289 
+ (pizza, bananas, bacon)      (eggs) 0.183333    0.940171  1.176194 
+         (coffee, bacon)      (eggs) 0.116000    0.938005  1.173485 
+         (coffee, bacon)     (pizza) 0.102667    0.830189  1.036872 
+          (eggs, coffee)     (pizza) 0.193667    0.812587  1.014889 
+                 (bacon)     (pizza) 0.319000    0.811017  1.012927 
+        (bananas, bacon)     (pizza) 0.195000    0.809129  1.010569 
+           (eggs, bacon)     (pizza) 0.302333    0.806222  1.006939 
+\end{Verbatim}
+\begin{center}
+\line(1,0){400}
+\end{center}
+\normalsize
 
-\subsection{Transforming the feature space}
+As expected, ``\{bacon\} $\Rightarrow$ \{eggs\}'' has a very high confidence
+(and support, and lift), as do rules of the form ``\{bacon + various other
+stuff\} $\Rightarrow$ \{eggs\}.'' Even in this synthetic case, however, the
+lift values aren't all that high numerically, so don't expect them to be.
 
-Finally, one of the coolest approaches to reducing the feature space is to
-\textit{transform it into a different set of dimensions}. This may sound
-heady, and it is: it involves some linear algebra which you may know or learn
-someday. But the basic idea is that the raw features themselves, as given in
-the data set, may not be the most useful measurements of the data: perhaps
-some \textit{combinations} of the features can give us more mileage. Instead
-of height, age, salary, and work experience, perhaps we can take some
-mathematical function of height-and-age, and another mathematical function of
-salary-and-work-experience, and work with those two combined features instead.
-(Often, the combined features will involve components of \textit{all} the
-original features, not just in pairs as in this example.) The general term
-\textbf{dimensionality reduction} is what to look for in this area, together
-with specific techniques like \textbf{principal components analysis} (PCA) and
-\textbf{singular value decomposition} (SVD).
 
 
