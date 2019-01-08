@@ -2,12 +2,12 @@
 % INCLUDING ONE-HOT ENCODING
 
 
-\chapter{Machine Learning classifiers}
+\chapter{ML classifiers: Na\"{i}ve Bayes}
 
 For some folks, the coolest and most exciting parts of Data Science are the
-under-the-hood techniques for doing prediction and analytics. We'll look at a
-few of them briefly in this class, and you'll delve into them more fully in
-later courses.
+\textbf{machine learning (ML)} algorithms. These are the under-the-hood
+techniques for doing prediction and analytics. We'll look at a few of them
+briefly in this class, and you'll delve into them more fully in later courses.
 
 Recall that a \textbf{classifier} is an algorithm/program to predict which of
 several \textbf{labels} (or \textbf{classes}) to assign to a data point.
@@ -39,7 +39,7 @@ the answers for the test data, feed them to the algorithm which has been
 trained on the \textit{training} points, and then score how well it did.
 
 One of the simplest (and quickest) classifiers around is called the
-\textbf{Naive Bayes classifier}, for reasons which will become apparent. In
+\textbf{Na\"{i}ve Bayes classifier}, for reasons which will become apparent. In
 some ways, it's the rock-bottom, no-frills default algorithm for
 classification. One reason it's important is that it's simple and actually
 works surprisingly (even embarrassingly) well in many cases. Another reason is
@@ -47,7 +47,7 @@ that even when it doesn't turn out to have the best performance,
 it's still a \textbf{baseline} which other algorithms' performance can be
 compared to. A researcher might report: ``our whiz-bang algorithm X got 89.4\%
 of examples correct on this test set, compared with 83.7\% for straightforward
-Naive Bayes.''
+Na\"{i}ve Bayes.''
 
 \section{Background: Probability}
 
@@ -191,7 +191,7 @@ statements in statistics and even all of mathematics.
 
 \subsection{Independence}
 
-We need one more background concept before we attack Naive Bayes Classifiers,
+We need one more background concept before we attack Na\"{i}ve Bayes Classifiers,
 and that is the \textbf{independence} of events.
 
 Simply put, two events are ``independent'' if \textit{whether one of them
@@ -221,7 +221,7 @@ P(A,B) &= P(A) \cdot P(B) \\
 P(A|B) &= P(A)
 \end{align*}
 
-\section{The Naive Bayes algorithm}
+\section{The Na\"{i}ve Bayes algorithm}
 
 Suppose we're designing a security system for a Galactic Cruiser. One thing we
 need to do is identify possible evildoers on our security cameras. Given what
@@ -261,7 +261,7 @@ security camera \#305. Should we sound the alarm? That, of course, depends
 upon their (as yet unknown) \texttt{type}. We want to predict this based on
 our past examples.
 
-The \textbf{Naive Bayes} classification algorithm applies conditional
+The \textbf{Na\"{i}ve Bayes} classification algorithm applies conditional
 probability to this problem. Really, what we're asking is: ``which of
 the following two quantities is greater:
 
@@ -336,11 +336,11 @@ this, go back to the definition of conditional probability. We're really
 calculating $\dfrac{P(\textrm{yes},\textrm{Jedi})}{P(\textrm{Jedi})}$ here,
 which is ``the number of bearded Jedi divided by the number of total Jedi.''}
 
-This is called \textbf{the Naive Bayes assumption}. Of course it's probably
+This is called \textbf{the Na\"{i}ve Bayes assumption}. Of course it's probably
 not true that beardedness, height, demeanor, and lightsaber color are all
 independent of each other; for one thing, if some or all of these features are
 indicative of Jedi-ness (which we hope), then they certainly \textit{do} vary
-together. But the Naive Bayes classifier says ``aw heck, let's just throw
+together. But the Na\"{i}ve Bayes classifier says ``aw heck, let's just throw
 caution to the wind and see how things work out.''
 
 \section{A numerical example}
@@ -502,7 +502,7 @@ def predict(beard, height, demeanor, lightsaber):
     else:
         return "Sith"
 \end{Verbatim}
-\caption{Our Naive Bayes ML \texttt{predict} function.}
+\caption{Our Na\"{i}ve Bayes ML \texttt{predict} function.}
 \label{fig:predictFunc}
 \end{figure}
 
@@ -694,7 +694,7 @@ another, it's up to us to somewhat arbitrarily choose how many bins to use and
 where the demarcation lines are. This has an \textit{ad hoc} feel to it.
 
 Better is to treat the continuous variable as what it really is: a number.
-\textbf{Gaussian Naive Bayes} is probably the most common way to deal with
+\textbf{Gaussian Na\"{i}ve Bayes} is probably the most common way to deal with
 this in a principled fashion: we make the assumption that the numeric feature
 is distributed \textbf{normally} (``normal''==``Gaussian''), and estimate its
 mean and standard deviation from the training data. Then, to estimate
@@ -717,7 +717,7 @@ of a categorical one. Our data might look like this:
                     . . .
 \end{Verbatim}
 
-Our Gaussian Naive Bayes assumption will be that \textit{for each class, the
+Our Gaussian Na\"{i}ve Bayes assumption will be that \textit{for each class, the
 \texttt{height} feature is distributed normally}. If we take all the
 \texttt{Jedi} rows, and calculate their \texttt{height}s' mean and standard
 deviation, we get:
