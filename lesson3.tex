@@ -111,8 +111,9 @@ the song \textit{Kakumei}). Clearly, there should be some (positive)
 relationship between the two quantities: when \texttt{num\_hrs} is high, you'd
 expect \texttt{score} to also be high. If you're familiar with the game,
 though, you know that the zero points for these variables do \textit{not}
-coincide: if you've never ever played at all, you'll still manage to stumble
-through the song, learn how to play as you go, and get a positive score.
+coincide: even if you've never ever played at all, you'll still manage to
+stumble through the song, learn how to play as you go, and get a positive
+score.
 
 Let's generate the \texttt{num\_hrs} variable first, and then generate the
 \texttt{score} variable based on that.
@@ -206,7 +207,7 @@ your list \textit{without replacement} (meaning once a value is chosen, it
 will not be chosen again). This is often useful.
 \item \texttt{p} -- a list of \textit{probabilities} (in the range 0 to 1)
 specifying how likely each element in the list is to be chosen. (Note these
-must sum to 1, and NumPy dumbly will not normalize it for you.)
+must sum to 1; and NumPy, stupidly, will not normalize it for you.)
 \end{compactitem}
 
 A more complicated example:
