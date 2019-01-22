@@ -111,9 +111,10 @@ exploratory statistics and plots too much.}
 The answers to these questions determines what kind of \textbf{statistic} is
 relevant, and what kind of \textbf{plot} is appropriate.
 
+\bigskip
 Example: let's say we're exploring a data set of great works of literature:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+\begin{Verbatim}[fontsize=\normalsize,samepage=true,frame=single]
 >>> books.head()
                        gender  year     lang   words
 name                                                
@@ -122,7 +123,6 @@ The Brothers Karamazov      M  1879  Russian  364153
 Anna Karenina               M  1877  Russian  349736
 The Inferno                 M  1320  Italian   45750
 Huck Finn                   M  1884  English  109571
-
 \end{Verbatim}
 
 For each book, we have the \texttt{gender} of the author, the \texttt{year}
@@ -130,6 +130,7 @@ and \texttt{language} in which it was written, and the total number of
 \texttt{words} it contains. Clearly \texttt{gender} and \texttt{lang} are
 categorical variables, while \texttt{year} and \texttt{words} are numeric.
 
+\pagebreak
 \subsection{Case 1: univariate categorical data}
 
 When looking at just one variable, which is categorical in nature, the
@@ -158,7 +159,7 @@ can create by simply tacking \texttt{.plot.bar()} at the end:
 \includegraphics[width=0.8\textwidth]{barplot.png}
 \end{center}
 
-\subsection{Case 1: univariate numeric data}
+\subsection{Case 2: univariate numeric data}
 
 When your single variable of interest is numeric, as is the \texttt{words}
 column, the appropriate statistics are \textbf{mean}, \textbf{standard
@@ -397,24 +398,28 @@ For instance, take this DataFrame:
     Rey              Apprentice   blue  Light
 \end{Verbatim}
 
+\begin{samepage}
 This query works just fine:
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+\begin{Verbatim}[fontsize=\normalsize,samepage=true,frame=single]
 >>> characters.loc['Kylo Ren':'Rey']['rank']
     name
     Kylo Ren    Apprentice
     Rey         Apprentice
     Name: rank, dtype: object
 \end{Verbatim}
+\end{samepage}
 
+\begin{samepage}
 so naturally you'd think you could do this:
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 >>> characters.loc['Kylo Ren':'Rey']['rank'] = 'Jedi'
 \end{Verbatim}
+\end{samepage}
 
 Alas, no:
 
 \quad \texttt{A value is trying to be set on a copy of a slice from a DataFrame.}
+\bigskip
 
 The solution is best performed in two steps. First, compute the \textbf{index
 values} of the rows you want to change. In this case, they're the rows from
@@ -431,8 +436,6 @@ syntax and the proper column to actually set the values:
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 >>> characters.loc[soon_to_be_jedi,'rank'] = 'Jedi'
 \end{Verbatim}
-
-(Your mileage may vary.)
 
 
 % Significant?:
