@@ -1,5 +1,6 @@
 
 \chapter{Correlation, the NumPy library}
+\label{ch:correlation}
 
 \section{``Are these things correlated?''}
 
@@ -16,6 +17,7 @@ Here are my preferred quick-and-dirty ways.
 
 A quick and dirty way to tell whether two variables in a contingency table
 affect each other is to run a $\chi ^2$ test:
+\label{chisq}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 >>> import scipy.stats
@@ -56,6 +58,7 @@ do a t-test if the notches look funny; see \texttt{scipy.stats.ttest\_ind} and
 
 Besides visually inspecting scatterplots to spot correlations, the Pearson's
 correlation coefficient can give you a quick-and-dirty answer:
+\label{pearsonsR}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 >>> import scipy.stats.stats
