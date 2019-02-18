@@ -226,9 +226,9 @@ M       French     209
 Name: lang, dtype: int64
 \end{Verbatim}
 
-which shows, for each \texttt{gender}, how many books in each \texttt{lang}
-are in the data set. I personally think the \texttt{pd.crosstab()} function is
-a bit easier on the eyes for this, though, and it can also compute margins:
+which shows, for each \texttt{gender}, how many books in each \texttt{lang} are
+in the data set. I personally think the \texttt{pd.crosstab()} function is a
+bit easier on the eyes for this, though:
 
 \begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=single]
 >>> gender_lang = pd.crosstab(books['lang'], columns=books['gender'])
@@ -240,7 +240,18 @@ French   79  209
 Italian  29   87
 Russian  11  115
 Spanish  34  193
+\end{Verbatim}
 
+\subsubsection{Margins: raw counts}
+
+The \texttt{pd.crosstab()} function is also useful for computing
+\textbf{margins}, or row/column aggregate information. The easy part is to
+include ``\texttt{margins=True}'' as an argument to \texttt{pd.crosstab()}. The
+tricky part is understanding the different ways of presenting the margins,
+since they're each subtly different and often confused. So heads up. Our first
+use of margins will be to simply compute \textbf{raw counts}:
+
+\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=single]
 >>> gender_lang = pd.crosstab(books['lang'], columns=books['gender'], margins=True)
 >>> print(gender_lang)
 gender     F    M   All
@@ -253,7 +264,23 @@ Spanish   34  193   227
 All      205  800  1005
 \end{Verbatim}
 
-Get overall percentages with:
+In this table, the margins are \textit{total counts for each row, and for each
+column.} Inspect the table and verify this is so: for each row (say,
+\texttt{English}) the sum of the \texttt{F} entry (52) and \texttt{M} entry
+(196) is equal to the total in the \texttt{All} entry (248). Similarly, the sum
+of the entire first column (the \texttt{F}'s for all languages, which are 52,
+79, 29, 11, and 34) is equal to the \texttt{All} element of that column (205).
+And of course, the sum of the \texttt{All} rows -- or \texttt{All} columns,
+same diff -- is the grand total of 1005.
+
+\subsubsection{Margins: overall percentages}
+
+Now suppose we \textit{divide every value of this table} by the grand total.
+(We could literally divide by the number 1005, or divide by
+\texttt{gender\_lang.loc['All']['All']}, since that's how to programmatically
+obtain the value of the bottom-right-hand entry.) This gives us \textbf{overall
+proportions}, and if we multiply by 100, \textbf{overall percentages}:
+
 \begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=single]
 >>> gender_lang / gender_lang.loc['All']['All'] * 100
 gender       F      M     All
@@ -266,11 +293,20 @@ Spanish   3.38  19.20   22.59
 All      20.40  79.60  100.00
 \end{Verbatim}
 
-which tells us that over $\frac{1}{5}$th of all these books were written in
-French by males. You can get column totals like so:
+Note carefully how to interpret this result: the sum total of all the table's
+entries (except for those in the \texttt{All} row/column) is equal to 100\%.
+This tells us that over $\frac{1}{5}$th (20.8\%) of all these books
+\textit{were written in French by males}, only about 1\% of the books
+\textit{were written in Russian by females}, and so forth.
+
+\subsubsection{Margins: percentages by column}
+
+By contrast, sometimes it's more helpful to have \textit{each column} add up to
+100\%, rather than the entire table adding up to 100\%. You can accomplish this
+like so:
 
 \begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=single]
->>> gender_lang / gender_lang.loc['All'] * 100
+>>> gender_lang.div(gender_lang.loc['All'],axis=1) * 100
 gender        F       M     All
 lang                           
 English   25.37   24.50   24.68
@@ -281,12 +317,20 @@ Spanish   16.59   24.12   22.59
 All      100.00  100.00  100.00
 \end{Verbatim}
 
-Now each column sums to 100\%, which lets us see, for instance, that female
-authors are heavily slanted towards the French language, whereas hardly any
-females write in Russian.
+(For now, the ``\texttt{.div()}'' call, and the ``\texttt{axis=1}'' thing, are
+best to just follow verbatim rather than trying to understand what they mean.)
 
-By-row totals are a bit trickier; you have to use the \texttt{.div()} method
-to divide by the other axis:
+Notice that every \texttt{All} entry at the bottom is now equal to 100.
+(The \texttt{All} entries on the right side are \textit{not}.) This view of
+things allows us to see the language data \textit{on a per-gender basis}. For
+instance, over 38\% \textit{of all the female authors} wrote in French, whereas
+only 26\% \textit{of all the males} were in French.
+
+\subsubsection{Margins: percentages by row}
+
+We can do the corresponding process on a by-row basis by changing our syntax to
+this:
+
 \begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=single]
 >>> gender_lang.div(gender_lang['All'],axis=0) * 100
 gender       F      M    All
@@ -299,8 +343,17 @@ Spanish  14.98  85.02  100.0
 All      20.40  79.60  100.0
 \end{Verbatim}
 
-Now each \textit{row} sums to 100\%, which allows us to see that 91.27\% of
-the Russian books were written by men, but only 75\% of the Italian ones were.
+\underline{Important}: there are \textit{two} changes here from the previous
+example, only one of which jumps out at you. The obvious one is that we have
+``\texttt{axis=0}'' instead of ``\texttt{axis=1}''. But the one that's easy to
+miss is that instead of ``\texttt{gender\_lang.loc['All']}'' we now have
+``\texttt{gender\_lang['All']}'' (with \textit{no} ``\texttt{.loc}''). If you
+forget this part, you'll get nonsense.
+
+If you do it correctly, each \textit{row} (not column) will now sum to 100\%,
+which gives us gender data \textit{on a per-language basis}. For example,
+we can see that 91.27\% \textit{of the Russian books} were written by
+men, but only 75\% \textit{of the Italian ones} were.
 
 You can stare at these numbers to get a feel for the them, and this is
 encouraged. As we'll see in Lesson~\ref{ch:correlation} (p.~\pageref{chisq}),
@@ -437,6 +490,7 @@ syntax and the proper column to actually set the values:
 >>> characters.loc[soon_to_be_jedi,'rank'] = 'Jedi'
 \end{Verbatim}
 
+% TODO: copy vs in-place
 
 % Significant?:
 % import scipy.stats.chi2_contingency
