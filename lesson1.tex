@@ -244,6 +244,7 @@ Spanish  34  193
 \end{Verbatim}
 
 \subsubsection{Margins: raw counts}
+\label{marginsBegin}
 
 The \texttt{pd.crosstab()} function is also useful for computing
 \textbf{margins}, or row/column aggregate information. The easy part is to
@@ -356,8 +357,6 @@ which gives us gender data \textit{on a per-language basis}. For example,
 we can see that 91.27\% \textit{of the Russian books} were written by
 men, but only 75\% \textit{of the Italian ones} were.
 
-% TODO: somewhere central, we should probably explain from the bottom-up what
-% "statistically significant" means.
 You can stare at these numbers to get a feel for the them, and this is
 encouraged. As we'll see in Lesson~\ref{ch:correlation} (p.~\pageref{chisq}),
 the proper way to test whether there's a \textbf{statistically significant}
@@ -368,6 +367,7 @@ The only plots I know of to visualize multiple categorical variables are
 \textbf{mosaic plot}s and \textbf{heat map}s, but I think they're difficult to
 interpret and don't really recommend them.
 
+\label{marginsEnd}
 % TODO: gimme a break, show heat maps
 
 \subsection{Case 4: bivariate data: categorical--numerical}

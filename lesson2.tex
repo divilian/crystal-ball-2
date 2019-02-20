@@ -72,7 +72,28 @@ table. Then, the next question is usually, ``okay, the proportions of the
 values of one variable are different across the other variable...but is this
 statistically significant?'' A quick and dirty way to tell is to run a
 \textbf{$\chi ^2$ test} (sometimes written ``chi-squared,'' but pronounced
-``kai squared''): \label{chisq}
+``kai squared''), as shown below.
+
+\label{chisq}
+
+\fbox{\parbox{\textwidth}{
+
+\textbf{*WARNING!} When you run a $\chi ^2$ test on a contingency table, as
+shown below, \textit{it must be a \textbf{margin-less} contingency table!!} In
+other words, if you used any of the techniques from section~\ref{marginsBegin}
+(pp.\pageref{marginsBegin}-\pageref{marginsEnd}) in order to see
+row/column/overall totals, you must \textbf{\textit{not}} use that table with
+the extra ``\texttt{All}'' columns as the argument to the
+\texttt{chi2\_contingency()} function described below. Doing so will give you
+\textit{wrong} and misleading answers, with no obvious indication that they are
+wrong. Always give \texttt{chi2\_contingency()} the original contingency table,
+\textit{without} margins.
+
+}}
+
+\bigskip
+\medskip
+Okay. Warnings aside, here's the code to perform the $\chi ^2$ test:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 >>> import scipy.stats
