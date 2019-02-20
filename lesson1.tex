@@ -132,6 +132,7 @@ categorical variables, while \texttt{year} and \texttt{words} are numeric.
 
 \pagebreak
 \subsection{Case 1: univariate categorical data}
+\label{contingencyTable}
 
 When looking at just one variable, which is categorical in nature, the
 appropriate analysis is the \textbf{one-dimensional contingency table}, which
@@ -355,10 +356,13 @@ which gives us gender data \textit{on a per-language basis}. For example,
 we can see that 91.27\% \textit{of the Russian books} were written by
 men, but only 75\% \textit{of the Italian ones} were.
 
+% TODO: somewhere central, we should probably explain from the bottom-up what
+% "statistically significant" means.
 You can stare at these numbers to get a feel for the them, and this is
 encouraged. As we'll see in Lesson~\ref{ch:correlation} (p.~\pageref{chisq}),
-the proper way to test whether there's a significant relationship between
-these two categorical variables is to use a $\chi ^2$ test.
+the proper way to test whether there's a \textbf{statistically significant}
+relationship between these two categorical variables is to use a $\chi ^2$
+test.
 
 The only plots I know of to visualize multiple categorical variables are
 \textbf{mosaic plot}s and \textbf{heat map}s, but I think they're difficult to
@@ -392,6 +396,7 @@ Read carefully the descriptions for the Python functions
 \texttt{scipy.stats.ttest\_ind()} and \texttt{scipy.stats.ttest\_rel()}.
 
 Another way is to use a \textbf{notched boxplot}:
+\label{notched}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 >>> books.boxplot(column='words',by='lang',notch=True)
