@@ -161,11 +161,15 @@ lightsaber color \textit{does} have something to do with what side of the Force
 you use.
 \end{compactenum}
 
-Okay, that was a lot. The short version of the above: ignore everything except
-element \texttt{[1]} of the \texttt{chi2\_contingency} output. If that number
-is less than .05, interpret it as ``these two categories variables \textit{are}
-in fact correlated,'' and if it's higher, interpret it as ``they don't look to
-be.''
+\textbf{TL;DR}\footnote{If you didn't know, the expression ``TL:DR'', commonly
+used on internet posts, stands for ``too long; didn't read.'' It's used to mark
+a super brief overview of a longer post, for those who want to cut to the chase
+and just get a summary. See
+\url{https://www.lifewire.com/what-is-tldr-2483633}.}: ignore everything except
+the second element (element~\texttt{[1]}) of the output from
+\texttt{chi2\_contingency()}. If that number is less than .05, interpret it as
+``these two categories variables \textit{are} in fact correlated,'' and if it's
+higher, interpret it as ``they don't look to be correlated.''
 
 \subsection{One categorical and one numeric variable}
 
