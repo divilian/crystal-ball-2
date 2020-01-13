@@ -1,90 +1,14 @@
-% ADD scatterplot matrices, and yes you can do them in Python
 
-\chapter{Spyder, review, misc tricks}
+\chapter{Exploratory Data Analysis (EDA): review and extensions}
 
-\section{Spyder}
-We'll be using Spyder this semester: a Python-based data analysis environment
-written especially for Data Science and scientific programming.
+% contingency table margins
+% notched boxplots
+% heatmaps
+% scatterplot matrices
+% facets
 
-It comes with the Anaconda distribution, as does pretty much everything else
-we'll use this semester (scikit-learn, NumPy, SciPy, Pandas, Matplotlib,
-\textit{etc.}) Download it from here: \url{https://www.anaconda.com/download}. 
-
-\textbf{Note:} make sure to get Python \textbf{3.*}, not \textbf{2.*}!! (They
-are \textit{not} mutually compatible.) The number(s) after the dot don't
-matter so much. But before the dot \textit{must} be a \textbf{``3''}.
-
-Don't worry: all the stuff you learned using Python Jupyter Notebooks still
-applies! The only difference is that using an IDE like Spyder is not
-Web-based: it's entirely offline, responsive, and more powerful. You will be
-creating your own \texttt{.py} files directly.
-
-
-\section{Review (?) from DATA 101}
-
-\begin{compactitem}
-\itemsep.1em
-\item Data stuff
-    \begin{compactitem}
-    \item Contingency tables
-    \item Weighted averages (and averages of averages)
-    \item Scatterplots
-    \item Histograms
-    \item Boxplots
-    \item Quantiles
-    \end{compactitem}
-
-\item Python stuff
-    \begin{compactitem}
-    \item Lists and dictionaries
-    \item \texttt{for} loops
-    \item Modifying in-place vs. returning a copy
-    \item Pandas Series \& DataFrames
-        \begin{compactitem}
-        \itemsep.1em
-        \item The ``index''
-        \item \texttt{.iloc} vs. \texttt{.loc} vs. neither
-        \item Single ints/labels vs. slices vs. lists
-        \item Queries
-        \end{compactitem}
-    \end{compactitem}
-\end{compactitem}
-
-\section{Some more advanced extensions to the above}
-
-\subsection{Multi-list iteration}
-
-Suppose you have a bunch of sci-fi movie fans, each of whom gave a 1-to-10
-rating for Star Wars episode VII (\textit{The Force Awakens}) and VIII
-(\textit{The Last Jedi}):
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-    episode7 = [ 9, 6, 10, 10, 9, 10, 10, 10 ]
-    episode8 = [ 9, 7,  4,  8, 8, 10, 10,  7 ]
-\end{Verbatim}
-Say you want a new list \texttt{avgSW} that gives the average rating each
-viewer gave the two movies.
-
-\begin{enumerate}
-\itemsep.1em
-\item One way to do it (caveman style):
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-avgSW = []
-for i in range(len(episode7)):
-    avgSW.append((episode7[i]+episode8[i])/2)
-\end{Verbatim}
-
-\item Another way to do it (modern idiomatic Python) is with ``\texttt{zip}'':
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-avgSW = []
-for e7, e8 in zip(episode7, episode8):
-    avgSW.append((e7+e8)/2)
-\end{Verbatim}
-
-\end{enumerate}
-\section{Exploratory Data Analysis (EDA): review}
-
-When you're first exploring some data, the first and most basic questions to
-ask are:
+Remember, when you're first exploring some data, the first and most basic
+questions to ask are:
 
 \begin{compactenum}
 
@@ -93,17 +17,17 @@ ask are:
 at only one variable, even if there are many observations of that variable. A
 bunch of people's SAT scores comprises a univariate data set, as does a bunch
 of political affiliations, salaries, or declared majors. ``Bivariate'' data
-contains \textit{two} pieces of information for \textit{each} observation: if
-I have data about the SAT score \textit{and} the college GPA for each of a
-bunch of students, that's a bivariate data set. Another example: a data set
-with both the gender and the salary for each of a bunch of adults.}
+contains \textit{two} pieces of information for \textit{each} observation: if I
+have data about both the SAT score and the college GPA for each of a bunch of
+students, that's a bivariate data set. Another example: a data set with both
+the gender and the salary for each of a bunch of adults.}
 
 \item Is it \textbf{categorical} or \textbf{numerical}?\footnote{Recall that a
 ``categorical'' variable is qualitative, typically chosen from a set of
 possible values. Gender, political affiliation, and declared major are all
 examples. ``Numerical'' variables are numbers (duh): salary, GPA, SAT score.
 Numerical variables can further be refined by their scale of measure (ordinal,
-interval, ratio), although that doesn't usually affect the appropriate type of
+interval, ratio), although that often doesn't affect the appropriate type of
 exploratory statistics and plots too much.}
 
 \end{compactenum}
@@ -182,7 +106,7 @@ deviation}, and the various \textbf{quantile} statistics (\textbf{minimum},
 \end{Verbatim}
 
 Translation: on average, the books in our data set each have about 436,739
-words , and if distributed normally (which we haven't checked yet) about
+words, and if distributed normally (which we haven't checked yet) about
 $\frac{2}{3}$rds of them are in the range 436,739 $\pm$ 232,384 (or between
 204355 and 669123 words). The shortest book has 5443 words, the longest a
 whopping 805,341, and half the books in the data set have 462,552 or less. A
@@ -495,9 +419,8 @@ syntax and the proper column to actually set the values:
 >>> characters.loc[soon_to_be_jedi,'rank'] = 'Jedi'
 \end{Verbatim}
 
-% TODO: copy vs in-place
-
 % Significant?:
 % import scipy.stats.chi2_contingency
 % chi2_contingency(side_saber)
 
+% TODO: Weighted averages (and averages of averages)
