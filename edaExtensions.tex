@@ -1,11 +1,20 @@
 
-\chapter{Exploratory Data Analysis (EDA): review and extensions}
+\chapter{EDA: review and extensions}
 
 % contingency table margins
 % notched boxplots
 % heatmaps
 % scatterplot matrices
 % facets
+
+\index{Exploratory Data Analysis (EDA)}
+\index{univariate}
+\index{bivariate}
+\index{multivariate}
+
+In this chapter, we'll review the \textbf{EDA} (\textbf{Exploratory Data
+Analysis}) material you learned in DATA 101, and also present a few additional
+techniques.
 
 Remember, when you're first exploring some data, the first and most basic
 questions to ask are:
@@ -35,11 +44,15 @@ exploratory statistics and plots too much.}
 The answers to these questions determines what kind of \textbf{statistic} is
 relevant, and what kind of \textbf{plot} is appropriate.
 
-\bigskip
+\pagebreak
 Example: let's say we're exploring a data set of great works of literature:
 
-\begin{Verbatim}[fontsize=\normalsize,samepage=true,frame=single]
->>> books.head()
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+books.iloc[0:5,:]
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
                        gender  year     lang   words
 name                                                
 Jane Eyre                   F  1847  English  183858
@@ -54,17 +67,23 @@ and \texttt{language} in which it was written, and the total number of
 \texttt{words} it contains. Clearly \texttt{gender} and \texttt{lang} are
 categorical variables, while \texttt{year} and \texttt{words} are numeric.
 
-\pagebreak
-\subsection{Case 1: univariate categorical data}
+\section{Case 1: univariate categorical data}
 \label{contingencyTable}
+\index{contingencyTable}
+
+\index{value\_counts@\texttt{.value\_counts()} (Pandas)}
 
 When looking at just one variable, which is categorical in nature, the
 appropriate analysis is the \textbf{one-dimensional contingency table}, which
 shows the counts of the various values. Let's create a contingency table for
 the book languages, using Pandas' \texttt{.value\_counts()} function:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
->>> books['lang'].value_counts()
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+books['lang'].value_counts()
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
 French     299
 English    247
 Spanish    217
@@ -74,17 +93,21 @@ Name: lang, dtype: int64
 \end{Verbatim}
 
 The most appropriate plot is a \textbf{bar chart} of these counts, which you
-can create by simply tacking \texttt{.plot.bar()} at the end:
+can create by simply tacking \texttt{.plot(kind="bar")} at the end:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
->>> books['lang'].value_counts().plot.bar()
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+books['lang'].value_counts().plot(kind="bar")
 \end{Verbatim}
 
 \begin{center}
-\includegraphics[width=0.8\textwidth]{barplot.png}
+\includegraphics[width=0.6\textwidth]{barplot.png}
 \end{center}
 
-\subsection{Case 2: univariate numeric data}
+\section{Case 2: univariate numeric data}
+
+\index{mean}
+\index{standard deviation}
+\index{quantiles}
 
 When your single variable of interest is numeric, as is the \texttt{words}
 column, the appropriate statistics are \textbf{mean}, \textbf{standard
@@ -92,12 +115,16 @@ deviation}, and the various \textbf{quantile} statistics (\textbf{minimum},
 \textbf{.25 quantile},  \textbf{median}, \textbf{.75 quantile}, and
 \textbf{maximum}):
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
->>> books['words'].mean()
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+books['words'].mean()
+books['words'].std()
+books['words'].quantile([0,.25,.5,.75,1])
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
 436739.737
->>> books['words'].std()
 232384.719
->>> books['words'].quantile([0,.25,.5,.75,1])
 0.00      5443.0
 0.25    241492.0
 0.50    462552.0
@@ -113,10 +140,12 @@ whopping 805,341, and half the books in the data set have 462,552 or less. A
 quarter of the books have fewer than 241,492 words, and three quarters have
 fewer than 637,765.
 
+\index{histogram}
+
 The best plot in this case is the \textbf{histogram}:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
->>> books['words'].plot.hist(bins=30)
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+books['words'].plot(kind="hist",bins=30)
 \end{Verbatim}
 
 which shows the entire ``lay of the land'' of the distribution of values.
@@ -125,18 +154,24 @@ can get very different pictures of how the data is distributed depending on
 your bin size (more on that in Lesson~\ref{ch:KDEs}).
 
 \begin{center}
-\includegraphics[width=.9\textwidth]{histogram.png}
+\includegraphics[width=.7\textwidth]{histogram.png}
 \end{center}
 
-\subsection{Case 3: bivariate data: categorical--categorical}
+\section{Case 3: bivariate data: categorical--categorical}
+
+\index{groupby@\texttt{.groupby()} (Pandas)}
 
 If you want to explore the relationship between two different variables, both
 of which are categorical, you need a \textbf{two-dimensional contingency
 table}. You can use \texttt{.value\_counts()} again in conjunction with
 \texttt{.groupby()}):
 
-\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=single]
->>> books.groupby('gender')['lang'].value_counts()
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+books.groupby('gender')['lang'].value_counts()
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
 gender  lang   
 F       French      79
         English     52
@@ -151,13 +186,21 @@ M       French     209
 Name: lang, dtype: int64
 \end{Verbatim}
 
+\index{crosstab@\texttt{.crosstab()} (Pandas)}
+
 which shows, for each \texttt{gender}, how many books in each \texttt{lang} are
 in the data set. I personally think the \texttt{pd.crosstab()} function is a
 bit easier on the eyes for this, though:
 
-\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=single]
->>> gender_lang = pd.crosstab(books['lang'], columns=books['gender'])
->>> print(gender_lang)
+\texttt{gender\_lang@\texttt{gender\_lang}}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+gender_lang = pd.crosstab(books['lang'], columns=books['gender'])
+print(gender_lang)
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
 gender    F    M
 lang            
 English  52  196
@@ -167,8 +210,13 @@ Russian  11  115
 Spanish  34  193
 \end{Verbatim}
 
-\subsubsection{Margins: raw counts}
+
+\subsection{Margins: raw counts}
 \label{marginsBegin}
+\index{margins (of a contingency table)}
+\index{raw counts@``raw'' counts}
+
+\index{crosstab@\texttt{.crosstab()} (Pandas)}
 
 The \texttt{pd.crosstab()} function is also useful for computing
 \textbf{margins}, or row/column aggregate information. The easy part is to
@@ -177,9 +225,13 @@ tricky part is understanding the different ways of presenting the margins,
 since they're each subtly different and often confused. So heads up. Our first
 use of margins will be to simply compute \textbf{raw counts}:
 
-\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=single]
->>> gender_lang = pd.crosstab(books['lang'], columns=books['gender'], margins=True)
->>> print(gender_lang)
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+gender_lang = pd.crosstab(books['lang'], columns=books['gender'], margins=True)
+print(gender_lang)
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
 gender     F    M   All
 lang                   
 English   52  196   248
@@ -199,16 +251,21 @@ of the entire first column (the \texttt{F}'s for all languages, which are 52,
 And of course, the sum of the \texttt{All} rows -- or \texttt{All} columns,
 same diff -- is the grand total of 1005.
 
-\subsubsection{Margins: overall percentages}
+\subsection{Margins: overall percentages}
 
 Now suppose we \textit{divide every value of this table} by the grand total.
 (We could literally divide by the number 1005, or divide by
-\texttt{gender\_lang.loc['All']['All']}, since that's how to programmatically
+\texttt{gender\_lang.loc[\textquotesingle All\textquotesingle
+][\textquotesingle All\textquotesingle ]}, since that's how to programmatically
 obtain the value of the bottom-right-hand entry.) This gives us \textbf{overall
 proportions}, and if we multiply by 100, \textbf{overall percentages}:
 
-\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=single]
->>> gender_lang / gender_lang.loc['All']['All'] * 100
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(gender_lang / gender_lang.loc['All']['All'] * 100)
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
 gender       F      M     All
 lang                         
 English   5.17  19.50   24.68
@@ -225,14 +282,20 @@ This tells us that over $\frac{1}{5}$th (20.8\%) of all these books
 \textit{were written in French by males}, only about 1\% of the books
 \textit{were written in Russian by females}, and so forth.
 
-\subsubsection{Margins: percentages by column}
+\subsection{Margins: percentages by column}
 
 By contrast, sometimes it's more helpful to have \textit{each column} add up to
 100\%, rather than the entire table adding up to 100\%. You can accomplish this
 like so:
 
-\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=single]
->>> gender_lang.div(gender_lang.loc['All'],axis=1) * 100
+\index{div@\texttt{.div() (NumPy)}}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(gender_lang.div(gender_lang.loc['All'],axis=1) * 100)
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
 gender        F       M     All
 lang                           
 English   25.37   24.50   24.68
@@ -252,13 +315,19 @@ things allows us to see the language data \textit{on a per-gender basis}. For
 instance, over 38\% \textit{of all the female authors} wrote in French, whereas
 only 26\% \textit{of all the males} were in French.
 
-\subsubsection{Margins: percentages by row}
+\subsection{Margins: percentages by row}
 
 We can do the corresponding process on a by-row basis by changing our syntax to
 this:
 
-\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=single]
->>> gender_lang.div(gender_lang['All'],axis=0) * 100
+\index{div@\texttt{.div() (NumPy)}}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(gender_lang.div(gender_lang['All'],axis=0) * 100)
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
 gender       F      M    All
 lang                        
 English  20.97  79.03  100.0
@@ -272,155 +341,148 @@ All      20.40  79.60  100.0
 \underline{Important}: there are \textit{two} changes here from the previous
 example, only one of which jumps out at you. The obvious one is that we have
 ``\texttt{axis=0}'' instead of ``\texttt{axis=1}''. But the one that's easy to
-miss is that instead of ``\texttt{gender\_lang.loc['All']}'' we now have
-``\texttt{gender\_lang['All']}'' (with \textit{no} ``\texttt{.loc}''). If you
-forget this part, you'll get nonsense.
+miss is that instead of ``\texttt{gender\_lang.loc[\textquotesingle
+All\textquotesingle ]}'' we now have ``\texttt{gender\_lang[\textquotesingle
+All\textquotesingle ]}'' (with \textit{no} ``\texttt{.loc}''). If you forget
+this part, you'll get nonsense.
 
 If you do it correctly, each \textit{row} (not column) will now sum to 100\%,
 which gives us gender data \textit{on a per-language basis}. For example,
 we can see that 91.27\% \textit{of the Russian books} were written by
 men, but only 75\% \textit{of the Italian ones} were.
 
-You can stare at these numbers to get a feel for the them, and this is
-encouraged. As we'll see in Lesson~\ref{ch:correlation} (p.~\pageref{chisq}),
-the proper way to test whether there's a \textbf{statistically significant}
-relationship between these two categorical variables is to use a $\chi ^2$
-test.
+\subsection{\textit{Warning!}}
 
-The only plots I know of to visualize multiple categorical variables are
-\textbf{mosaic plot}s and \textbf{heat map}s, but I think they're difficult to
-interpret and don't really recommend them.
+\index{statistical significance}
+\index{$\chi ^2$ test}
+
+Now you can stare at these numbers to get a feel for the them, and this is
+encouraged. Remember, though, the proper way to test whether there's a
+\textbf{statistically significant} relationship between two categorical
+variables is to use a $\chi ^2$ test. And that leads me to mention a very
+common pitfall.
+
+\index{chi2\_contingency()@\texttt{chi2\_contingency()} (SciPy)}
+
+Recall that when you call \texttt{scipy.stats.chi2\_contingency()}, you pass it
+the contingency table. All well and good. But you must remember to pass it
+\textit{the original contingency table \textbf{without} margins!} Once you've
+started to compute and display margins, it's all too easy to forget that adding
+margins \textit{adds a row and a column to the table} (for the ``\texttt{All}''
+information) and if you give \texttt{chi2\_contingency()} this extraneous data
+it messes up the whole $\chi ^2$ computation.
+
+This is why in all the examples above, I deliberately did \textit{not} store
+the ``margined'' version of the table back into the \texttt{gender\_lang}
+variable. Instead, I kept only the table of raw counts in the variable, and
+simply \textit{printed} the margined version when necessary, a la:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+# Correct!
+gender_lang = pd.crosstab(books['lang'], columns=books['gender'])
+print(gender_lang.div(gender_lang.loc['All'],axis=1) * 100)
+scipy.stats.chi2_contingency(gender_lang)
+\end{Verbatim}
+
+I've seen plenty of well-intentioned students do this instead:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+# WRONG!
+gender_lang = pd.crosstab(books['lang'], columns=books['gender']).div(
+    gender_lang.loc['All'],axis=1) * 100)
+print(gender_lang)
+scipy.stats.chi2_contingency(gender_lang)
+\end{Verbatim}
+
+which leads to madness.
+
+\subsection{(Not) plotting multiple categorical variables}
+
+\index{mosaic plot}
+
+Finally, what about plots for multiple categorical variables? Unfortunately,
+the only plot I really know of for this is called a \textbf{mosaic plot}, and I
+think they're so difficult to interpret that I don't really recommend them. Let
+me know if you find a good alternative.
 
 \label{marginsEnd}
-% TODO: gimme a break, show heat maps
 
-\subsection{Case 4: bivariate data: categorical--numerical}
+
+\section{Case 4: bivariate data: categorical--numerical}
 
 Suppose the two variables you're interested in are one categorical and one
 numerical. For instance, maybe you're wondering whether men or women have
 contributed more recent literary works, or which languages tend to have longer
 longer books. 
 
-The right plot here is the \textbf{boxplot}, since it allows you to easily
-compare groups. For the language vs. length example:
+\index{box plot}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
->>> books.boxplot(column='words',by='lang')
+The right plot here is the \textbf{box plot}, since it allows you to easily
+compare groups. For the language vs.~length example:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+books.boxplot(column='words', by='lang')
 \end{Verbatim}
 
 \begin{center}
-\includegraphics[width=0.9\textwidth]{boxplot.png}
+\includegraphics[width=0.8\textwidth]{boxplot.png}
 \end{center}
 
-Apparently Italian works are a bit more diverse in their lengths than the
-other languages (especially French), but it's hard to tell whether there's any
-truly significant difference between the averages among the various groups.
-One way to find this out is a \textbf{t-test for the difference of means}.
-Read carefully the descriptions for the Python functions
-\texttt{scipy.stats.ttest\_ind()} and \texttt{scipy.stats.ttest\_rel()}.
+\index{$t$-test}
+\index{ttest\_ind@\texttt{ttest\_ind()} (SciPy)}
 
-Another way is to use a \textbf{notched boxplot}:
+Apparently Italian works are a bit shorter than the other languages (especially
+French), but it's hard to tell whether there's any truly significant difference
+between the averages among the various groups. Recall that one way to find this
+out is a \textbf{$t$-test for the difference of means}, using
+\texttt{scipy.stats.ttest\_ind()}.
+
+\index{box plot!notched}
+\index{notched box plot}
+
+Here's another way. You can use a \textbf{\textit{notched} boxplot}:
 \label{notched}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
->>> books.boxplot(column='words',by='lang',notch=True)
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+books.boxplot(column='words', by='lang', notch=True)
 \end{Verbatim}
+
+\index{statistical significance}
 
 As long as your group sizes are big enough, this visually indicates whether or
 not there is a stat sig diff between groups, based on \textit{whether the
 notched areas overlap}. In the above case, the French and Italian notches
-overlap, which means \textit{we can conclude nothing reliable} about Italian
-works being longer than French ones. However, the Italian and Russian notches
-do \textit{not} have any overlap, which means we \textit{should} feel
-confident about declaring that on average, Russian works are shorter than
-Italian ones.
+overlap, which means we can conclude \textit{nothing} reliable about French
+works being longer than Italian ones. However, the Russian and Italian notches
+do \textit{not} have any overlap, which means we \textit{should} feel confident
+about declaring that on average, Russian works are longer than Italian ones.
 
 \begin{center}
 \includegraphics[width=0.9\textwidth]{notchedboxplot.png}
 \end{center}
 
-\subsection{Case 5: bivariate data: numerical--numerical}
+\section{Case 5: bivariate data: numerical--numerical}
+
+\index{scatter plot}
 
 Finally, the case where our two variables of interest are both numerical. The
-obvious plot type here is the \textbf{scatterplot}, which shows one point for
+obvious plot type here is the \textbf{scatter plot}, which shows one point for
 each observation, with its $x$ and $y$ position determined by its values for
 each variable.
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
->>> books.plot.scatter(x='year',y='words')
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+books.plot.scatter(x='year', y='words')
 \end{Verbatim}
 
+\index{Pearson correlation coefficient}
+\index{correlation coefficient}
+
 Clearly a big takeaway from the scatter plot below is that literary works have
-been getting steadily shorter over the years. This statistical reliability of
-this conclusion could be confirmed (or denied) by taking a look at the
-Pearson's (or other variant of) \textbf{correlation coefficient}, as we'll see
-on p.~\pageref{pearsonsR}.
+been getting steadily shorter over the years. You'll remember that the
+statistical reliability of this conclusion could be confirmed (or denied) by
+taking a look at the Pearson's correlation coefficient.
 
 \begin{center}
 \includegraphics[width=0.9\textwidth]{scatterplot.png}
 \end{center}
 
-
-
-
-\section{Pandas DF updating}
-
-Sometimes you can run into trouble when trying to update a Pandas DataFrame.
-For instance, take this DataFrame:
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
->>> print(characters)
-                           rank  saber   side
-    name                                     
-    Darth Vader       Sith Lord    red   Dark
-    Obi-wan Kenobi  Jedi Master   blue  Light
-    Yoda            Jedi Master  green  Light
-    Luke Skywalker         Jedi  green  Light
-    Kylo Ren         Apprentice    red   Dark
-    Rey              Apprentice   blue  Light
-\end{Verbatim}
-
-\begin{samepage}
-This query works just fine:
-\begin{Verbatim}[fontsize=\normalsize,samepage=true,frame=single]
->>> characters.loc['Kylo Ren':'Rey']['rank']
-    name
-    Kylo Ren    Apprentice
-    Rey         Apprentice
-    Name: rank, dtype: object
-\end{Verbatim}
-\end{samepage}
-
-\begin{samepage}
-so naturally you'd think you could do this:
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
->>> characters.loc['Kylo Ren':'Rey']['rank'] = 'Jedi'
-\end{Verbatim}
-\end{samepage}
-
-Alas, no:
-
-\quad \texttt{A value is trying to be set on a copy of a slice from a DataFrame.}
-\bigskip
-
-The solution is best performed in two steps. First, compute the \textbf{index
-values} of the rows you want to change. In this case, they're the rows from
-\texttt{Kylo Ren} to \texttt{Rey}, inclusive. Let's call the indices of those
-rows ``\texttt{soon\_to\_be\_jedi}'':
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
->>> soon_to_be_jedi = characters.loc['Kylo Ren':'Rey'].index
-\end{Verbatim}
-
-Then, as the second step, use those indices in conjunction with the ``comma''
-syntax and the proper column to actually set the values:
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
->>> characters.loc[soon_to_be_jedi,'rank'] = 'Jedi'
-\end{Verbatim}
-
-% Significant?:
-% import scipy.stats.chi2_contingency
-% chi2_contingency(side_saber)
-
-% TODO: Weighted averages (and averages of averages)
