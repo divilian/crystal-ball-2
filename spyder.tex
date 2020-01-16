@@ -17,9 +17,147 @@ are \textit{not} mutually compatible.) The number(s) after the dot don't
 matter so much. But before the dot \textit{must} be a \textbf{``3''}.
 
 \index{Jupyter Notebooks}
+\index{IDE}
+\index{py file@\texttt{.py} file (Python source code)}
+\index{extension (filename)}
 
 Don't worry: all the stuff you learned using Python Jupyter Notebooks still
-applies! The only difference is that using an IDE like Spyder is not
-Web-based: it's entirely offline, responsive, and more powerful. You will be
-creating your own \texttt{.py} files directly.
+applies! The only difference is that using an IDE (Integrated Development
+Environment) like Spyder is not Web-based: it's entirely offline, responsive,
+and more powerful. Instead of a Notebook, you'll be creating your own Python
+source code files (each of which has a \texttt{.py} extension) and executing
+them directly.
 
+As with a Notebook, a Python source code file (\texttt{.py}) can have English
+text as well as Python code. However, the English text must be ``commented'' by
+prefixing each non-code line with a hashtag (``\texttt{\#}''). This tells Spyder
+that the line in question is not intended to be parsed and executed when the
+program is run.
+
+
+\section{The Spyder tutorial}
+
+First, download the latest version of Anaconda for your platform from
+\url{https://www.anaconda.com/distribution/}. This will take a while, after
+which you should be able to start the Spyder IDE (details depend on your
+operating system).
+
+Spyder comes with a nice tutorial, so it would be duplicative for me to
+reiterate those instructions here. As of this writing, you can access it by
+choosing ``Spyder Tutorial'' from the ``Help'' menu once you start Spyder. Make
+sure to click on each little green arrow to expand it as you go. (Btw, I don't
+recommend clicking on links in this tutorial, since it brings you to the linked
+section but then gives you no obvious way to get back where you were. Perhaps
+I'm missing how.)
+
+You can \textit{skip over} the following tutorial sections:
+
+\begin{compactitem}
+\item ``PEP 8''
+\item ``Automatic Symbolic Python''
+\item ``Other observations''
+\item ``Documentation string formatting''
+\end{compactitem}
+
+We won't be using any of those features in this course or this book.
+
+There are a few concepts you'll encounter in this tutorial which were not
+covered in the previous book. They include:
+
+\begin{itemize}
+\itemsep.1em
+
+\index{IPython}
+\index{console}
+
+\item The concept of the ``IPython console,'' the pane in the lower-right of
+the Spyder screen with which you can interact and see output. This is somewhat
+different (but better) than the way Jupyter Notebooks acts with its cells and
+printed-output-of-each-cell. Get very comfortable with using the console.
+
+\item The concept of a ``docstring,'' which is text enclosed in
+triple-double-quotes (\texttt{"""}) immediately after a function
+\texttt{def}inition, which then shows up in the console if you type
+\texttt{help(}\textsl{that\_functions\_name}\texttt{)}. This is mildly useful.
+
+\item The concept of an interactive debugger, which can be a very useful IDE
+feature.
+
+\end{itemize}
+
+\section{Configuration}
+
+Finally, a couple of settings you should change before we crack our knuckles.
+These are on the ``Preferences'' page, which you can get to these via ``Tools >
+Preferences'' in Linux or Windows, or via ``Python/Spyder > Preferences'' on
+MacOS:
+
+\begin{enumerate}
+\itemsep.1em
+
+\item Under ``Editor,'' find the ``Source Code'' tab, and make sure that the
+``Indentation characters'' is set to ``4 spaces.''
+
+\item Under ``IPython console,'' find the ``Graphics'' tab, and set the
+``Graphics backend'' to ``Inline.'' Make sure that after doing this, you can
+type a graphics command like this into the console:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,rulecolor=\color{lightgray},framesep=3mm]
+import pandas as pd
+pd.Series([4,9,8],index=['bill','kevin','jane']).plot(kind='bar')
+\end{Verbatim}
+
+and see the resulting plot on the ``Plots'' pane of the upper-right window.
+
+\end{enumerate}
+
+\section{A note about folders/directories}
+
+\index{file}
+\index{folder}
+\index{directory (folder)}
+
+One common gotcha I'll mention that plagues many new Spyderers has to do with
+where files are stored on your computer. You probably know that your computer
+stores its information in a cascading hierarchy of \textbf{files} and
+\textbf{folders} (also called \textbf{directories}). A file is a single unit of
+information, which can be opened by an application; it might contain text, a
+song, an image, or even video. A folder, on the other hand, is a
+\textit{container} of files (and often, other directories).
+
+\index{read\_csv@\texttt{read\_csv()} (Pandas)}
+
+Perhaps you're the kind of person who likes to arrange their information in a
+sensible way, using directories as an expressive organizational mechanism. Or
+perhaps you're the kind who just plops everything down wherever, knowing you
+can search for it later. Either way, what's important to know is that Python,
+when it tries to read a file (say, with \texttt{pd.read\_csv()}) is going to
+\textit{look} in a certain folder/directory in order to find it. If it doesn't
+find it there, it throws up its hands.
+
+This is frustrating for students who download data (maybe a \texttt{.csv} file)
+from a website, but don't really understand \textit{where} their browser put
+this file on their hard drive. They then write a Python program -- undoubtedly
+saving that \texttt{.py} file to a different folder than the one the
+\texttt{.csv} file is in -- which attempts to open it and comes up empty.
+
+The solution is actually really simple: \textit{store your data files in the
+same folder as your Python files.}
+
+Right now, you should create a folder to hold all your code and data for this
+course. Name it something sensible, and remember how to navigate to it. Then:
+
+\begin{compactitem}
+
+\item[\leftthumbsup] Whenever you create a new Python program, ``Save as...''
+the \texttt{.py} file into this folder.
+
+\item[\leftthumbsup] Whenever you download a data file, store it in this
+folder.\footnote{If your browser automatically stores downloads in a
+``Downloads'' folder of some kind, either reconfigure your browser to prompt
+you for a location when it downloads, or else manually copy the files that you
+download into your new folder.}
+
+\end{compactitem}
+
+Onward!
