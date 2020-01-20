@@ -1,8 +1,6 @@
 
 \chapter{EDA: review and extensions}
 
-% contingency table margins
-% notched boxplots
 % heatmaps
 % scatterplot matrices
 % facets
@@ -34,7 +32,7 @@ the gender and the salary for each of a bunch of adults.}
 \item Is it \textbf{categorical} or \textbf{numerical}?\footnote{Recall that a
 ``categorical'' variable is qualitative, typically chosen from a set of
 possible values. Gender, political affiliation, and declared major are all
-examples. ``Numerical'' variables are numbers (duh): salary, GPA, SAT score.
+examples. ``Numerical'' variables are (duh) numbers: salary, GPA, SAT score.
 Numerical variables can further be refined by their scale of measure (ordinal,
 interval, ratio), although that often doesn't affect the appropriate type of
 exploratory statistics and plots too much.}
@@ -159,12 +157,13 @@ your bin size (more on that in Lesson~\ref{ch:KDEs}).
 
 \section{Case 3: bivariate data: categorical--categorical}
 
+\index{value\_counts@\texttt{.value\_counts()} (Pandas)}
 \index{groupby@\texttt{.groupby()} (Pandas)}
 
 If you want to explore the relationship between two different variables, both
 of which are categorical, you need a \textbf{two-dimensional contingency
-table}. You can use \texttt{.value\_counts()} again in conjunction with
-\texttt{.groupby()}):
+table}. One way to get this is to use \texttt{.value\_counts()} again, this
+time in conjunction with \texttt{.groupby()}:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 books.groupby('gender')['lang'].value_counts()
@@ -192,7 +191,7 @@ which shows, for each \texttt{gender}, how many books in each \texttt{lang} are
 in the data set. I personally think the \texttt{pd.crosstab()} function is a
 bit easier on the eyes for this, though:
 
-\texttt{gender\_lang@\texttt{gender\_lang}}
+\index{gender\_lang@\texttt{gender\_lang}}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 gender_lang = pd.crosstab(books['lang'], columns=books['gender'])
@@ -222,14 +221,18 @@ The \texttt{pd.crosstab()} function is also useful for computing
 \textbf{margins}, or row/column aggregate information. The easy part is to
 include ``\texttt{margins=True}'' as an argument to \texttt{pd.crosstab()}. The
 tricky part is understanding the different ways of presenting the margins,
-since they're each subtly different and often confused. So heads up. Our first
-use of margins will be to simply compute \textbf{raw counts}:
+since they're each subtly different and often confused. So heads up.
+
+\begin{samepage}
+Our first use of margins will be to simply compute \textbf{raw counts}:
+\index{gender\_lang\_m@\texttt{gender\_lang\_m}}
 
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
-gender_lang = pd.crosstab(books['lang'], columns=books['gender'], margins=True)
-print(gender_lang)
+gender_lang_m = pd.crosstab(books['lang'], columns=books['gender'], margins=True)
+print(gender_lang_m)
 \end{Verbatim}
 \vspace{-.2in}
+\end{samepage}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
 gender     F    M   All
@@ -242,14 +245,15 @@ Spanish   34  193   227
 All      205  800  1005
 \end{Verbatim}
 
-In this table, the margins are \textit{total counts for each row, and for each
-column.} Inspect the table and verify this is so: for each row (say,
-\texttt{English}) the sum of the \texttt{F} entry (52) and \texttt{M} entry
-(196) is equal to the total in the \texttt{All} entry (248). Similarly, the sum
-of the entire first column (the \texttt{F}'s for all languages, which are 52,
-79, 29, 11, and 34) is equal to the \texttt{All} element of that column (205).
-And of course, the sum of the \texttt{All} rows -- or \texttt{All} columns,
-same diff -- is the grand total of 1005.
+The word ``margins'' refers to the ``\texttt{All}'' row and the
+``\texttt{All}'' column. In this table, they contain \textit{the total counts
+for each row, and for each column.} Inspect the table and verify this is so:
+for each row (say, \texttt{English}) the sum of the \texttt{F} entry (52) and
+\texttt{M} entry (196) is equal to the total in the \texttt{All} entry (248).
+Similarly, the sum of the entire first column (the \texttt{F}'s for all
+languages, which are 52, 79, 29, 11, and 34) is equal to the \texttt{All}
+element of that column (205). And of course, the sum of the \texttt{All} rows
+-- or \texttt{All} columns, same diff -- is the grand total of 1005.
 
 \subsection{Margins: overall percentages}
 
@@ -261,7 +265,7 @@ obtain the value of the bottom-right-hand entry.) This gives us \textbf{overall
 proportions}, and if we multiply by 100, \textbf{overall percentages}:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-print(gender_lang / gender_lang.loc['All']['All'] * 100)
+print(gender_lang_m / gender_lang_m.loc['All']['All'] * 100)
 \end{Verbatim}
 \vspace{-.2in}
 
@@ -291,7 +295,7 @@ like so:
 \index{div@\texttt{.div() (NumPy)}}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-print(gender_lang.div(gender_lang.loc['All'],axis=1) * 100)
+print(gender_lang_m.div(gender_lang_m.loc['All'],axis=1) * 100)
 \end{Verbatim}
 \vspace{-.2in}
 
@@ -322,8 +326,10 @@ this:
 
 \index{div@\texttt{.div() (NumPy)}}
 
+\index{gender\_lang\_m@\texttt{gender\_lang\_m}}
+
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-print(gender_lang.div(gender_lang['All'],axis=0) * 100)
+print(gender_lang_m.div(gender_lang_m['All'],axis=0) * 100)
 \end{Verbatim}
 \vspace{-.2in}
 
@@ -355,6 +361,8 @@ men, but only 75\% \textit{of the Italian ones} were.
 
 \index{statistical significance}
 \index{$\chi ^2$ test}
+\index{gender\_lang@\texttt{gender\_lang}}
+\index{gender\_lang\_m@\texttt{gender\_lang\_m}}
 
 Now you can stare at these numbers to get a feel for the them, and this is
 encouraged. Remember, though, the proper way to test whether there's a
@@ -372,38 +380,21 @@ margins \textit{adds a row and a column to the table} (for the ``\texttt{All}''
 information) and if you give \texttt{chi2\_contingency()} this extraneous data
 it messes up the whole $\chi ^2$ computation.
 
-This is why in all the examples above, I deliberately did \textit{not} store
-the ``margined'' version of the table back into the \texttt{gender\_lang}
-variable. Instead, I kept only the table of raw counts in the variable, and
-simply \textit{printed} the margined version when necessary, a la:
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-# Correct!
-gender_lang = pd.crosstab(books['lang'], columns=books['gender'])
-print(gender_lang.div(gender_lang.loc['All'],axis=1) * 100)
-scipy.stats.chi2_contingency(gender_lang)
-\end{Verbatim}
-
-I've seen plenty of well-intentioned students do this instead:
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-# WRONG!
-gender_lang = pd.crosstab(books['lang'], columns=books['gender']).div(
-    gender_lang.loc['All'],axis=1) * 100)
-print(gender_lang)
-scipy.stats.chi2_contingency(gender_lang)
-\end{Verbatim}
-
-which leads to madness.
+This is why in all the examples above, I deliberately changed my variable name
+for the ``margined'' table from \texttt{gender\_lang} to
+\texttt{gender\_lang\_m} (\texttt{m} stands for ``margins.'') This is a nice
+visual reminder that I \textit{don't} want to pass this table as an argument to 
+\texttt{scipy.stats.chi2\_contingency()}: instead, I want to pass the vanilla,
+margin-less table \texttt{gender\_lang}. I suggest you do the same.
 
 \subsection{(Not) plotting multiple categorical variables}
 
 \index{mosaic plot}
 
 Finally, what about plots for multiple categorical variables? Unfortunately,
-the only plot I really know of for this is called a \textbf{mosaic plot}, and I
-think they're so difficult to interpret that I don't really recommend them. Let
-me know if you find a good alternative.
+the only plot I know of for this is called a \textbf{mosaic plot}, and they're
+so difficult to interpret that I don't really recommend them. Let me know if
+you find a good alternative.
 
 \label{marginsEnd}
 
@@ -425,7 +416,7 @@ books.boxplot(column='words', by='lang')
 \end{Verbatim}
 
 \begin{center}
-\includegraphics[width=0.8\textwidth]{boxplot.png}
+\includegraphics[width=0.6\textwidth]{boxplot.png}
 \end{center}
 
 \index{$t$-test}
@@ -451,14 +442,14 @@ books.boxplot(column='words', by='lang', notch=True)
 
 As long as your group sizes are big enough, this visually indicates whether or
 not there is a stat sig diff between groups, based on \textit{whether the
-notched areas overlap}. In the above case, the French and Italian notches
-overlap, which means we can conclude \textit{nothing} reliable about French
-works being longer than Italian ones. However, the Russian and Italian notches
-do \textit{not} have any overlap, which means we \textit{should} feel confident
-about declaring that on average, Russian works are longer than Italian ones.
+notched areas overlap}. In the above case, the English and French notches
+overlap, which means we can conclude nothing reliable about English works being
+longer than French ones. However, the English and Italian notches do
+\textit{not} overlap, which means we \textit{should} feel confident about
+declaring that on average, English works are longer than Italian ones.
 
 \begin{center}
-\includegraphics[width=0.9\textwidth]{notchedboxplot.png}
+\includegraphics[width=0.8\textwidth]{notchedboxplot.png}
 \end{center}
 
 \section{Case 5: bivariate data: numerical--numerical}
