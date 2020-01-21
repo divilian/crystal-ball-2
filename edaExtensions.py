@@ -74,9 +74,9 @@ print(books.lang.value_counts())
 #books.boxplot(column='words',by='lang',notch=True)
 #plt.savefig('notchedboxplot.png')
 #
-#plt.figure()
-#books.plot.scatter(x='year',y='words',xlim=(1600,2018))
-#plt.savefig('scatterplot.png')
+plt.figure()
+books.plot.scatter(x='year',y='words',xlim=(1600,2018), color="purple")
+plt.savefig('scatterplot.png')
 
 books = books[books.year > 1500]
 
@@ -91,13 +91,13 @@ books = books[books.year > 1500]
 #plt.figure()
 #plot_kws={"s":30}
 #facet = sns.FacetGrid(books, col='lang')
-#facet.map(plt.scatter, 'year', 'words', marker=".")
+#facet.map(plt.scatter, 'year', 'words', marker=".", color="red")
 #plt.savefig('scatterplotfacets.png')
-
+#
 #plt.figure()
 #plot_kws={"s":30}
 #facet = sns.FacetGrid(books, row='gender', col='lang')
-#facet.map(plt.scatter, 'year', 'words', marker=".")
+#facet.map(plt.scatter, 'year', 'words', marker=".", color="darkgreen")
 #plt.savefig('scatterplotfacets2d.png')
 
 #plt.figure()
