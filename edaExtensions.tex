@@ -417,9 +417,11 @@ the other libraries we've used. One such plot is the heat map, which you can
 create simply by passing the Seaborn function a contingency table:
 
 \index{gender\_lang@\texttt{gender\_lang}}
+\index{heatmap@\texttt{heatmap()} (Seaborn)}
+\index{color scheme}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-sns.headmap(gender_lang)
+sns.heatmap(gender_lang)
 \end{Verbatim}
 
 (Notice I passed \texttt{gender\_lang}, without the margins, not
@@ -430,7 +432,14 @@ we see \textit{a mapping of numbers to colors}. In this particular color scheme
 (there are many others to choose from), a light tan color indicates a high
 value up near 200, whereas a dark black color indicates a low color down below
 40. In between, the colors go through shades of purple and red and orange, each
-indicating progressively higher values.
+indicating progressively higher values.\footnote{Btw, there are lots of other
+color schemes available; you can add a value for the ``\texttt{cmap}'' argument
+to your \texttt{heatmap()} call giving the color scheme's name. I personally
+like the \index{seismic@\texttt{seismic} (color scheme)}``\texttt{seismic}''
+one since it makes it extremely clear which colors go with high vs.~low values.
+You can get a list of the available ones by passing \texttt{cmap="list"} as the
+second argument to \texttt{heatmap()}.}
+
 
 \begin{figure}[ht]
 \centering
