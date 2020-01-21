@@ -87,15 +87,22 @@ books = books[books.year > 1500]
 #pd.plotting.scatter_matrix(books[['year','words','chaps']], alpha=1,
 #    figsize=(5,5))
 #plt.savefig('scatterplotmatrix.png')
-#
-#facet = sns.FacetGrid(books, col='gender')
-#facet.map(plt.scatter, 'year','words')
-#plt.show()
 
-plt.figure()
-sns.set(rc={'figure.figsize':(11,11)})
-plot_kws={"s":30}
-sns.pairplot(data=books,x_vars=["year"],y_vars=["words"],hue="lang",
-    plot_kws={"s":16})
-plt.savefig('groupedscatter.png')
-plt.show()
+#plt.figure()
+#plot_kws={"s":30}
+#facet = sns.FacetGrid(books, col='lang')
+#facet.map(plt.scatter, 'year', 'words', marker=".")
+#plt.savefig('scatterplotfacets.png')
+
+#plt.figure()
+#plot_kws={"s":30}
+#facet = sns.FacetGrid(books, row='gender', col='lang')
+#facet.map(plt.scatter, 'year', 'words', marker=".")
+#plt.savefig('scatterplotfacets2d.png')
+
+#plt.figure()
+#sns.set(rc={'figure.figsize':(11,11)})
+#sns.pairplot(data=books,x_vars=["year"],y_vars=["words"],hue="lang",
+#    plot_kws={"s":16})
+#plt.savefig('groupedscatter.png')
+#plt.show()

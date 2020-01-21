@@ -604,9 +604,9 @@ pd.plotting.scatter_matrix(books_num, alpha=1)
 \end{Verbatim}
 
 Don't worry about the \texttt{alpha} part for the moment. The result of this
-command is in Figure~\ref{scatterplotmatrix} (p.~\pageref{scatterplotmatrix}).
-As I said, it's busy: almost too much to look at. You'll understand it when we
-go through the components, though.
+command is in Figure~\ref{scatterplotmatrix} (end of the chapter,
+p.~\pageref{scatterplotmatrix}). As I said, it's busy: almost too much to look
+at. You'll understand it when we go through the components, though.
 
 First, notice that the overall figure is a $3\times 3$ grid of smaller figures,
 and remember that we passed \texttt{scatter\_matrix()} a \texttt{DataFrame}
@@ -743,6 +743,82 @@ here.
 \label{groupedscatter}
 \end{figure}
 
+\subsection{Facets}
+
+\index{facets}
+
+More generally, a technique which is applicable to lots of different kinds of
+plots involves adding \textbf{facets}. With facets, you can partition a single
+plot into multiple plots, thereby effectively showing multivariate data with
+more than two variables. 
+
+\index{facetgrid@\texttt{FacetGrid()} (Seaborn)}
+
+To illustrate facets, let's do the same kind of thing we did with a grouped
+scatter plot in Figure~\ref{groupedscatter}. First, we create a
+``\texttt{facet}'' object by calling Seaborn's \texttt{FacetGrid()}, passing it
+our \texttt{DataFrame} and which variable we want it to use to split into
+subplots:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+facet = sns.FacetGrid(books, col='lang')
+\end{Verbatim}
+
+The ``\texttt{col}'' stands for column, not because \texttt{lang} is a
+\texttt{DataFrame} column (although it is), but because we want each subplot
+to be in its own column.
+
+We then follow this up with a call to the \texttt{.map()} method of this
+\texttt{facet}:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+facet.map(plt.scatter, 'year', 'words')
+\end{Verbatim}
+
+In plain language, this says ``please map a scatter plot, of \texttt{words}
+vs.~\texttt{year}, to each subplot.'' The result is as in
+Figure~\ref{scatterplotfacets}. Each of the five languages appears on its own
+separate subplot, which in each case is a plot of the \texttt{words} vs.~the
+\texttt{year}s for books in that language.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=1.05\textwidth]{scatterplotfacets.png}
+\caption{A faceted scatter plot.}
+\label{scatterplotfacets}
+\end{figure}
+
+The reason the \texttt{FacetGrid()} function has the word ``grid'' in the title
+is because you can go hog wild by specifying not only columns for the
+subplots, but rows:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+facet = sns.FacetGrid(books, row='gender', col='lang')
+facet.map(plt.scatter, 'year', 'words')
+\end{Verbatim}
+
+The resulting Figure~\ref{scatterplotfacets2d} has \textit{ten} different
+subplots, one for each combination of \texttt{gender} and \texttt{lang}. And
+all nicely labeled, too!
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=1.05\textwidth]{scatterplotfacets2d.png}
+\caption{A faceted scatter plot with two faceted variables.}
+\label{scatterplotfacets2d}
+\end{figure}
+
+Notice that the Figure~\ref{scatterplotfacets2d} infographic is analyzing
+\textit{four} variables all acting in concert: two that determine the subplot
+(\texttt{gender} and \texttt{lang}) and two that are plotted against one
+another in each of the subplots.% (\texttt{year} and \texttt{words}).
+
+Facets can also be used with box plots or heat maps, depending on how many of
+your variables are categorical or numerical. In every case, one subplot is
+created for each subset of the data that has particular value(s) for the
+faceted variable(s).
+
+
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.9\textwidth]{scatterplotmatrix.png}
@@ -751,13 +827,3 @@ here.
 \label{scatterplotmatrix}
 \end{figure}
 
-\subsection{Facets}
-
-\index{facets}
-
-More generally, another technique which is applicable to lots of different
-kinds of plots involves adding \textbf{facets}. With facets, you can partition
-a single plot into multiple plots, thereby effectively showing multivariate
-data with more than two variables. 
-
-Let's go back to the \texttt{books}. We've plotted \texttt{words}
