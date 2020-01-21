@@ -53,7 +53,7 @@ books.iloc[0:5,:]
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
                        gender  year     lang   words  chaps
-name                                                       
+name
 Jane Eyre                   F  1847  English  183858     38
 The Brothers Karamazov      M  1879  Russian  364153     92
 Anna Karenina               M  1877  Russian  349736    219
@@ -67,7 +67,7 @@ For each book, we have the \texttt{gender} of the author, the \texttt{year} and
 \texttt{lang} are categorical variables, while \texttt{year}, \texttt{words},
 and \texttt{chaps} are numeric.
 
-\section{Case 1: univariate categorical data}
+\section{Case 1 -- univariate data: categorical}
 \label{contingencyTable}
 \index{contingencyTable}
 
@@ -103,7 +103,7 @@ books['lang'].value_counts().plot(kind="bar")
 \includegraphics[width=0.6\textwidth]{barplot.png}
 \end{center}
 
-\section{Case 2: univariate numeric data}
+\section{Case 2 -- univariate data: numeric}
 
 \index{mean}
 \index{standard deviation}
@@ -157,7 +157,7 @@ your bin size (more on that in Lesson~\ref{ch:KDEs}).
 \includegraphics[width=.7\textwidth]{histogram.png}
 \end{center}
 
-\section{Case 3: bivariate data: categorical--categorical}
+\section{Case 3 -- bivariate data: categorical--categorical}
 
 \index{value\_counts@\texttt{.value\_counts()} (Pandas)}
 \index{groupby@\texttt{.groupby()} (Pandas)}
@@ -173,7 +173,7 @@ books.groupby('gender')['lang'].value_counts()
 \vspace{-.2in}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-gender  lang   
+gender  lang
 F       French      79
         English     52
         Spanish     34
@@ -203,7 +203,7 @@ print(gender_lang)
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
 gender    F    M
-lang            
+lang
 English  52  196
 French   79  209
 Italian  29   87
@@ -238,7 +238,7 @@ print(gender_lang_m)
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
 gender     F    M   All
-lang                   
+lang
 English   52  196   248
 French    79  209   288
 Italian   29   87   116
@@ -273,7 +273,7 @@ print(gender_lang_m / gender_lang_m.loc['All']['All'] * 100)
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
 gender       F      M     All
-lang                         
+lang
 English   5.17  19.50   24.68
 French    7.86  20.80   28.66
 Italian   2.89   8.66   11.54
@@ -303,7 +303,7 @@ print(gender_lang_m.div(gender_lang_m.loc['All'],axis=1) * 100)
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
 gender        F       M     All
-lang                           
+lang
 English   25.37   24.50   24.68
 French    38.54   26.12   28.66
 Italian   14.15   10.88   11.54
@@ -337,7 +337,7 @@ print(gender_lang_m.div(gender_lang_m['All'],axis=0) * 100)
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
 gender       F      M    All
-lang                        
+lang
 English  20.97  79.03  100.0
 French   27.43  72.57  100.0
 Italian  25.00  75.00  100.0
@@ -385,7 +385,7 @@ it messes up the whole $\chi ^2$ computation.
 This is why in all the examples above, I deliberately changed my variable name
 for the ``margined'' table from \texttt{gender\_lang} to
 \texttt{gender\_lang\_m} (\texttt{m} stands for ``margins.'') This is a nice
-visual reminder that I \textit{don't} want to pass this table as an argument to 
+visual reminder that I \textit{don't} want to pass this table as an argument to
 \texttt{scipy.stats.chi2\_contingency()}: instead, I want to pass the vanilla,
 margin-less table \texttt{gender\_lang}. I suggest you do the same.
 
@@ -464,7 +464,7 @@ print(gender_lang)
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
 lang    English  French  Italian  Russian  Spanish
-gender                                            
+gender
 F            48      84       15       10       28
 M           205     197       82      129      207
 \end{Verbatim}
@@ -485,12 +485,12 @@ rectangles are almost exactly the same shade of purple.
 
 
 
-\section{Case 4: bivariate data: categorical--numerical}
+\section{Case 4 -- bivariate data: categorical--numerical}
 
 Suppose the two variables you're interested in are one categorical and one
 numerical. For instance, maybe you're wondering whether men or women have
 contributed more recent literary works, or which languages tend to have longer
-longer books. 
+longer books.
 
 \index{box plot}
 
@@ -538,7 +538,7 @@ declaring that on average, English works are longer than Italian ones.
 \includegraphics[width=0.8\textwidth]{notchedboxplot.png}
 \end{center}
 
-\section{Case 5: bivariate data: numerical--numerical}
+\section{Case 5 -- bivariate data: numerical--numerical}
 
 \index{scatter plot}
 
@@ -607,14 +607,6 @@ Don't worry about the \texttt{alpha} part for the moment. The result of this
 command is in Figure~\ref{scatterplotmatrix} (p.~\pageref{scatterplotmatrix}).
 As I said, it's busy: almost too much to look at. You'll understand it when we
 go through the components, though.
-
-\begin{figure}[ht]
-\centering
-\includegraphics[width=0.9\textwidth]{scatterplotmatrix.png}
-\caption{A scatter plot matrix of the \texttt{books} \texttt{DataFrame}
-(restricted to only numeric variables).}
-\label{scatterplotmatrix}
-\end{figure}
 
 First, notice that the overall figure is a $3\times 3$ grid of smaller figures,
 and remember that we passed \texttt{scatter\_matrix()} a \texttt{DataFrame}
@@ -691,3 +683,81 @@ same general area will they become fully dark and visible.
 
 % TODO: add figure to illustrate transparency
 
+
+\section{Case 6 -- multivariate data}
+
+All of the previous examples involved either one or two variables. But what if
+you have more than that? How do you plot them?
+
+It gets tricky when you try and make sense of too many different entangled
+variables at once. However, it can be done, in most circumstances, if you're on
+your game in terms of interpretation.
+
+Let's talk about the three-variable case in particular. First off, it helps a
+lot if at least one of the variables is categorical. If all three are numeric,
+then you essentially need a three-dimensional plot (such as a 3-d scatter plot,
+contour plot, or a wireframe plot) which are difficult to interpret. (Humans
+just aren't very good, it turns out, at visualizing things in three dimensions.
+Most people, however, are quite good at two dimensions.)
+
+\subsection{Grouped scatter plots}
+
+\index{grouped scatter plot}
+\index{scatter plot!grouped}
+
+Suppose one of your variables is categorical and the other two numeric. In this
+case, sometimes a good option is to use a \textbf{grouped scatter plot} which
+depicts the categorical values via different styles of point: different colors
+are the most common, but different shapes can be used too.
+
+\index{pairplot@\texttt{pairplot()} (Seaborn)}
+
+The Seaborn library lets us do this with its \texttt{pairplot()} function. It
+has a lot of parameters, but see if you can make sense of it:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+sns.pairplot(data=books, x_vars=["year"], y_vars=["words"], hue="lang")
+\end{Verbatim}
+
+\index{boxies (square brackets)}
+\index{[]@\texttt{[]} (boxies)}
+
+The \texttt{data=books} parameter tells \texttt{pairplot()} which
+\texttt{DataFrame} we want to use. The \texttt{x\_vars} and \texttt{y\_vars}
+parameters are \textit{lists}, notice (in boxies) of what we want on the x and
+y axis of our plot. (I almost always use just one-element lists.) Finally, the
+\texttt{hue="lang"} bit tells Seaborn which variable we want the color -- or
+``hue'' -- to be based on.
+
+The result is in Figure~\ref{groupedscatter}. From it, we can see that (in our
+fictitious data set) although books seem to have been getting shorter over
+time, this isn't true of the \texttt{Russian} books, which are staying more a
+constant size. This observation wasn't really possible without involving all
+three variables in the plot, which is why a grouped scatter plot was valuable
+here.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.75\textwidth]{groupedscatter.png}
+\caption{A grouped scatter plot.}
+\label{groupedscatter}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.9\textwidth]{scatterplotmatrix.png}
+\caption{A scatter plot matrix of the \texttt{books} \texttt{DataFrame}
+(restricted to only numeric variables).}
+\label{scatterplotmatrix}
+\end{figure}
+
+\subsection{Facets}
+
+\index{facets}
+
+More generally, another technique which is applicable to lots of different
+kinds of plots involves adding \textbf{facets}. With facets, you can partition
+a single plot into multiple plots, thereby effectively showing multivariate
+data with more than two variables. 
+
+Let's go back to the \texttt{books}. We've plotted \texttt{words}

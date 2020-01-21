@@ -24,7 +24,9 @@ more_langs = np.where(more_genders=='M',
 more_years = np.where(more_genders=='M',
     np.round(np.random.uniform(1600,2000,NUM_MORE)),
     np.round(np.random.uniform(1800,2000,NUM_MORE)))
-more_words = 1000000 - (more_years-1600) * 2000 + np.random.normal(0,90000,NUM_MORE)
+more_words = np.where(more_langs=="Russian",
+    800000 - (more_years-1600) * 200 + np.random.normal(0,200000,NUM_MORE),
+    1000000 - (more_years-1600) * 2000 + np.random.normal(0,90000,NUM_MORE))
 more_words = more_words.clip(20000,np.Inf)
 more_chaps = more_words / 10000 + np.random.normal(0,30,NUM_MORE)
 more_chaps = more_chaps.clip(0,np.Inf)
@@ -40,50 +42,60 @@ books = pd.DataFrame({
 
 print(books.lang.value_counts())
 
-plt.figure()
-books.lang.value_counts().plot.bar()
-plt.savefig('barplot.png')
-
-print(books.words.mean())
-print(books.words.std())
-print(books.words.quantile([0,.25,.5,.75,1]))
-
-plt.figure()
-books.words.plot.hist(bins=30)
-plt.savefig('histogram.png')
-
-print(books.groupby('gender')['lang'].value_counts())
-
-gender_lang_m = pd.crosstab(books['lang'], columns=books['gender'], margins=True)
-print(gender_lang_m / gender_lang_m.loc['All']['All'] * 100)
-print(np.round(gender_lang_m / gender_lang_m.loc['All'] * 100,2))
-print(np.round(gender_lang_m.div(gender_lang_m['All'],axis=0) * 100,2))
-
-gender_lang = pd.crosstab(books['gender'], books['lang'], margins=False)
-plt.figure()
-sns.heatmap(gender_lang)
-plt.savefig('heatmap.png')
-
-plt.figure()
-books.boxplot(column='words',by='lang')
-plt.savefig('boxplot.png')
-
-plt.figure()
-books.boxplot(column='words',by='lang',notch=True)
-plt.savefig('notchedboxplot.png')
-
-plt.figure()
-books.plot.scatter(x='year',y='words',xlim=(1600,2018))
-plt.savefig('scatterplot.png')
+#plt.figure()
+#books.lang.value_counts().plot.bar()
+#plt.savefig('barplot.png')
+#
+#print(books.words.mean())
+#print(books.words.std())
+#print(books.words.quantile([0,.25,.5,.75,1]))
+#
+#plt.figure()
+#books.words.plot.hist(bins=30)
+#plt.savefig('histogram.png')
+#
+#print(books.groupby('gender')['lang'].value_counts())
+#
+#gender_lang_m = pd.crosstab(books['lang'], columns=books['gender'], margins=True)
+#print(gender_lang_m / gender_lang_m.loc['All']['All'] * 100)
+#print(np.round(gender_lang_m / gender_lang_m.loc['All'] * 100,2))
+#print(np.round(gender_lang_m.div(gender_lang_m['All'],axis=0) * 100,2))
+#
+#gender_lang = pd.crosstab(books['gender'], books['lang'], margins=False)
+#plt.figure()
+#sns.heatmap(gender_lang)
+#plt.savefig('heatmap.png')
+#
+#plt.figure()
+#books.boxplot(column='words',by='lang')
+#plt.savefig('boxplot.png')
+#
+#plt.figure()
+#books.boxplot(column='words',by='lang',notch=True)
+#plt.savefig('notchedboxplot.png')
+#
+#plt.figure()
+#books.plot.scatter(x='year',y='words',xlim=(1600,2018))
+#plt.savefig('scatterplot.png')
 
 books = books[books.year > 1500]
 
 # Need to use "tight layout," but I couldn't make it stick without doing it
 # manually in the interactive image GUI.
+#plt.figure()
+#plt.tight_layout()
+#pd.plotting.scatter_matrix(books[['year','words','chaps']], alpha=1,
+#    figsize=(5,5))
+#plt.savefig('scatterplotmatrix.png')
+#
+#facet = sns.FacetGrid(books, col='gender')
+#facet.map(plt.scatter, 'year','words')
+#plt.show()
+
 plt.figure()
-plt.tight_layout()
-pd.plotting.scatter_matrix(books[['year','words','chaps']], alpha=1,
-    figsize=(5,5))
-plt.savefig('scatterplotmatrix.png')
-
-
+sns.set(rc={'figure.figsize':(11,11)})
+plot_kws={"s":30}
+sns.pairplot(data=books,x_vars=["year"],y_vars=["words"],hue="lang",
+    plot_kws={"s":16})
+plt.savefig('groupedscatter.png')
+plt.show()
