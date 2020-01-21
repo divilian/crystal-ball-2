@@ -389,16 +389,91 @@ visual reminder that I \textit{don't} want to pass this table as an argument to
 \texttt{scipy.stats.chi2\_contingency()}: instead, I want to pass the vanilla,
 margin-less table \texttt{gender\_lang}. I suggest you do the same.
 
-\subsection{(Not) plotting multiple categorical variables}
+\label{marginsEnd}
+
+\subsection{Plotting multiple categorical variables}
 
 \index{mosaic plot}
 
-Finally, what about plots for multiple categorical variables? Unfortunately,
-the only plot I know of for this is called a \textbf{mosaic plot}, and they're
-so difficult to interpret that I don't really recommend them. Let me know if
-you find a good alternative.
+Finally, what about plots for multiple categorical variables? One choice that
+is (rarely) used for this is called a \textbf{mosaic plot}, but they're so
+difficult to interpret that I don't really recommend them. A more common choice
+is a \texttt{heat map}, which can be both beautiful and effective.
 
-\label{marginsEnd}
+\index{Seaborn}
+\index{import@\texttt{import}}
+
+This brings us to our next \texttt{import} statement, this time of the Seaborn
+graphical visualization library:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+import seaborn as sns
+\end{Verbatim}
+
+Seaborn is a terrific package that is widely used by Pythonistas in the Data
+Science community. It provides great support for several important kinds of
+plots that aren't implemented (or are implemented suckily) in base Python and
+the other libraries we've used. One such plot is the heat map, which you can
+create simply by passing the Seaborn function a contingency table:
+
+\index{gender\_lang@\texttt{gender\_lang}}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+sns.headmap(gender_lang)
+\end{Verbatim}
+
+(Notice I passed \texttt{gender\_lang}, without the margins, not
+\texttt{gender\_lang\_m}.) The result is shown in Figure~\ref{heatmap}
+(p.~\pageref{heatmap}). It's disorienting at first, but the key to grasping the
+message is to look at the color spectrum at the far right of the diagram. Here
+we see \textit{a mapping of numbers to colors}. In this particular color scheme
+(there are many others to choose from), a light tan color indicates a high
+value up near 200, whereas a dark black color indicates a low color down below
+40. In between, the colors go through shades of purple and red and orange, each
+indicating progressively higher values.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.8\textwidth]{heatmap.png}
+\caption{A heatmap of two categorical variables.}
+\label{heatmap}
+\end{figure}
+
+\index{gender\_lang@\texttt{gender\_lang}}
+
+With that firmly in mind, look now at the main part of the image. You'll see
+there are two ``axes,'' one for \texttt{gender} and one for \texttt{lang}, just
+like in our \texttt{gender\_lang} contingency table. And there are ten
+rectangles, one for each combination of values of those two categorical
+variables. In fact, you'll see that this heat map is really just a pictorial
+representation of this table:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(gender_lang)
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+lang    English  French  Italian  Russian  Spanish
+gender                                            
+F            48      84       15       10       28
+M           205     197       82      129      207
+\end{Verbatim}
+
+A heat map is like looking at a table ``from above.'' Looking down on
+\texttt{gender\_lang}, we see that the highest peaks are \texttt{English} and
+\texttt{Spanish} \texttt{m}ales, with \texttt{French} \texttt{m}ales close
+behind. \texttt{French} writers stand out among the \texttt{f}emales, who
+otherwise have lower quantities across the board. If you glance back and forth
+between the table and the heat map, you'll see that the heat map has
+brighter/more-light-tan rectangles in exactly the places where the table has a
+high value, and darker rectangles for lower values. Sanity check that just as
+the numbers 84 (\texttt{French} \texttt{f}emales) and 82 (\texttt{Italian}
+\texttt{m}ales) are almost identical in magnitude, so the two corresponding
+rectangles are almost exactly the same shade of purple.
+
+
+
 
 
 \section{Case 4: bivariate data: categorical--numerical}
@@ -516,12 +591,13 @@ And now, the scatter plot matrix:
 \index{scatter\_matrix@\texttt{scatter\_matrix()} (Pandas)}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-pd.plotting.scatter_matrix(books_num)
+pd.plotting.scatter_matrix(books_num, alpha=1)
 \end{Verbatim}
 
-The result is in Figure~\ref{scatterplotmatrix}
-(p.~\pageref{scatterplotmatrix}). As I said, it's busy: almost too much to look
-at. You'll understand it when we go through the components, though.
+Don't worry about the \texttt{alpha} part for the moment. The result of this
+command is in Figure~\ref{scatterplotmatrix} (p.~\pageref{scatterplotmatrix}).
+As I said, it's busy: almost too much to look at. You'll understand it when we
+go through the components, though.
 
 \begin{figure}[ht]
 \centering
@@ -557,22 +633,52 @@ What about the upper-left to lower-right diagonal? These are grid squares which
 should ostensibly have a scatter plot of ``\texttt{year} vs.~\texttt{year}'',
 ``\texttt{words} vs.~\texttt{words},'' \textit{etc.} Obviously that doesn't
 make sense -- a scatter plot of a variable against itself would be useless
-(think out why this is the case) so Pandas does us a favor and at least shows
+(think out why this is true). So Pandas does us a favor and at least shows
 us \textit{something} in these squares that's useful. And the useful thing it
 shows is our favorite plot for univariate numeric data: the histogram. The
 upper-left corner is a histogram of the \texttt{year} variable by its lonesome,
 the middle square is a histogram of \texttt{words}, and the bottom-right is a
-histogram of \texttt{chaps}. This lets you see the 
+histogram of \texttt{chaps}. This lets you see the distribution of each of your
+variables in isolation, right alongside their correlation with every other
+variable in the set. Neat.
 
+Scatter plot matrices can be a powerful tool for EDA, so you can quickly
+identify what variable pairings might be of interest (\textit{i.e.}, might have
+associations). They're not usually used for a final presentation of analysis
+results, since they really contain too much information to be effective for
+that.
 
-Scatter plot matrices can be a powerful tool for EDA. They're not usually used
-for a final presentation of analysis results, since they contain too much
-information. But the trick to using a scatter plot matrix is to run your
-eyeballs over the plots, looking for straight-ish lines (as opposed to
-amorphous clouds). In this case, all three of our variables are pretty strongly
-correlated, but you can see from the scatter plot matrix that the
+The trick to using a scatter plot matrix for EDA is to run your eyeballs over
+the plots, looking for straight-ish lines (as opposed to amorphous clouds). In
+the \texttt{books} case, all three of our variables are pretty strongly
+correlated, but you can see from Figure~\ref{scatterplotmatrix} that the
 \texttt{words}-\texttt{year} association is the most pronounced. The
-\texttt{year} and \texttt{chaps} variables, though somewhat correlated (you can
-see a downward trend in the bottom-left grid square, are more ``noisy,''
-meaning that the link between them isn't as precise and predictive.
+\texttt{year} and \texttt{chaps} variables, although somewhat correlated with
+each other (you can see a downward trend in the bottom-left grid square) are
+more ``noisy,'' meaning that the link between them isn't as precise and
+predictive.
+
+\subsection{Transparency}
+
+\index{alpha@alpha (for transparency)}
+
+The ``\texttt{alpha}'' parameter we skipped over earlier has to do with scatter
+plots that have too many points to see clearly. You've probably had experience
+with scatter plots that look like a big blue cloud: there are so many points
+plotting next to and on top of each other that you can get any sense of where
+they're most concentrated. One solution to this is to add the
+\texttt{marker="."} parameter to your call to \texttt{df.plot.scatter()}: this
+tells Python to use a tiny dot instead of a larger circle.
+
+\index{transparency}
+
+There are limitations to this, though, especially for a truly huge number of
+points. A better solution is to use \textbf{transparency}, which is what the
+\texttt{alpha} parameter -- on a scale of 0.0 to 1.0 -- controls. When
+\texttt{alpha} is set all the way to 1.0, dots are plotted the way you normally
+see them: all the way opaque. By reducing this number, each dot gets plotted in
+a partially transparent way, so that only if lots of dots are plotted in the
+same general area will they become fully dark and visible.
+
+% TODO: add figure to illustrate transparency
 

@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 books = pd.DataFrame({
     'name':['Jane Eyre','The Brothers Karamazov','Anna Karenina',
@@ -53,10 +54,15 @@ plt.savefig('histogram.png')
 
 print(books.groupby('gender')['lang'].value_counts())
 
-gender_lang = pd.crosstab(books['lang'], columns=books['gender'], margins=True)
-print(gender_lang / gender_lang.loc['All']['All'] * 100)
-print(np.round(gender_lang / gender_lang.loc['All'] * 100,2))
-print(np.round(gender_lang.div(gender_lang['All'],axis=0) * 100,2))
+gender_lang_m = pd.crosstab(books['lang'], columns=books['gender'], margins=True)
+print(gender_lang_m / gender_lang_m.loc['All']['All'] * 100)
+print(np.round(gender_lang_m / gender_lang_m.loc['All'] * 100,2))
+print(np.round(gender_lang_m.div(gender_lang_m['All'],axis=0) * 100,2))
+
+gender_lang = pd.crosstab(books['gender'], books['lang'], margins=False)
+plt.figure()
+sns.heatmap(gender_lang)
+plt.savefig('heatmap.png')
 
 plt.figure()
 books.boxplot(column='words',by='lang')
