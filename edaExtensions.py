@@ -9,7 +9,8 @@ books = pd.DataFrame({
     'lang':['English','Russian','Russian','Italian','English'],
     'year':[1847,1879,1877,1320,1884],
     'gender':['F','M','M','M','M'],
-    'words':[183858,364153,349736,45750,109571]
+    'words':[183858,364153,349736,45750,109571],
+    'chaps':[38,92,219,34,43]
 }).set_index('name')
 
 NUM_MORE = 1000
@@ -24,14 +25,17 @@ more_years = np.where(more_genders=='M',
     np.round(np.random.uniform(1800,2000,NUM_MORE)))
 more_words = 1000000 - (more_years-1600) * 2000 + np.random.normal(0,90000,NUM_MORE)
 more_words = more_words.clip(20000,np.Inf)
+more_chaps = more_words / 10000 + np.random.normal(0,30,NUM_MORE)
+more_chaps = more_chaps.clip(0,np.Inf)
 
 books = pd.DataFrame({
     'name':np.concatenate([books.index,['NA']*NUM_MORE]),
     'gender':np.concatenate([books.gender,more_genders]),
     'year':np.concatenate([books.year,more_years]).astype(int),
     'lang':np.concatenate([books.lang,more_langs]),
-    'words':np.concatenate([books.words,more_words]).astype(int)
-}).set_index('name')[['gender','year','lang','words']]
+    'words':np.concatenate([books.words,more_words]).astype(int),
+    'chaps':np.concatenate([books.chaps,more_chaps]).astype(int)
+}).set_index('name')[['gender','year','lang','words','chaps']]
 
 print(books.lang.value_counts())
 
@@ -65,5 +69,15 @@ plt.savefig('notchedboxplot.png')
 plt.figure()
 books.plot.scatter(x='year',y='words',xlim=(1600,2018))
 plt.savefig('scatterplot.png')
+
+books = books[books.year > 1500]
+
+# Need to use "tight layout," but I couldn't make it stick without doing it
+# manually in the interactive image GUI.
+plt.figure()
+plt.tight_layout()
+pd.plotting.scatter_matrix(books[['year','words','chaps']], alpha=1,
+    figsize=(5,5))
+plt.savefig('scatterplotmatrix.png')
 
 

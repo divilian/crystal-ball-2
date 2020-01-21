@@ -2,7 +2,6 @@
 \chapter{EDA: review and extensions}
 
 % heatmaps
-% scatterplot matrices
 % facets
 
 \index{Exploratory Data Analysis (EDA)}
@@ -45,25 +44,28 @@ relevant, and what kind of \textbf{plot} is appropriate.
 \pagebreak
 Example: let's say we're exploring a data set of great works of literature:
 
+\index{books@\texttt{books}}
+
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 books.iloc[0:5,:]
 \end{Verbatim}
 \vspace{-.2in}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-                       gender  year     lang   words
-name                                                
-Jane Eyre                   F  1847  English  183858
-The Brothers Karamazov      M  1879  Russian  364153
-Anna Karenina               M  1877  Russian  349736
-The Inferno                 M  1320  Italian   45750
-Huck Finn                   M  1884  English  109571
+                       gender  year     lang   words  chaps
+name                                                       
+Jane Eyre                   F  1847  English  183858     38
+The Brothers Karamazov      M  1879  Russian  364153     92
+Anna Karenina               M  1877  Russian  349736    219
+The Inferno                 M  1320  Italian   45750     34
+Huck Finn                   M  1884  English  109571     43
 \end{Verbatim}
 
-For each book, we have the \texttt{gender} of the author, the \texttt{year}
-and \texttt{language} in which it was written, and the total number of
-\texttt{words} it contains. Clearly \texttt{gender} and \texttt{lang} are
-categorical variables, while \texttt{year} and \texttt{words} are numeric.
+For each book, we have the \texttt{gender} of the author, the \texttt{year} and
+\texttt{language} in which it was written, and the total number of
+\texttt{words} and \texttt{chap}ters it contains. Clearly \texttt{gender} and
+\texttt{lang} are categorical variables, while \texttt{year}, \texttt{words},
+and \texttt{chaps} are numeric.
 
 \section{Case 1: univariate categorical data}
 \label{contingencyTable}
@@ -468,12 +470,109 @@ books.plot.scatter(x='year', y='words')
 \index{Pearson correlation coefficient}
 \index{correlation coefficient}
 
-Clearly a big takeaway from the scatter plot below is that literary works have
-been getting steadily shorter over the years. You'll remember that the
-statistical reliability of this conclusion could be confirmed (or denied) by
-taking a look at the Pearson's correlation coefficient.
+The result is Figure~\ref{scatterplot}. Clearly a big takeaway is that literary
+works have been getting steadily shorter over the years. You'll remember that
+the statistical reliability of this conclusion could be confirmed (or denied)
+by taking a look at the Pearson's correlation coefficient.
 
-\begin{center}
+\begin{figure}[ht]
+\centering
 \includegraphics[width=0.9\textwidth]{scatterplot.png}
-\end{center}
+\caption{A scatter plot of two numerical variables.}
+\label{scatterplot}
+\end{figure}
+
+\subsection{Scatter plot matrices}
+
+\index{bird's-eye view}
+\index{scatter plot!matrix}
+
+So a single scatter plot is easy enough to generate. Sometimes, though, you
+have a data set with many variables, and it's nice to get a bird's-eye view of
+all the possible pairings. This is actually easy to do, by generating something
+called a \textbf{scatter plot matrix}. Scatter plot matrices look pretty
+``busy,'' but that's because there's a lot of information there, so let's give
+them a go.
+
+\index{books\_num@\texttt{books\_num}}
+\index{books@\texttt{books}}
+
+First, we're going to make sure that only do the analysis on the
+\textit{numeric} columns. I'll create a new variable called \texttt{books\_num}
+(for ``books: numeric'') to hold just the numeric variables:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+books_num = books[['year','words','chaps']]
+\end{Verbatim}
+
+\index{double boxies@``double boxies''}
+\index{boxies (square brackets)}
+\index{[]@\texttt{[]} (boxies)}
+
+(Mind the double boxies!)
+
+And now, the scatter plot matrix:
+
+\index{scatter\_matrix@\texttt{scatter\_matrix()} (Pandas)}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+pd.plotting.scatter_matrix(books_num)
+\end{Verbatim}
+
+The result is in Figure~\ref{scatterplotmatrix}
+(p.~\pageref{scatterplotmatrix}). As I said, it's busy: almost too much to look
+at. You'll understand it when we go through the components, though.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.9\textwidth]{scatterplotmatrix.png}
+\caption{A scatter plot matrix of the \texttt{books} \texttt{DataFrame}
+(restricted to only numeric variables).}
+\label{scatterplotmatrix}
+\end{figure}
+
+First, notice that the overall figure is a $3\times 3$ grid of smaller figures,
+and remember that we passed \texttt{scatter\_matrix()} a \texttt{DataFrame}
+with three columns. Each little figure in this grid depicts \textit{two} of the
+\texttt{DataFrame} variables scatter-plotted against each other.
+
+Take the left-middle grid square on the side for starters. This grid square is
+labeled ``words'' on the left and ``year'' on the bottom. It is therefore a
+scatter plot of \texttt{words} vs.~\texttt{year} -- \textit{exactly} the same
+plot as in Figure~\ref{scatterplot} (take a moment to visually compare these).
+And the upper-middle grid square also involves the same two variables, although
+this time it's \texttt{year} vs.~\texttt{words}; it contains the same
+information as the middle-left, but the axes are reversed.
+
+If you look at the lower-left and upper-right corners of the grid, you'll see
+the result of a \texttt{chaps} vs.~\texttt{year} (and \texttt{year}
+vs.~\texttt{chaps}) scatter plot. And the bottom-middle/right-middle squares
+plot \texttt{words} vs.~\texttt{chaps}. Every pairwise combination of variables
+is present here (twice).
+
+\index{univariate}
+\index{histogram}
+
+What about the upper-left to lower-right diagonal? These are grid squares which
+should ostensibly have a scatter plot of ``\texttt{year} vs.~\texttt{year}'',
+``\texttt{words} vs.~\texttt{words},'' \textit{etc.} Obviously that doesn't
+make sense -- a scatter plot of a variable against itself would be useless
+(think out why this is the case) so Pandas does us a favor and at least shows
+us \textit{something} in these squares that's useful. And the useful thing it
+shows is our favorite plot for univariate numeric data: the histogram. The
+upper-left corner is a histogram of the \texttt{year} variable by its lonesome,
+the middle square is a histogram of \texttt{words}, and the bottom-right is a
+histogram of \texttt{chaps}. This lets you see the 
+
+
+Scatter plot matrices can be a powerful tool for EDA. They're not usually used
+for a final presentation of analysis results, since they contain too much
+information. But the trick to using a scatter plot matrix is to run your
+eyeballs over the plots, looking for straight-ish lines (as opposed to
+amorphous clouds). In this case, all three of our variables are pretty strongly
+correlated, but you can see from the scatter plot matrix that the
+\texttt{words}-\texttt{year} association is the most pronounced. The
+\texttt{year} and \texttt{chaps} variables, though somewhat correlated (you can
+see a downward trend in the bottom-left grid square, are more ``noisy,''
+meaning that the link between them isn't as precise and predictive.
 
