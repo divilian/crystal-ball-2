@@ -1,4 +1,6 @@
 
+% TODO: do we need to define the word "distribution?!"
+
 \chapter{KDEs and distributions}
 \label{ch:KDEs}
 
@@ -6,10 +8,11 @@
 \section{Limitations of histograms}
 
 Histograms are a great tool for seeing the distribution of a numerical,
-univariate sample. One problem with them, though, is that a data set doesn't
-uniquely determine a histogram: instead, we must specify parameters such as
-the bin size and the ``alignment'' of the bins (\textit{i.e.}, where exactly
-the breaks occur), and the resulting display is colored by those choices.
+univariate sample. As we'll see in this chapter, though, they have some
+deficiencies. One problem is that a data set doesn't uniquely determine a
+histogram: instead, we must specify parameters such as the bin size and the
+``alignment'' of the bins (\textit{i.e.}, where exactly the breaks occur), and
+the resulting display is colored (no pun intended) by those choices.
 
 Consider this simple data set\footnote{From Janert, P. K. (2010). Data Analysis
 with Open Source Tools: A Hands-On Guide for Programmers and Data Scientists (1
@@ -76,11 +79,11 @@ income levels) which we dutifully collect and then analyze. The purpose is
 the individual bread crumbs themselves.
 
 To our present point, when we look at a histogram of (say) GPAs of a sample of
-UMW students, we're somewhat strangely not actually interested in what those
-sampled GPAs precisely are. We're instead interested in what they tell us about
-UMW student GPAs in general. We want to draw conclusions about the
-\textbf{population} by looking at the \textbf{sample}.\footnote{If you haven't
-encountered these words before, the ``population'' is the entire set of
+UMW students, we're not actually interested in what those sampled GPAs
+precisely are, strange as that may sound. We're instead interested in what they
+tell us about UMW student GPAs in general. We want to draw conclusions about
+the \textbf{population} by looking at the \textbf{sample}.\footnote{If you
+haven't encountered these words before, the ``population'' is the entire set of
 relevant objects of study that are out there in the world, most of which we'll
 never get a direct measurement for because they're just too numerous. The
 ``sample'' is the small subset of the population that we did get a measurement
@@ -114,38 +117,39 @@ a ``quirk?''
 
 If you're like me, your inclination is to say, ``yeah, okay, in this particular
 sample we happened to be missing any 5-foot-6 people, but it's not like we're
-going to draw any grand conclusions from that fact, such as `UMW students are
-almost never 5-foot-6 -- they're almost always either a tad shorter or a tad
-longer than that.' Such a conclusion would be ludicrous!''
+going to draw any grand conclusions from that fact. We're not going to deduce
+that `UMW students are almost never 5-foot-6 -- they're almost always either a
+tad shorter or a tad taller than that.' Such a conclusion would be ludicrous!''
 
 \index{background knowledge}
 
-I sympathize and agree. But really, this conclusion is only because we bring
-in \textbf{background knowledge} to the problem. We've seen lots of people of
+I sympathize and agree. But really, we only know this because we bring
+\textbf{background knowledge} to the problem. We've all seen lots of people of
 various heights, and we know something about how genetics and nutrition and
 other factors play into a person's height, and it just screams ``wrong!'' to
 think that there's some magic ``missing height'' out there, right in the middle
 of otherwise quite common heights, that for some reason is virtually
 unattainable.
 
-Think about it: if we were studying an \textit{unknown} phenomenon, about which
-we had no previous experience, it would be pretty audacious for us to infer the
-existence of lots of ``66's'' which we never actually observed, simply on the
-grounds that there were lots of 65's and 67's in our sample. My point is not to
-forsake your background knowledge: quite the opposite, you should make good use
-of it! My point is only to draw attention to the justification we're using to
-infer lots of 66-inch-tall (5-foot-6) people in the population even though we
-never actually observed any.
+Think about it, though: if we were studying an \textit{unknown} phenomenon,
+about which we had no previous experience, it would be pretty audacious for us
+to infer the existence of lots of ``66's'' which we never actually observed,
+simply on the grounds that there were lots of 65's and 67's in our sample. My
+point is not to forsake your background knowledge: quite the opposite, you
+should make good use of it! My point is only to draw attention to the
+justification we're using to infer the existence of plenty of 66-inch-tall
+(5-foot-6) people in the population, even though we never actually observed
+any.
 
 So my main point is this. Although we look at a histogram like this one in
-order to see ``the lay of the land'' -- which values of the numeric variable
-are more frequent, and which are less frequent -- if we're smart we can't help
-but recognize two different aspects to the figure. Some of the histogram's
-features are generalizable, and indicative of what the population probably
-looks like: we'd (correctly) gather that many or most UMW students were between
-60 and 80 inches tall, with the majority in the 65-ish to 75-ish range. But
-some of its features we'd (correctly) characterize as mere artifacts of this
-particular sample, like the weird fact that we happen to have several
+order to see ``the lay of the land'' -- to see which values of the numeric
+variable are more frequent, and which are less frequent -- if we're smart we
+can't help but recognize two different aspects to the figure. Some of the
+histogram's features are generalizable, and indicative of what the population
+probably looks like: we'd (correctly) gather that many or most UMW students
+were between 60 and 80 inches tall, with the majority in the 65-ish to 75-ish
+range. But some of its features we'd (correctly) characterize as mere artifacts
+of this particular sample, like the weird fact that we happen to have several
 65-inchers and 67-inchers but no 66-inchers.
 
 What we'd really like is a plot that obscures (or ``smooths over'') the second
@@ -154,8 +158,8 @@ we'd like a plot that shows us the features of the data that are probably
 generalizable, while hiding the individual nooks and crannies. Such a plot is
 coming right up in Section~\ref{kdes}, below.
 
-Before we discuss that, though, I'll just note that histograms have a couple
-of additional problems, too:
+Just to finish venting, I'll list yet another couple of problems with
+histograms:
 
 \begin{itemize}
 \itemsep.1em
@@ -171,21 +175,41 @@ majority of points.
 
 \label{kdes}
 
-Okay. One solution to these unfortunate histogram problems is a more advanced
+One solution to these unfortunate histogram problems is a more advanced
 technique called a \textbf{Kernel Density Estimate}, or a \textbf{KDE}.
+
+\index{kernel}
+\index{Gaussian (kernel)}
+\index{normal distribution}
 
 A ``kernel'' is defined as a single, strongly-peaked function that has an area
 under its curve of exactly 1. Normally (no pun intended!) we will use a
 \textit{Gaussian kernel}, which means ``a bell curve a la the normal
-distribution.'' 
+distribution'':
 
-One thing we have to decide is the \textit{width} of this kernel --- which in
-our case essentially means ``the standard deviation of the normal
+\begin{center}
+\includegraphics[width=0.4\textwidth]{lilGaussian.png}
+\end{center}
+
+(In math and stats, ``Gaussian'' and ``normal'' are synonyms.)
+
+\index{bandwidth}
+\index{standard deviation}
+
+One thing we have to decide on is the \textit{width} of this kernel --- which
+in our case essentially means ``the standard deviation of the normal
 distribution we're using.'' This is kind of like having to choose the bin width
-for histograms, but in practice it turns out not to 
+for histograms, but in practice the choice turns out not to be as critical. The
+width we choose is called the kernel's \textbf{bandwidth}.
 
-To form a KDE, we place a ``copy'' of this kernel at each data point, and then
-add up all the kernel contributions to make a smooth curve.
+Okay, now visualize this. In order to form a KDE, we place a \textit{copy} of
+this kernel on the x-axis at each data point, and then add up all the kernel
+contributions to make a smooth curve. This has the effect of smoothing out all
+the jaggedy ups and downs of the actual histogram. The goal is to reflect the
+``true, underlying'' shape of the data for the entire population.
+
+\index{gaussian\_kde@\texttt{gaussian\_kde()} (SciPy)}
+\index{kdeplot@\texttt{kdeplot()} (Seaborn)}
 
 There are several different ways to do this with Python packages. The Seaborn
 library has a good ``\texttt{kdeplot()}'' function. Using straight SciPy, we
@@ -198,32 +222,45 @@ values.
 
 It's easier than it sounds when you run the actual code:
 
+\index{bw\_method@\texttt{bw\_method()} argument to \texttt{gaussian\_kde()}}
+
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
 import scipy.stats
-kde = scipy.stats.gaussian_kde(data,bw_method=2)
-x_vals = np.arange(0,4,.1)
+kde = scipy.stats.gaussian_kde(data,bw_method=.5)
+x_vals = np.arange(0,10,.1)
 plt.plot(x_vals,kde(x_vals))
 \end{Verbatim}
 
-Choosing a larger kernel width effectively smooths out the KDE more, making
-each point ``fuzzier'' with respect to its actual position. Choosing a narrower
-kernel focuses each data point's contribution more at its actual value,
-making the plot choppier.
+\index{bandwidth}
+
+The ``\texttt{data}'' argument to \texttt{gaussian\_kde()} is the array you're
+working with, and ``\texttt{bw\_method}'' (a dumb name) gives the kernel's
+bandwidth. (\texttt{x\_vals} is an array of the x coordinates you want to plot
+the KDE for, and should cover the range.)
+
+Now stare at the four plots in Figure~\label{kdes}. These are all KDEs for the
+green Figure~\ref{kdehist} histogram, but each one uses a different bandwidth.
+Choosing a larger kernel bandwidth effectively smooths out the KDE more,
+spreading the contribution of each point quite a bit farther from its original
+position. Choosing a narrower kernel focuses each data point's contribution
+more precisely at its actual value, making the plot choppier.
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.4\textwidth]{kde1.png}
-\includegraphics[width=0.4\textwidth]{kde2.png}
-\includegraphics[width=0.4\textwidth]{kde3.png}
-\includegraphics[width=0.4\textwidth]{kde4.png}
-\caption{Gaussian KDEs with bandwidths of 2, 1, .5, and .2, respectively.}
+\includegraphics[width=1\textwidth]{kdes.png}
+\includegraphics[width=0.7\textwidth]{kdehist.png}
+\caption{Gaussian KDEs with bandwidths of 1, .5, .3, and .1, respectively, for
+the data behind the green Figure~\ref{kdehist} histogram (repeated here).}
+\label{kdes}
 \end{figure}
 
 In practice, it's another parameter to play with. If the data follows a smooth
 distribution, you can use a wider bandwidth which will ``blur'' each data point
 more and give a more intuitive view of the general distribution
-characteristics. If the distribution is more ``wiggly,'' though, you need a
-narrower bandwidth to see all the relevant detail.
+characteristics. If the distribution is more wiggly, though, you need a
+narrower bandwidth to see all the relevant detail. Which of the
+Figure~\ref{kdes} bandwidths do you think best captures the ``true''
+distribution of the points in the histogram?
 
 Like most things in Data Science (and in life), there's no one true
 hard-and-fast right answer. There is instead a range of points of view, many
