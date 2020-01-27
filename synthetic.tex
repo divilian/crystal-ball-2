@@ -83,6 +83,11 @@ bottom distribution, however, the babies' birth minutes will all be between 0
 and 60 but with no particular tendency towards any value in that range more
 than any other.
 
+\subsubsection{Generating normal random values}
+
+\index{normal random values}
+\index{normal@\texttt{normal()} (NumPy)}
+
 Let's see if that works. The three arguments to \texttt{normal()} are (1) the
 mean of the distribution, (2) the standard deviation, and (3) how many random
 numbers you actually want. We'll just start with one at a time:
@@ -154,7 +159,7 @@ Notice that each time we call \texttt{normal()}, we get an array back (even if
 it has only a single value).
 
 By the way, we should sure expect that if we generate many random speeds, and
-take their average, it should be darn close to 65 mph:
+take their average, it should be pretty darn close to 65 mph:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 print(np.random.normal(65,4,1000).mean())                        
@@ -165,4 +170,86 @@ print(np.random.normal(65,4,1000).mean())
 \end{Verbatim}
 
 Yep.
+
+\subsubsection{Generating uniform random values}
+
+\index{uniform random values}
+\index{uniform@\texttt{uniform()} (NumPy)}
+
+Uniform random values can be generated the same way, but with the
+\texttt{uniform()} function, which takes the min and the max as its first two
+arguments (and, as before, the number of desired values as the third):
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+np.random.seed(13)
+print(np.random.uniform(0,60,1))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+[46.66214463]
+\end{Verbatim}
+
+This synthetic baby was born at 46.6 minutes past the hour. What about the next
+one?
+
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(np.random.uniform(0,60,1))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+[14.2524732]
+\end{Verbatim}
+
+And the next one?
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(np.random.uniform(0,60,1))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+[49.45671196]
+\end{Verbatim}
+
+And the next eleven?
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(np.random.uniform(0,60,11))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+[57.94495188 58.35606683 27.20695485 36.54254777 46.53159088 38.49680069
+ 43.32109377  2.10219145 17.90696825  3.51074951 51.42365656]
+\end{Verbatim}
+
+Of course, resetting the seed gives us our original sequence back:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(np.random.uniform(0,60,5))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+[46.66214463 14.2524732  49.45671196 57.94495188 58.35606683]
+\end{Verbatim}
+
+(Check those numbers with the previous ones to convince yourself.)
+
+And finally, let's sanity check the average:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(np.random.uniform(0,60,1000).mean())                       
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+29.2049841447296
+\end{Verbatim}
+
+Yay. ``On average,'' our thousand synthetic babies are born at about half past
+the hour, which is what we'd expect.
 
