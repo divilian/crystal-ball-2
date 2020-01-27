@@ -1,5 +1,5 @@
 
-\chapter{Synthetic data sets}
+\chapter{Random value generation}
 
 \index{synthetic data set}
 
@@ -12,23 +12,25 @@ data sets that we suspect have similar characteristics. And sometimes we
 simply don't have access to relevant real-world data but we need inputs into
 some simulation process.
 
-\section{Random number generation}
+This chapter and the next will teach you the essentials of this process.
 
 \index{random number}
-\index{seed (of a random number generator)}
+\index{random value}
+\index{seed (of a random generator)}
 
-\subsection{Setting the seed}
+\section{Setting the seed}
 
-Generating \textbf{random number}s is an activity we perform surprisingly often
-in Data Science. ``Random numbers,'' as it turns out, aren't truly random,
-because the programming language uses a bizarre -- but deterministic and
-repeatable -- algorithm to come up with them. This is nice, because we can
-guarantee that each time we run a program we'll get the same sequence of random
-numbers. We do this by setting the random number generator's \textbf{seed} to a
-particular value. It helps us in debugging our code, because otherwise, a
-shifting sequence of numbers would be a frustrating moving target. 
+Generating \textbf{random number}s (and other \textbf{random value}s) is an
+activity we perform surprisingly often in Data Science. ``Random numbers,'' as
+it turns out, aren't truly random, because the programming language uses a
+bizarre -- but deterministic and repeatable -- algorithm to come up with them.
+This is nice, because we can guarantee that each time we run a program we'll
+get the same sequence of random numbers. We do this by setting the random
+number generator's \textbf{seed} to a particular value. It helps us in
+debugging our code, because otherwise, a shifting sequence of numbers would be
+a frustrating moving target. 
 
-\texttt{seed@\texttt{seed()} (NumPy)}
+\index{seed@\texttt{seed()} (NumPy)}
 
 NumPy provides a really nice library for all this, all of which is in the
 namespace \texttt{np.random}. To set the random number generator's seed, all
@@ -38,20 +40,19 @@ you do is call its \texttt{seed()} function and pass it your favorite number:
 np.random.seed(13)
 \end{Verbatim}
 
-(I chose 13 because that was my little league baseball uniform number as a
+(I chose 13 because that was my little league baseball jersey number as a
 kid.) I recommend you put this line of code (with any positive integer you
-like) near the top of any \texttt{.py} file in which you do random number
-generation. If you want a different sequence of random numbers later, you can
+like) near the top of any \texttt{.py} file in which you do random value
+generation. If you want a different sequence of random values later, you can
 either change the integer to something different, or comment out the line
 altogether by prepending a ``\texttt{\#}'' character.
 
-\subsection{Generating random values}
+\section{Generating random numbers}
 
 To actually generate a random number value, you first have to figure out what
 \textbf{distribution} you want it to come from. Think of a distribution as a
-KDE from last chapter: it's a way of specifying which values will be more
-likely to occur and which will be less likely. The two standard distributions
-we'll use most are:
+KDE from last chapter: it's a way of specifying which values are more common
+and which are less. The two standard distributions we'll use most are:
 
 \begin{itemize}
 \itemsep.1em
@@ -83,7 +84,7 @@ bottom distribution, however, the babies' birth minutes will all be between 0
 and 60 but with no particular tendency towards any value in that range more
 than any other.
 
-\subsubsection{Generating normal random values}
+\subsection{Generating normal random numbers}
 
 \index{normal random values}
 \index{normal@\texttt{normal()} (NumPy)}
@@ -171,14 +172,14 @@ print(np.random.normal(65,4,1000).mean())
 
 Yep.
 
-\subsubsection{Generating uniform random values}
+\subsection{Generating uniform random numbers}
 
 \index{uniform random values}
 \index{uniform@\texttt{uniform()} (NumPy)}
 
 Uniform random values can be generated the same way, but with the
-\texttt{uniform()} function, which takes the min and the max as its first two
-arguments (and, as before, the number of desired values as the third):
+\texttt{uniform()} function, which takes as its arguments (1) the min, (2) the
+max, and (3) the number of desired values:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 np.random.seed(13)
@@ -252,4 +253,91 @@ print(np.random.uniform(0,60,1000).mean())
 
 Yay. ``On average,'' our thousand synthetic babies are born at about half past
 the hour, which is what we'd expect.
+
+
+\section{Generating categorical random values}
+
+\index{random values}
+\index{categorical random values}
+\index{choice@\texttt{choice()} (NumPy)}
+
+NumPy also provides a way to generate \textit{categorical} values with certain
+frequencies, through its \texttt{choice()} function. You give it an array of
+the possible values, and it chooses one:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+np.random.seed(13)
+np.random.choice(['Steelers','Redskins','Giants'])
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+'Giants'
+\end{Verbatim}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+np.random.choice(['Steelers','Redskins','Giants'])
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+'Steelers'
+\end{Verbatim}
+
+(As always, resetting the seed will restart the same sequence of random team
+choices from the beginning.)
+
+\pagebreak
+\begin{samepage}
+Other useful arguments to \texttt{choice()} include:
+
+\begin{compactitem}
+\item \texttt{size} -- the number of elements you want in the resulting array.
+\item \texttt{replace} -- if \texttt{False}, the elements will be drawn from
+your list \textit{without replacement} (meaning once a value is chosen, it
+will not be chosen again). This is often useful.
+\item \texttt{p} -- a list of \textit{probabilities} (in the range 0 to 1)
+specifying how likely each element in the list is to be chosen. (Note these
+must sum to 1; and NumPy, stupidly, will not normalize it for you.)
+\end{compactitem}
+\end{samepage}
+
+To illustrate:
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+print(np.random.choice(['Steelers','Redskins','Giants'], size=14, p=[.3,.6,.1]))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+['Steelers' 'Redskins' 'Redskins' 'Redskins' 'Giants' 'Steelers' 'Steelers'
+ 'Redskins' 'Redskins' 'Steelers' 'Redskins' 'Giants' 'Steelers' 'Redskins']
+\end{Verbatim}
+
+We asked for 14 random teams, and we told it to give us \texttt{Steelers} 30\%
+of the time, \texttt{Redskins} 60\%, and \texttt{Giants} only 10\%. I think
+you'll agree that the resulting array was pretty faithful to that. (Of course,
+you'll get a different random array each time.)
+
+Finally, let's test a large random array and verify that the requested
+percentages are approximately correct:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+pd.Series(np.random.choice(['Steelers','Redskins','Giants'], size=1000,
+    p=[.3,.6,.1])).value_counts() 
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+Redskins    584
+Steelers    319
+Giants       97
+dtype: int64
+\end{Verbatim}
+
+\index{value\_counts@\texttt{.value\_counts()} (Pandas)}
+
+Our friend the \texttt{.value\_counts()} method confirms that it pretty much
+checks out.
+
 
