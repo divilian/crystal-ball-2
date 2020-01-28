@@ -239,12 +239,12 @@ working with, and ``\texttt{bw\_method}'' (a dumb name) gives the kernel's
 bandwidth. (\texttt{x\_vals} is an array of the x coordinates you want to plot
 the KDE for, and should cover the range.)
 
-Now stare at the four plots in Figure~\label{kdes}. These are all KDEs for the
-green Figure~\ref{kdehist} histogram, but each one uses a different bandwidth.
-Choosing a larger kernel bandwidth effectively smooths out the KDE more,
-spreading the contribution of each point quite a bit farther from its original
-position. Choosing a narrower kernel focuses each data point's contribution
-more precisely at its actual value, making the plot choppier.
+Now stare at the four plots in Figure~\ref{kdesfig}. These are all KDEs for
+the green Figure~\ref{kdehist} histogram, but each one uses a different
+bandwidth. Choosing a larger kernel bandwidth effectively smooths out the KDE
+more, spreading the contribution of each point quite a bit farther from its
+original position. Choosing a narrower kernel focuses each data point's
+contribution more precisely at its actual value, making the plot choppier.
 
 \begin{figure}[ht]
 \centering
@@ -252,7 +252,7 @@ more precisely at its actual value, making the plot choppier.
 \includegraphics[width=0.7\textwidth]{kdehist.png}
 \caption{Gaussian KDEs with bandwidths of 1, .5, .3, and .1, respectively, for
 the data behind the green Figure~\ref{kdehist} histogram (repeated here).}
-\label{kdes}
+\label{kdesfig}
 \end{figure}
 
 In practice, it's another parameter to play with. If the data follows a smooth
@@ -260,7 +260,7 @@ distribution, you can use a wider bandwidth which will ``blur'' each data point
 more and give a more intuitive view of the general distribution
 characteristics. If the distribution is more wiggly, though, you need a
 narrower bandwidth to see all the relevant detail. Which of the
-Figure~\ref{kdes} bandwidths do you think best captures the ``true''
+Figure~\ref{kdesfig} bandwidths do you think best captures the ``true''
 distribution of the points in the histogram?
 
 Like most things in Data Science (and in life), there's no one true

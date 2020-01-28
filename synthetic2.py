@@ -30,3 +30,14 @@ plt.savefig("uncorrscatterclip.png")
 print(scipy.stats.pearsonr(heights,sat_scores))
 
 print("min: {:.2f}, max: {:.2f}".format(sat_scores.min(), sat_scores.max()))
+
+
+weights_lbs = np.random.normal(150, 30, 100)
+weights_kg = weights_lbs / 2.2
+plt.figure()
+plt.scatter(weights_kg, weights_lbs)
+plt.xlabel("weight (kg)")
+plt.ylabel("weight (lbs)")
+plt.savefig("compcorrscatter.png")
+
+print(scipy.stats.pearsonr(weights_lbs,weights_kg))

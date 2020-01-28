@@ -106,22 +106,46 @@ scores ``clipped'' to stay above 400 and below 1600.}
 
 
 
-%\subsection{Totally correlated numeric variables}
-%
-%If two variables are \textit{completely} correlated, then one is simply a
-%direct (linear) function of the other. That's easy to accomplish by creating
-%only \textit{one} randomly, and then using it to compute the other:
-%
-%\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-%weights_lbs = np.random.normal(150, 30, 100)
-%weights_kg = weights_lbs / 2.2
-%\end{Verbatim}
-%
-%Scatterplotting these should give a perfectly straight line, and Pearson
-%should tell us they're totally correlated (r=1).
-%
-%\subsection{Somewhat correlated numeric variables}
-%
+\subsection{Totally correlated numeric variables}
+
+On the other extreme, if two variables are \textit{completely} correlated, then
+one is simply a direct (linear) function of the other. That's easy to
+accomplish by creating only \textit{one} randomly, and then using it to compute
+the other:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+weights_lbs = np.random.normal(150, 30, 100)
+weights_kg = weights_lbs / 2.2
+\end{Verbatim}
+
+Clearly a person's weight in pounds completely determines their weight in
+kilograms: all you do is divide by a constant factor to convert between units.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.45\textwidth]{compcorrscatter.png}
+\smallskip
+\caption{Two \textit{completely} correlated numeric variables.}
+\label{compcorrscatter}
+\end{figure}
+
+Scatter plotting these gives a perfectly straight line (see
+Figure~\ref{compcorrscatter}), and Pearson tells us they're totally correlated
+(the $p$-value is rock bottom 0.0, and $r$=1):
+
+\index{pearsonr@\texttt{pearsonr()} (SciPy)}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(scipy.stats.pearsonr(weights_lbs,weight_kg))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+(1.0, 0.0)
+\end{Verbatim}
+
+\subsection{Somewhat correlated numeric variables}
+
 %A first approach to generate a data set in which two numerical variables
 %are somewhat, but not completely, correlated, is to generate one randomly, and
 %then to compute the second as a function of the first \textit{with added
