@@ -32,6 +32,9 @@ On one extreme, let's say you wanted to create a data set with two completely
 SAT scores of a group of college applicants. Then you'd just generate two
 arrays, one at a time:
 
+\index{sat\_scores@\texttt{sat\_scores}}
+\index{heights@\texttt{heights}}
+
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 heights = np.random.normal(65, 8, 100)
 sat_scores = np.random.normal(1000, 300, 100)
@@ -146,178 +149,247 @@ print(scipy.stats.pearsonr(weights_lbs,weight_kg))
 
 \subsection{Somewhat correlated numeric variables}
 
-%A first approach to generate a data set in which two numerical variables
-%are somewhat, but not completely, correlated, is to generate one randomly, and
-%then to compute the second as a function of the first \textit{with added
-%noise}. ``Noise'' is a somewhat misleading word that's used in a variety of
-%statistical situations: here it means ``other (linearly additive) influences
-%that affect the second variable besides just the value of the first.'' To wit:
-%
-%\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-%sat_scores = np.random.normal(1400, 350, 100)
-%gpas = sat_scores * (2.5 / 1400) + np.random.normal(0, 1, 100)
-%\end{Verbatim}
-%
-%Here we're modeling the college GPA of a student as somewhat correlated with
-%the SAT score that she received in high school. The ``$\frac{2.5}{1400}$''
-%multiplier is an attempt to quantify the relationship between the two
-%variables, which of course are measured on completely different scales. We're
-%guestimating that a 1400 on the SAT would kinda sorta equate to about a 2.5
-%college GPA. Notice that the second component of \texttt{gpas} is a normally
-%distributed ``noise'' component \textit{with zero mean}. 
-%
-%This is a good first attempt. Notice two assumptions/limitations, though:
-%
-%\begin{enumerate}
-%\item We're assuming that the relationship between the two variables is
-%\textit{linear} --- namely, that ``the first value times a constant'' is a good
-%estimate for the second value. In reality, of course, the relationship is
-%often more complex: it might be better modeled as the \textit{square} of the
-%first value, for instance, or ``$e$ to the'' first value, or the cube root of
-%the first value, \textit{etc.}
-%\item We're assuming that the ``zero point'' for the two variables coincide:
-%in other words, a zero for one value would on average roughly correspond to a
-%zero for the other. In the above case, we're assuming that a person who got a
-%0 on the SAT would have, on average, a 0 GPA. If this isn't appropriate, we
-%should add an \textbf{intercept term} (a constant) to our generative formula.
-%This takes our generated second variable and just shifts it, wholesale, to a
-%new region of the number range.
-%\end{enumerate}
-%
-%We'll stick with the first assumption (linearity) for the moment, but be more
-%flexible about the second. If we include an intercept term, our formula for
-%generating the dependent variable boils down to:
-%
-%\begin{center}
-%\texttt{dep\_variable} = $m \ \cdot$ \texttt{indep\_variable}
-%+ $b$ + \texttt{np.random.normal(0, $\sigma$, $n$)}
-%\end{center}
-%
-%which is the familiar equation for a line ($y=mx+b$) with a noise term added
-%in (with $\sigma$ standard deviation). Now we have to estimate decent values
-%for $m$, $b$, and $\sigma$. How should we do this?
-%
-%\medskip
-%
-%My preferred approach is to identify a ``high-ish'' value of the first
-%variable, and estimate the roughly-on-average corresponding value of the
-%second variable. Then do the same for a ``low-ish'' value. Then, plug those
-%into the $y=mx+b$ formula and solve for the slope and intercept.
-%
-%\subsubsection{Example}
-%
-%I'm going to generate a synthetic data set of two variables: the number of
-%hours a person has practiced playing the Dance Dance Revolution (DDR)
-%videogame in their lifetime, and the score they achieved in a DDR contest (on
-%the song \textit{Kakumei}). Clearly, there should be some (positive)
-%relationship between the two quantities: when \texttt{num\_hrs} is high, you'd
-%expect \texttt{score} to also be high. If you're familiar with the game,
-%though, you know that the zero points for these variables do \textit{not}
-%coincide: even if you've never ever played at all, you'll still manage to
-%stumble through the song, learn how to play as you go, and get a positive
-%score.
-%
-%Let's generate the \texttt{num\_hrs} variable first, and then generate the
-%\texttt{score} variable based on that.
-%
-%Based on my knowledge of the game, I estimate:
-%\begin{compactitem}
-%\item A good-ish player who has practiced for 100 hours might get a score of
-%around 60,000,000.
-%\item A sucky-ish player who has practiced for only 10 hours might get a score
-%of around 30,000,000.
-%\end{compactitem}
-%
-%Running the algebra, I get:
-%\begin{align*}
-%60,000,000 &= m \cdot 100 + b\\
-%30,000,000 &= m \cdot 10 + b\\
-%\end{align*}
-%\vspace{-.7in}
-%\begin{center}
-%\dots \textit{insert algebra here} \dots \\
-%$m = 333,333, b = 26,666,666$
-%\end{center}
-%
-%Thus we get back-of-the-envelope estimates of $m$ and $b$.
-%
-%How to estimate $\sigma$? Play with it. If you're using the normal
-%distribution, remember that two-thirds of your data points will fall between
-%one standard deviation from the mean. I think two-thirds of my 100-hour
-%practicers might get between 50,000,000 and 70,000,000. So I'll go with a
-%$\sigma$ of 10,000,000 and see how that looks. My final code for a synthetic
-%data set of 200 players is:
-%
-%\begin{Verbatim}[fontsize=\footnotesize,samepage=true]
-%num_hrs = np.random.normal(50,20,200).clip(0,100)
-%score = num_hrs * 333333 + 26666666 + np.random.normal(0,10000000,200)
-%\end{Verbatim}
-%
-%(The ``\texttt{.clip()}'' makes sure all the \texttt{num\_hrs} values are
-%between 0 and 100.)
-%
-%This looks pretty decent:
-%
-%\includegraphics[width=0.9\textwidth]{ddr.png}
-%
-%Note: there's also a \texttt{multivariate\_normal()} function in the
-%\texttt{scipy.stats} package which can generate these kinds of correlated data
-%sets more powerfully.
-%
-%
-%
-%
-%
-%
-%
-%
-%
-%
-%
-%
-%
-%
-%
-%
-%
-%
-%
-%
-%
-%
-%
-%
-%
-%
-%
+Now let's take the most common and interesting case: a data set in which our
+two numeric variables are \textit{partially}, but not completely, correlated.
+(By ``partially correlated'' I just mean that there \textit{is} an association
+between the variables, but it's not a rigidly perfect one, like the one between
+weight-in-pounds and weight-in-kg.)
+
+\index{noise}
+
+What we'll do is first generate one of the variables independently and
+randomly, and then compute the second as a function of the first \textit{with
+added \textbf{noise}}. ``Noise'' is a strange (and somewhat misleading) term
+that's used in a variety of statistical situations. Here it means ``random
+other factors that influence a numeric variable's value up or down.''
+
+\index{SAT}
+\index{GPA}
+
+As an example, let's create a synthetic data set with two variables about high
+school seniors: her SAT score, and her high school GPA. A moment's thought
+will tell you that this indeed falls under our third, ``somewhat correlated''
+case: students with better SAT scores also on average tend to have higher GPAs,
+but this is an imperfect relationships that doesn't always hold completely.
+
+\index{nudge@``nudge''}
+
+Our strategy is as follows. First, randomly create an array of synthetic SAT
+scores. Then, calculate each student's GPA as a function of her SAT score,
+plus a random ``nudge'' either up or down to account for other random factors.
+
+\index{white noise}
+
+For our noise factor (the ``nudge'') we'll take the most common approach: a
+normally-distributed random variable with a mean of zero. This is called
+``\textbf{white noise},'' for various semi-interesting reasons. We use a mean
+of 0 for this because on average, we don't want the random ``nudges'' to be
+biased in either the up direction or the down direction. On average, we want
+the net nudge to be zero.
+
+Okay. Now see if you can understand the two lines of code we use to implement
+this strategy:
+
+\index{sat\_scores@\texttt{sat\_scores}}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+sat_scores = np.random.normal(1000, 300, 100)
+gpas = sat_scores * (2.5 / 1400) + np.random.normal(0, 1, 100)
+\end{Verbatim}
+
+The \texttt{sat\_scores} line is the same one we had before. We're then
+modeling the high school GPA of a student as \textit{somewhat} correlated with
+his SAT score. The ``$\frac{2.5}{1400}$'' multiplier is an attempt to quantify
+the relationship between the two variables, which of course are measured on
+completely different scales. We're guestimating that a 1400 on the SAT would
+kinda sorta equate to about a 2.5 GPA. Notice that the second component of
+\texttt{gpas} is a normally distributed noise component \textit{with zero
+mean}. (Why a standard deviation of 1? Just a guess. We can tweak it later if
+we don't like the results.)
+
+Now this is a good first attempt. Notice two assumptions/limitations, though:
+
+\begin{enumerate}
+
+\item We're assuming that the relationship between the two variables is
+\textit{linear} --- namely, that ``the first value times a constant'' is a good
+estimate for the second value. In reality, of course, the relationship is often
+more complex: it might be better modeled as the \textit{square} of the first
+value, for instance, or ``$e$ to the'' first value, or the cube root of the
+first value, \textit{etc.}
+
+\index{intercept term}
+
+\item We're assuming that the ``zero point'' for the two variables coincide: in
+other words, a zero for one value would on average roughly correspond to a zero
+for the other. In the above case, we're assuming that a person who got a 0 on
+the SAT would have, on average, a 0 GPA. If this isn't appropriate, we should
+add an \textbf{intercept term} (a constant) to our generative formula. This
+takes our generated second variable and just shifts it, wholesale, to a new
+region of the number range.
+
+\end{enumerate}
+
+We'll stick with the first assumption (linearity) for the moment, but be more
+flexible about the second. If we include an intercept term, our formula for
+generating the dependent variable boils down to:
+
+\begin{center}
+
+\texttt{dep\_variable} = $m \ \cdot$ \texttt{indep\_variable} + $b$ +
+\texttt{np.random.normal(0, $\sigma$, $n$)}
+
+\end{center}
+
+\index{y=mx+b@$y=mx+b$}
+
+which is the familiar equation for a line ($y=mx+b$) with a noise term added
+in (with $\sigma$ standard deviation). Now we have to estimate decent values
+for $m$, $b$, and $\sigma$. How should we do this?
+
+\medskip
+
+My preferred approach is to identify a ``high-ish'' value of the first
+variable, and estimate a (roughly, on average) corresponding value of the
+second variable. Then do the same for a ``low-ish'' value. Then, plug those
+into the $y=mx+b$ formula and solve for the slope and intercept.
+
+Example: let's generate a synthetic data set of two variables: the number of
+hours a person has practiced playing the Dance Dance Revolution (DDR) videogame
+in their lifetime, and the score they achieved in a DDR contest (on the song
+\textit{Kakumei}). Clearly, there should be some (positive) relationship
+between the two quantities: when \texttt{num\_hrs} is high, you'd expect
+\texttt{score} to also be high. If you're familiar with the game, though, you
+know that the zero points for these variables do \textit{not} coincide: even if
+you've never ever played at all, you'll still manage to stumble through the
+song, learn how to play as you go, and get a positive score.
+
+Based on my knowledge of the game (which I suck at, by the way), I estimate: 
+
+\begin{compactitem}
+
+\item A decent player who has practiced for 100 hours might get a score of
+around 60 million.
+%\footnote{For whatever reason, even bad scores in DDR are
+%zany high numbers. To avoid writing out tons of zeros, I'll just consider
+%``60'' to be a player's score instead of ``60,000,000.''}
+
+\item A sucky-ish player who has practiced for only 10 hours might
+get a score of around 30 million.
+
+\end{compactitem}
+
+
+Running the algebra\footnote{Linear algebra fans can avoid doing all the
+mechanical steps by noting that our two equations form the following matrix
+equation:
+\vspace{-.2in}
+
+\begin{align*}
+\begin{bmatrix} 100 & 1 \\ 10 & 1 \end{bmatrix}
+\cdot
+\begin{bmatrix} m \\ b \end{bmatrix}
+=
+\begin{bmatrix} 60 \\ 30 \end{bmatrix}
+\end{align*}
+
+NumPy can solve this for $m$ and $b$ like so:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+X = np.array([[100,1],[10,1]])
+Y = np.array([60,30])
+print(np.linalg.solve(X,Y))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+[ 0.33333333 26.66666667]
+\end{Verbatim}
+But only if you're feeling lazy. 
+}, I get:
+\begin{samepage}
+\begin{align*}
+60 &= m \cdot 100 + b\\
+30 &= m \cdot 10 + b\\
+\end{align*}
+\vspace{-.7in}
+\begin{center}
+\dots \textit{insert algebra here} \dots \\
+\smallskip
+$m = .333, b = 26.667$
+\end{center}
+\end{samepage}
+
+Thus we get back-of-the-envelope estimates of $m$ and $b$.
+
+Now how to estimate $\sigma$, the standard deviation of the noise term? Play
+with it. The larger it is, the more your second variable will deviate from the
+perfectly straight line we would predict solely from the $y=mx+b$. Remember
+that with the normal distribution, two-thirds of your data points will fall
+within one standard deviation from the mean. I think two-thirds of my 100-hour
+practicers might get between 50 and 70 million. So I'll go with a
+$\sigma$ of 10 and see how that looks.
+
+Finall, here's the actual code to produce a synthetic data set of 200 dancers.
+First, generate the practice times themselves:
+
+\index{clip@\texttt{.clip()} method (NumPy)}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+num_hrs = np.random.normal(50,20,200).clip(0,500)
+\end{Verbatim}
+
+Perhaps your average dancer practiced 50 hours for the competition, with most
+of them within 20 hours of that, and no one who practiced less than 0 hours
+(not even me), or greater than 500 hours.
+
+Then, we generate these players' scores:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+score = num_hrs * .333 + 26.667 + np.random.normal(0,10,200)
+\end{Verbatim}
+
+I think it looks pretty decent (Figure~\ref{ddr}).
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.46\textwidth]{ddr1.png}
+\includegraphics[width=0.46\textwidth]{ddr2.png}
+\caption{A scatter plot of two synthetic, partially-but-not-completely
+correlated numeric variables. In the left figure, the $\sigma$ for the noise
+was set to 10 million; in the right, to 3 million.}
+\label{ddr}
+\end{figure}
+
+Note: there's also a \texttt{multivariate\_normal()} function in the
+\texttt{scipy.stats} package which can generate these kinds of correlated data
+sets more powerfully.
+
+
 %\section{\textit{Categorical} variables}
 %
 %NumPy provides a way to generate a categorical data set with certain
 %frequencies, through its \texttt{np.random.choice()} function:
 %
-%\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-%>>> np.random.choice(['Steelers','Redskins','Giants'])
-%    'Redskins'
-%\end{Verbatim}
+%\begin{Verbatim}[fontsize=\small,samepage=true,frame=single] >>>
+%np.random.choice(['Steelers','Redskins','Giants']) 'Redskins' \end{Verbatim}
 %
 %Useful arguments include:
 %
-%\begin{compactitem}
-%\item \texttt{size} -- the number of elements you want in the resulting array.
-%\item \texttt{replace} -- if \texttt{False}, the elements will be drawn from
-%your list \textit{without replacement} (meaning once a value is chosen, it
-%will not be chosen again). This is often useful.
-%\item \texttt{p} -- a list of \textit{probabilities} (in the range 0 to 1)
+%\begin{compactitem} \item \texttt{size} -- the number of elements you want in
+%the resulting array. \item \texttt{replace} -- if \texttt{False}, the elements
+%will be drawn from your list \textit{without replacement} (meaning once a
+%value is chosen, it will not be chosen again). This is often useful. \item
+%\texttt{p} -- a list of \textit{probabilities} (in the range 0 to 1)
 %specifying how likely each element in the list is to be chosen. (Note these
 %must sum to 1; and NumPy, stupidly, will not normalize it for you.)
 %\end{compactitem}
 %
 %A more complicated example:
-%\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
-%>>> np.random.choice(['Steelers','Redskins','Giants'], size=10, p=[.3,.6,.1])
-%    ['Redskins' 'Redskins' 'Giants' 'Redskins' 'Redskins' 'Steelers' 'Redskins'
-%     'Steelers' 'Redskins' 'Giants']
-%\end{Verbatim}
+%\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single] >>>
+%np.random.choice(['Steelers','Redskins','Giants'], size=10, p=[.3,.6,.1])
+%['Redskins' 'Redskins' 'Giants' 'Redskins' 'Redskins' 'Steelers' 'Redskins'
+%'Steelers' 'Redskins' 'Giants'] \end{Verbatim}
 %
 %
 %\subsection{Uncorrelated categorical variables}
@@ -328,22 +400,18 @@ print(scipy.stats.pearsonr(weights_lbs,weight_kg))
 %
 %Since these variables are uncorrelated, we generate each one separately:
 %
-%\begin{Verbatim}[fontsize=\footnotesize,samepage=true]
-%party = np.random.choice(['Democrat','Republican'], p=[.54,.46], size=2000)
-%superbowl = np.random.choice(['Eagles','Patriots'], p=[.3,.7], size=2000)
-%\end{Verbatim}
+%\begin{Verbatim}[fontsize=\footnotesize,samepage=true] party =
+%np.random.choice(['Democrat','Republican'], p=[.54,.46], size=2000) superbowl
+%= np.random.choice(['Eagles','Patriots'], p=[.3,.7], size=2000) \end{Verbatim}
 %
 %As expected, a $\chi^2$ test's p-value shows no correlation:
 %
-%\begin{Verbatim}[fontsize=\footnotesize,samepage=true]
-%>>> pd.crosstab(superbowl,party)
-%          Democrat  Republican
-%Eagles         334         286
+%\begin{Verbatim}[fontsize=\footnotesize,samepage=true] >>>
+%pd.crosstab(superbowl,party) Democrat  Republican Eagles         334 286
 %Patriots       746         634
 %
 %>>> round(scipy.stats.chi2_contingency(pd.crosstab(superbowl,party))[1],2)
-%0.98
-%\end{Verbatim}
+%0.98 \end{Verbatim}
 %
 %\subsection{Completely correlated categorical variables}
 %
@@ -353,9 +421,8 @@ print(scipy.stats.pearsonr(weights_lbs,weight_kg))
 %can generate another vector from scratch with the same setup. The
 %\texttt{np.where()} function comes in handy:
 %
-%\begin{Verbatim}[fontsize=\footnotesize,samepage=true]
-%party_color = np.where(party=='Democrat','blue','red')
-%\end{Verbatim}
+%\begin{Verbatim}[fontsize=\footnotesize,samepage=true] party_color =
+%np.where(party=='Democrat','blue','red') \end{Verbatim}
 %
 %\texttt{np.where()} is tricky but powerful. It takes three arguments -- a
 %vector of booleans (\texttt{True}s and \texttt{False}s), and two other
@@ -370,16 +437,12 @@ print(scipy.stats.pearsonr(weights_lbs,weight_kg))
 %
 %We thus (obviously) get perfect correlation:
 %
-%\begin{Verbatim}[fontsize=\footnotesize,samepage=true]
-%In [30]: pd.crosstab(party,party_color)
-%Out[30]: 
-%            blue  red
-%Democrat    1080    0
+%\begin{Verbatim}[fontsize=\footnotesize,samepage=true] In [30]:
+%pd.crosstab(party,party_color) Out[30]: blue  red Democrat    1080    0
 %Republican     0  920
 %
 %>>> round(scipy.stats.chi2_contingency(pd.crosstab(party, party_color))[1],2)
-%0.0
-%\end{Verbatim}
+%0.0 \end{Verbatim}
 %
 %\subsection{Somewhat correlated categorical variables}
 %
@@ -388,11 +451,10 @@ print(scipy.stats.pearsonr(weights_lbs,weight_kg))
 %for roughly 44\% of Republicans and for 20\% of Democrats. For this, we can go
 %back to our friend \texttt{np.where()}:
 %
-%\begin{Verbatim}[fontsize=\footnotesize,samepage=true]
-%gun_owner = np.where(party=='Democrat',
-%    np.random.choice([True,False],p=[.2,.8],size=2000),
-%    np.random.choice([True,False],p=[.44,.56],size=2000))
-%\end{Verbatim}
+%\begin{Verbatim}[fontsize=\footnotesize,samepage=true] gun_owner =
+%np.where(party=='Democrat',
+%np.random.choice([True,False],p=[.2,.8],size=2000),
+%np.random.choice([True,False],p=[.44,.56],size=2000)) \end{Verbatim}
 %
 %This time, our second and third arguments to \texttt{np.where()} are
 %\textit{vectors themselves}. We're saying, ``in every position where
@@ -403,12 +465,9 @@ print(scipy.stats.pearsonr(weights_lbs,weight_kg))
 %
 %Checking, we do get the desired correlation:
 %
-%\begin{Verbatim}[fontsize=\footnotesize,samepage=true]
-%>> pd.crosstab(party,gun_owner)
-%            False  True 
-%Democrat      841    239
-%Republican    505    415
+%\begin{Verbatim}[fontsize=\footnotesize,samepage=true] >>
+%pd.crosstab(party,gun_owner) False  True Democrat      841    239 Republican
+%505    415
 %
 %>> scipy.stats.chi2_contingency(pd.crosstab(party,gun_owner))[1]
-%1.5994151557508934e-27
-%\end{Verbatim}
+%1.5994151557508934e-27 \end{Verbatim}
