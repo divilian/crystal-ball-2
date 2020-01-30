@@ -576,6 +576,230 @@ Republican  394     550
 \label{party_gun_head}
 \end{figure}
 
+\section{Intermission: stitching it all together}
+
+\index{DataFrame@\texttt{DataFrame} (Pandas)}
+\index{stitching arrays together}
+
+By the way, in all of the examples above, we simply generated two separate
+NumPy arrays. Even though these arrays were implicitly related to each other --
+they were the same length, and corresponding elements referred to aspects of
+the same student/dancer/citizen/whatever -- they weren't actually in a
+\texttt{DataFrame} together. How can we make them so?
+
+\index{dictionary}
+\index{key-value pair}
+\index{key-value pair}
+\index{\{\}@\texttt{\{\}} (curlies)}
+\index{curlies (curly braces)}
+\index{[]@\texttt{[]} (boxies)}
+\index{boxies (square brackets)}
+
+
+The syntax seems a little strange if you've never seen a Python
+``\textbf{dictionary}'' before, but this helpful little data structure will
+come up later. You can think of a dictionary as a stripped-down,
+less-feature-rich version of a Pandas \texttt{Series}. In other words, it's a
+repository of key-value pairs. To create one, you use a pair of \textbf{curly
+braces}, inside of which you list the key-value pairs, each pair separated by a
+comma, and the key and value separated by a colon. An example would be:
+
+\index{WNBA}
+\index{Seattle Storm}
+\index{Washington Mystics}
+\index{Los Angeles Sparks}
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+teams = { 'Washington':'Mystics', 'Los Angeles':'Sparks', 'Seattle':'Storm' }
+\end{Verbatim}
+
+You can then treat it like a \texttt{Series}, using boxies (\texttt{[]}) to
+get/set elements, although none of the advanced Pandas features won't work.
+
+Anyway, the reason I mention this is that the easiest way to create a
+\texttt{DataFrame} out of a bunch of NumPy arrays is to pass the
+\texttt{DataFrame()} function a dictionary, where the keys are the column
+names you want, and the values are the arrays.
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+citizens = pd.DataFrame({'party': party, 'color': party_color,
+    'prediction': superbowl, 'gun_owner': gun_owner})
+print(citizens.iloc[0:8])
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+        party color prediction gun_owner
+0  Republican   red      49ers       gun
+1  Republican   red     Chiefs    no gun
+2    Democrat  blue     Chiefs    no gun
+3    Democrat  blue      49ers       gun
+4    Democrat  blue      49ers    no gun
+5  Republican   red     Chiefs    no gun
+6    Democrat  blue      49ers    no gun
+7    Democrat  blue      49ers    no gun
+\end{Verbatim}
+
+It's a snap!
+
 \section{One categorical and one numeric variable}
 
-\section{Stitching it all together}
+Okay, back to our synthetic data creation. Our third and final case is a data
+set with one variable of each kind: numeric and categorical. Let's use
+professional athletes as our running example for this case.
+
+\subsection{Completely uncorrelated}
+
+Let's create a synthetic data set with information about professional athletes
+in three sports: baseball, football, and basketball. I'm going to guess that
+players in each of these sports, on average, train about the same number of
+hours per week. That would make \texttt{sport} (categorical) completely
+uncorrelated with \texttt{training\_hours} (numeric). So, we just generate them
+independently. Let's go with:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+sport = np.random.choice(['baseball','football','basketball'],
+    p=[.35,.45,.2], size=1000)
+training_hrs = np.random.normal(35,10,1000)
+print(sport[0:8])
+print(training_hrs[0:8])
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+['football' 'basketball' 'basketball' 'football' 'football' 'football' 'baseball' 'baseball']
+[26.24722534 57.79145737 51.44831989 26.75212874 21.95934126 41.5458716 30.76964488 30.99836693]
+\end{Verbatim}
+
+Looks to be in the ballpark of what we want (pun intended). Let's put this info
+in a \texttt{DataFrame} and then generate a box plot:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+athletes = pd.DataFrame({'sport': sport, 'training_hrs': training_hrs})
+athletes.boxplot("training_hrs", by="sport")
+\end{Verbatim}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.6\textwidth]{sport_training.png}
+\caption{Synthetic mixed variables: uncorrelated.}
+\label{sport_training}
+\end{figure}
+
+As expected.
+
+
+\subsection{Completely correlated}
+
+It's kind of hard to think of an example with two completely correlated
+variables, one categorical and one numeric. This would mean that the value of
+the categorical variable \textit{completely} determines the numeric value for
+that individual. So all baseball players must have the exact same value, and
+the same for all football players, and for all basketball players. What is like
+that? Just to have a complete set of examples, how about we use ``the year the
+sport was invented.''
+
+\index{where@\texttt{where()} (NumPy)}
+\index{nested}
+We'll use good ol' \texttt{np.where()} again, although there's a bit of a catch
+(pun intended) since we have \textit{three} different values for \texttt{sport}
+instead of just two. The key is to use \textbf{nested} function calls. Check it
+out:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+year_inv = np.where(athletes.sport == 'baseball', 1869,
+    np.where(athletes.sport == 'football', 1920, 1946))
+\end{Verbatim}
+
+If you follow the logic, it makes sense. This code says:
+
+\small
+\begin{compactenum}
+\item Make a new array, same size as \texttt{athletes.sport}.
+\item For every place where \texttt{athletes.sport} has the value
+\texttt{\textquotesingle baseball\textquotesingle}, use the value 1869.
+\item For every place where it has some other value, use...
+    \begin{compactenum}
+    \item ...a new array, same size as \texttt{athletes.sport}.
+    \item For every place where \texttt{athletes.sport} has the value
+    \texttt{\textquotesingle football\textquotesingle}, use 1920.
+    \item For every place where it has some other value, use 1946.
+    \end{compactenum}
+\end{compactenum}
+\normalsize
+
+\index{()@\texttt{()} (bananas)}
+\index{bananas (parentheses)}
+
+Get it? It's kind of like a sequence of nested \texttt{if} statements. Just
+make sure all your bananas line up.
+
+We'll add this new column to our \texttt{DataFrame}:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+athletes['year_inv'] = year_inv
+\end{Verbatim}
+
+and take it for a spin:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+athletes.boxplot("year_inv", by="sport", notch=True)
+\end{Verbatim}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.6\textwidth]{sport_year_inv.png}
+\caption{Synthetic mixed variables: completely correlated.}
+\label{sport_year_inv}
+\end{figure}
+
+Figure~\ref{sport_year_inv} looks odd at first, but it's correct: every single
+baseball player plays a sport that was invented in exactly 1869, and so forth.
+So of course each ``box'' is collapsed to just a single line.
+
+\subsection{Partially correlated}
+
+And finally, the case where the categorical variable partially, but not
+completely, determines the value of the numeric variable. Salaries for
+professionals in the three areas differ a great deal, even considering only
+male athletes: Major League Baseball players earn on average \$4.1 million
+annually, NBA players a whopping \$7.7 million, and NFL players, along with
+dealing with concussions, get a lowly \$2.7 million a year. Who knew?
+
+This data isn't truly normally distributed, you may realize, since there are a
+few Tom Bradys and LeBron Jameses who are paid astronomical amounts, skewing
+the average for everyone else. But just to finish this long chapter, let's
+assume normality, along with some reasonable-sounding standard deviation, and
+be done with it:
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+salary = np.where(athletes.sport == 'baseball',np.random.normal(4.1,1,1000),
+    np.where(athletes.sport == 'football', np.random.normal(2.7,1,1000),
+        np.random.normal(7.7,2,1000)))
+
+salary = salary.clip(.4,100000)
+
+athletes['salary'] = salary
+athletes.boxplot("salary", by="sport", notch=True)
+\end{Verbatim}
+
+It's \texttt{where()} again. This time, we're generating three complete sets of
+1000 synthetic salaries: one each to represent baseball, football, and
+basketball players. But then our \texttt{where()} call says ``if the
+\texttt{sport} is \texttt{\textquotesingle baseball\textquotesingle}, take the
+value from the first one; if it's \texttt{\textquotesingle
+football\textquotesingle}, take it from the second one; otherwise, take it from
+the third one.
+
+After creating this array, we clip it to make sure that no athlete is making
+less than \$400,000 per year (which Google tells me is legit).
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.6\textwidth]{sport_salary.png}
+\caption{Synthetic mixed variables: partially correlated.}
+\label{sport_salary}
+\end{figure}
+
+The result is in Figure~\ref{sport_salary}, which looks as we expected. Go
+team!
