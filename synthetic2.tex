@@ -12,7 +12,7 @@ extended to three or more. The important new question, now that we know how to
 generate single arrays in isolation, is: to what degree do we want our pair
 of synthetic variables to be correlated, and how do we make them so?
 
-\section{\textit{Numeric} variables}
+\section{Two numeric variables}
 
 \index{association}
 \index{Pearson correlation coefficient}
@@ -366,108 +366,216 @@ Note: there's also a \texttt{multivariate\_normal()} function in the
 sets more powerfully.
 
 
-%\section{\textit{Categorical} variables}
-%
-%NumPy provides a way to generate a categorical data set with certain
-%frequencies, through its \texttt{np.random.choice()} function:
-%
-%\begin{Verbatim}[fontsize=\small,samepage=true,frame=single] >>>
-%np.random.choice(['Steelers','Redskins','Giants']) 'Redskins' \end{Verbatim}
-%
-%Useful arguments include:
-%
-%\begin{compactitem} \item \texttt{size} -- the number of elements you want in
-%the resulting array. \item \texttt{replace} -- if \texttt{False}, the elements
-%will be drawn from your list \textit{without replacement} (meaning once a
-%value is chosen, it will not be chosen again). This is often useful. \item
-%\texttt{p} -- a list of \textit{probabilities} (in the range 0 to 1)
-%specifying how likely each element in the list is to be chosen. (Note these
-%must sum to 1; and NumPy, stupidly, will not normalize it for you.)
-%\end{compactitem}
-%
-%A more complicated example:
-%\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single] >>>
-%np.random.choice(['Steelers','Redskins','Giants'], size=10, p=[.3,.6,.1])
-%['Redskins' 'Redskins' 'Giants' 'Redskins' 'Redskins' 'Steelers' 'Redskins'
-%'Steelers' 'Redskins' 'Giants'] \end{Verbatim}
-%
-%
-%\subsection{Uncorrelated categorical variables}
-%
-%Let's generate a data set with 2000 registered voters in Fredericksburg, 54\%
-%Democrats and 46\% Republicans. We'll also generate their pick for the
-%Superbowl: Eagles (30\%) or Patriots (70\%).
-%
-%Since these variables are uncorrelated, we generate each one separately:
-%
-%\begin{Verbatim}[fontsize=\footnotesize,samepage=true] party =
-%np.random.choice(['Democrat','Republican'], p=[.54,.46], size=2000) superbowl
-%= np.random.choice(['Eagles','Patriots'], p=[.3,.7], size=2000) \end{Verbatim}
-%
-%As expected, a $\chi^2$ test's p-value shows no correlation:
-%
-%\begin{Verbatim}[fontsize=\footnotesize,samepage=true] >>>
-%pd.crosstab(superbowl,party) Democrat  Republican Eagles         334 286
-%Patriots       746         634
-%
-%>>> round(scipy.stats.chi2_contingency(pd.crosstab(superbowl,party))[1],2)
-%0.98 \end{Verbatim}
-%
-%\subsection{Completely correlated categorical variables}
-%
-%Now let's add a ``\texttt{party\_color}'' categorical variable that gives the
-%associated color of each voter's political party (blue for Democrats and red
-%for Republicans). Since this is perfectly correlated with \texttt{party}, we
-%can generate another vector from scratch with the same setup. The
-%\texttt{np.where()} function comes in handy:
-%
-%\begin{Verbatim}[fontsize=\footnotesize,samepage=true] party_color =
-%np.where(party=='Democrat','blue','red') \end{Verbatim}
-%
-%\texttt{np.where()} is tricky but powerful. It takes three arguments -- a
-%vector of booleans (\texttt{True}s and \texttt{False}s), and two other
-%arguments which are used as substitutions. It produces a vector \textit{that
-%includes the second argument in every position where the first is
-%\texttt{true}, and the third argument everywhere it's \texttt{false}.} In the
-%current example, we're saying ``for every place that the \texttt{party} vector
-%has a \texttt{\textquotesingle Democrat\textquotesingle } value, put
-%\texttt{\textquotesingle blue\textquotesingle } in this new vector you're
-%making for me, and put \texttt{\textquotesingle red\textquotesingle }
-%everywhere else.''
-%
-%We thus (obviously) get perfect correlation:
-%
-%\begin{Verbatim}[fontsize=\footnotesize,samepage=true] In [30]:
-%pd.crosstab(party,party_color) Out[30]: blue  red Democrat    1080    0
-%Republican     0  920
-%
-%>>> round(scipy.stats.chi2_contingency(pd.crosstab(party, party_color))[1],2)
-%0.0 \end{Verbatim}
-%
-%\subsection{Somewhat correlated categorical variables}
-%
-%Finally, let's create a ``\texttt{gun\_owner}'' categorical variable which has
-%the value \texttt{True} or \texttt{False} for each voter: it should be true
-%for roughly 44\% of Republicans and for 20\% of Democrats. For this, we can go
-%back to our friend \texttt{np.where()}:
-%
-%\begin{Verbatim}[fontsize=\footnotesize,samepage=true] gun_owner =
-%np.where(party=='Democrat',
-%np.random.choice([True,False],p=[.2,.8],size=2000),
-%np.random.choice([True,False],p=[.44,.56],size=2000)) \end{Verbatim}
-%
-%This time, our second and third arguments to \texttt{np.where()} are
-%\textit{vectors themselves}. We're saying, ``in every position where
-%\texttt{party} has a \texttt{\textquotesingle Democrat\textquotesingle }, use
-%the corresponding value from our random vector that is 80\% \texttt{false}s.
-%Otherwise, use the corresponding value from a different random vector that is
-%56\% \texttt{false}s.''
-%
-%Checking, we do get the desired correlation:
-%
-%\begin{Verbatim}[fontsize=\footnotesize,samepage=true] >>
-%pd.crosstab(party,gun_owner) False  True Democrat      841    239 Republican
-%505    415
-%
-%>> scipy.stats.chi2_contingency(pd.crosstab(party,gun_owner))[1]
-%1.5994151557508934e-27 \end{Verbatim}
+\section{Two categorical variables}
+
+\index{random values}
+\index{categorical random values}
+
+As with numeric variables, of course, a pair of categorical variables can be
+either uncorrelated, completely correlated, or ``somewhat correlated.''
+Let's generate examples all three types.
+
+\index{choice@\texttt{choice()} (NumPy)}
+
+\subsection{Uncorrelated categorical variables}
+
+Let's generate a data set with 2000 registered voters in Fredericksburg, 54\%
+Democrats and 46\% Republicans. We'll also generate their pick for the
+Superbowl: the Chiefs (58\%) or the 49ers (42\%).
+
+Since we want these variables to be uncorrelated, we just generate each one
+separately:
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+party = np.random.choice(['Democrat','Republican'], p=[.54,.46], size=2000)
+superbowl = np.random.choice(['Chiefs','49ers'], p=[.58,.42], size=2000)
+print(pd.crosstab(superbowl,party,margins=True))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+        Democrat  Republican   All
+49ers        461         383   844
+Chiefs       595         561  1156
+All         1056         944  2000
+(1.8182721995202566, 0.17751907928455413, 1, array([[445.632, 398.368],
+       [610.368, 545.632]]))
+\end{Verbatim}
+
+\index{heatmap@\texttt{heatmap()} (Seaborn)}
+
+Don't be fooled by the heat map on the left side of
+Figure~\ref{party_sup_heat}. It looks like the four categories have wildly
+different values, but that's because we didn't set the heat map's range
+explicitly, and so the color bar is all pinched to the range 400 to 600. We can
+tell Seaborn to use specific values by passing \texttt{vmin} and \texttt{vmax}
+arguments:
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.48\textwidth]{party_sup_heat_no_bounds.png}
+\includegraphics[width=0.48\textwidth]{party_sup_heat.png}
+\caption{Two heat maps for a synthetic set of uncorrelated categorical
+variables. The left heat map looks like the four totals are very different, but
+that's because the scale was not explicitly set. In the right map, we pegged
+the color scale to the range (0,2000).}
+\label{party_sup_heat}
+\end{figure}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+sns.heatmap(pd.crosstab(party, superbowl), vmin=0, vmax=2000)
+\end{Verbatim}
+
+Here, the range 0 to 2000 makes sense, because that's as far as any one of our
+compartments could possibly range. The result is the right side of
+Figure~\ref{party_sup_heat}.
+
+\index{$\chi ^2$ test}
+\index{p-value@$p$-value}
+
+As expected, a $\chi^2$ test's p-value shows no significant correlation
+(remember that the second entry is the $p$-value):
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+print(scipy.stats.chi2_contingency(party_sup))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+(1.8182721995202566, 0.17751907928455413, 1, array([[445.632, 398.368],
+       [610.368, 545.632]]))
+\end{Verbatim}
+
+
+\subsection{Completely correlated categorical variables}
+
+Now let's add a ``\texttt{party\_color}'' categorical variable that gives the
+associated color of each voter's political party (blue for Democrats and red
+for Republicans). Note that this is \textit{perfectly} correlated with
+\texttt{party}, and to enforce this, we need a different approach.
+
+\index{where@\texttt{where()} (NumPy)}
+
+NumPy's \texttt{where()} function comes in handy here. It's tricky but
+powerful. \texttt{np.where()} takes three arguments -- an array of booleans
+(\texttt{True}s and \texttt{False}s), and two other arguments which are used as
+substitutions. It produces an array \textit{that includes the second argument
+in every position where the first is \texttt{true}, and the third argument
+everywhere it's \texttt{false}.} In the current example, we're saying ``for
+every place that the \texttt{party} array has a \texttt{\textquotesingle
+Democrat\textquotesingle } value, put \texttt{\textquotesingle
+blue\textquotesingle } in this new array you're making for me, and put
+\texttt{\textquotesingle red\textquotesingle } everywhere else.''
+
+The code looks like this:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+party_color = np.where(party=='Democrat','blue','red')
+\end{Verbatim}
+
+As will be the case nearly every time we use \texttt{where()}, the first
+argument -- the ``array of booleans'' -- comes from a \textbf{query}. Remember
+that when we say something like ``\texttt{party==\textquotesingle
+Democrat\textquotesingle}'', we actually get back an array of \texttt{True}s
+and \texttt{False}s, one for each element in \texttt{party}:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(party)
+print(party=='Democrat')
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+['Republican' 'Republican' 'Democrat' ... 'Democrat' 'Democrat' 'Republican']
+[False False  True ...  True  True False]
+\end{Verbatim}
+
+
+So, our call to \texttt{where()} effectively said ``wherever
+\texttt{party==\textquotesingle Democrat\textquotesingle}, gimme a
+\texttt{True} (and thus take the second argument's value), otherwise gimme a
+\texttt{False} (and thus take the third argument's value). If we look at the
+first few values of our new array, we see that it worked:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(party)
+print(party_color)
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+['Republican' 'Republican' 'Democrat' ... 'Democrat' 'Democrat' 'Republican']
+['red' 'red' 'blue' ... 'blue' 'blue' 'red']
+\end{Verbatim}
+
+
+Thus, we get perfect correlation between our two variables:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(pd.crosstab(party, party_color))
+print(scipy.stats.chi2_contingency(pd.crosstab(party, party_color)))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+            blue  red
+Democrat    1056    0
+Republican     0  944
+(1995.989429141519, 0.0, 1, array([[557.568, 498.432],
+       [498.432, 445.568]]))
+\end{Verbatim}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.5\textwidth]{party_color_heat.png}
+\caption{Two completely correlated categorical variables.}
+\label{party_color_head}
+\end{figure}
+\subsection{Somewhat correlated categorical variables}
+
+And now let's create a ``\texttt{gun\_owner}'' categorical variable which has
+the value \texttt{\textquotesingle gun\textquotesingle} or
+\texttt{\textquotesingle no gun\textquotesingle} for each voter. According to
+data I Googled, approximately 44\% of our synthetic Republicans should own
+guns, and about 20\% of our Democrats should. For this, we can go back to our
+friend \texttt{np.where()}:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+gun_owner = np.where(party=='Democrat',
+    np.random.choice(['gun','no gun'],p=[.2,.8],size=2000),
+    np.random.choice(['gun','no gun'],p=[.44,.56],size=2000))
+\end{Verbatim}
+
+This time, our second and third arguments to \texttt{np.where()} are
+\textit{themselves arrays}. We're saying, ``in every position where
+\texttt{party} has a \texttt{\textquotesingle Democrat\textquotesingle }, use
+the corresponding value from our random array that has 20\% \texttt{gun}s.
+Otherwise, use the corresponding value from a different random array that is
+44\% \texttt{gun}s.''
+
+Checking, we do get the desired correlation:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(pd.crosstab(party, gun_owner, margins=True))
+print(scipy.stats.chi2_contingency(pd.crosstab(party, gun_owner)))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+            gun  no gun
+Democrat    208     848
+Republican  394     550
+(114.03433767499244, 1.2807137646232374e-26, 1, array([[317.856, 738.144],
+       [284.144, 659.856]]))
+\end{Verbatim}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.5\textwidth]{party_gun_heat.png}
+\caption{Two partially correlated categorical variables.}
+\label{party_gun_head}
+\end{figure}
+
+\section{One categorical and one numeric variable}
+
+\section{Stitching it all together}
