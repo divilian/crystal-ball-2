@@ -783,8 +783,8 @@ athletes['salary'] = salary
 athletes.boxplot("salary", by="sport", notch=True)
 \end{Verbatim}
 
-It's \texttt{where()} again. This time, we're generating three complete sets of
-1000 synthetic salaries: one each to represent baseball, football, and
+It's \texttt{np.where()} again. This time, we're generating three complete sets
+of 1000 synthetic salaries: one each to represent baseball, football, and
 basketball players. But then our \texttt{where()} call says ``if the
 \texttt{sport} is \texttt{\textquotesingle baseball\textquotesingle}, take the
 value from the first one; if it's \texttt{\textquotesingle
