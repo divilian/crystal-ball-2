@@ -1,0 +1,289 @@
+
+\chapter{JSON}
+\label{ch:JSON}
+
+JSON (pronounced like the name ``Jason'') is a simple, human-readable text file
+format that is very commonly used for information storage and interchange. (It
+stands for ``JavaScript Object Notation,'' but don't be fooled: it doesn't have
+much to do with the JavaScript language except historically. \textit{Any}
+language, including Python, can read/write JSON data.)
+
+In this chapter, we'll learn about how to read and navigate through JSON data.
+First, though, a word about a couple of Python essentials I omitted from DATA
+101 for brevity and simplicity.
+
+\section{Lists and dictionaries}
+
+\index{series@\texttt{Series} (Pandas)}
+\index{ndarray@\texttt{ndarray} (NumPy)}
+\index{associative array}
+\index{key-value pair}
+\index{index}
+
+Last semester, we spent a lot of time learning how to use NumPy
+\texttt{ndarray}s and Pandas \texttt{Series}es. These are the preferred
+implementations of arrays, and associative arrays, respectively, in the Python
+Data Science ecosystem. As you know, a NumPy array holds a numbered sequence of
+items (indexed starting from 0), and a \texttt{Series} holds a set of key-value
+pairs.
+
+For any serious data work, you want to use those tools, because they are
+lightning-fast, super-efficient, feature-rich, and optimized to the task.
+
+\index{plain-ol' Python}
+
+As it turns out, plain-ol' Python has stripped-down, feature-poor, but
+easy-to-type versions of these data structures as well, which are baked in to
+JSON and also important to know about in their own right. They're called
+\textbf{lists} and \textbf{dictionaries}.
+
+\subsection{Lists}
+
+If, instead of writing this:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+crew = np.array(["Ed", "Kelly", "Alara", "Bortus", "John", "Claire"])
+\end{Verbatim}
+
+you simply wrote this:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+crew = ["Ed", "Kelly", "Alara", "Bortus", "John", "Claire"]
+\end{Verbatim}
+
+\index{list}
+
+then you get a plain-ol \textbf{list} instead of a NumPy array. It isn't nearly
+as fast, nor can it store nearly as many items, and you can't do broadcasting
+operations and such with it, but it does the basic job. For example:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print("Captain {} initiating roll call for {} officers:".format(
+    crew[0], len(crew)))
+for member in crew[1:len(crew)]:
+    print("{} reporting for duty, sir!".format(member))
+print(crew[0])
+\end{Verbatim}
+
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+Captain Ed initiating roll call for 6 officers:
+Kelly reporting for duty, sir!
+Alara reporting for duty, sir!
+Bortus reporting for duty, sir!
+John reporting for duty, sir!
+Claire reporting for duty, sir!
+\end{Verbatim}
+
+Working with small lists of items is very, very similar to working with NumPy
+arrays, so I'm sure you'll pick this right up.
+
+Incidentally, we've actually used lists several times already, without knowing
+it. For instance, this very line:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+good = np.array(["Janet", "Chidi", "Eleanor", "Michael", "Tahani"])
+\end{Verbatim}
+
+is actually first creating a \textit{list}, and then passing that list as an
+argument to \texttt{np.array()}. And this code:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+alter_egos = pd.Series(['Hulk','Spidey','Iron Man','Thor'],
+    index=['Bruce','Peter','Tony','Thor'])
+\end{Verbatim}
+
+creates two separate lists, one for the data and one for the index, and passes
+those to \texttt{pd.Series()} to build a \texttt{Series} out of them. Lists are
+super-lightweight and super-common.
+
+
+\pagebreak
+
+\section{JSON}
+
+\index{JSON}
+
+The really nice things are (1) it's simple, and easy on the eyes (unlike
+binary formats, or XML), and (2) it structures information hierarchically in
+list-ish, dictionary-ish, string-ish type elements that will be instantly
+familiar to you. A JSON ``document'' is, in fact, \textit{essentially a Python
+list or dictionary with embedded contents.}
+
+Here's an example file in JSON format:
+
+\small
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+{"name": "Luke Skywalker", "rank": "Jedi", "lightsaber color": "blue",
+"episodes": ["IV", "V", "VI", "VII", "VIII"], "relations": {"Leia": "sister",
+"Han": "friend", "Artoo": "servant", "Rey": "student"}}
+\end{Verbatim}
+\normalsize
+
+Its structure is instantly apparent: a dictionary whose values are strings,
+lists, and other dictionaries, as appropriate.
+
+Probably the best thing about JSON is that once we read and parse a JSON file
+or other information source, we have a bona fide Python object that we can
+treat in the ordinary way.
+
+In Python, we have the \texttt{json} package, which you can import like any
+other:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+    import json
+\end{Verbatim}
+
+There are four functions that matter:
+\small
+\begin{compactitem}
+\item \texttt{json.dump}(\textit{someObject}, \textit{aFile}) - Dump the Python
+object to a file in JSON text format.
+\item \texttt{json.dumps}(\textit{someObject}) - Dump the Python
+object to a string in JSON text format (and return it).
+\item \texttt{json.load}(\textit{aFile}) - Build and return a Python
+object from the contents of the JSON text file.
+\item \texttt{json.loads}(\textit{someString}) - Build and return a Python object
+from the JSON text string.
+\end{compactitem}
+
+\normalsize
+So, for instance, to load a file \texttt{info.json} into a Python object
+called ``\texttt{my\_stuff}'':
+
+\small
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+    with open('info.json','r') as f:
+        my_stuff = json.load(f)
+\end{Verbatim}
+
+\normalsize
+We could parse and access the Luke Skywalker file just like this:
+
+\small
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+    with open('luke.json','r') as f:
+        luke = json.load(f)
+    print(luke['lightsaber color'])
+    blue
+
+    print(luke['episodes'][2])
+    VI
+\end{Verbatim}
+
+\normalsize
+Simple as that!
+
+\section{``Hierarchical'' vs. ``flat'' data}
+
+You can see that the JSON file format is essentially a textual representation
+of an arbitrarily nested Python object. This object can be a list or a
+dictionary, and have embedded lists and dictionaries to any arbitrary level of
+nesting. Here's another example:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+[{"prefix": "DATA", "num": 219, "creds": 3, "instructor": "Davies",
+"meetings": [{"time": {"day": "TR", "time": "2pm"}, "location": {"bldg":
+"Trinkle", "room": "B6"}}], "roster": [{"first": "Lady", "last": "Gaga",
+"email": "lgaga@umw.edu"}, {"first": "The", "last": "Rock", "email":
+"trock@umw.edu"}, ...
+\end{Verbatim}
+
+When you disentangle this, you'll realize that what you have is:
+
+\vspace{.2in}
+
+\large
+\noindent A list, each element of which is:\\
+$\bullet$ a dictionary, with key/value pairs:
+        \begin{compactenum}
+        \item \texttt{prefix}: a string
+        \item \texttt{num}: an int
+        \item \texttt{creds}: an int
+        \item \texttt{instructor}: a string
+        \item \texttt{meetings}: a list, each element of which is:
+            \begin{compactitem}
+            \item a dictionary, with key/value pairs:
+                \begin{compactenum}
+                \item \texttt{time}: a dictionary, with key/value pairs:
+                    \begin{compactenum}
+                    \item \texttt{day}: a string
+                    \item \texttt{time}: a string
+                    \end{compactenum}
+                \item \texttt{location}: a dictionary, with key/value pairs:
+                    \begin{compactenum}
+                    \item \texttt{bldg}: a string
+                    \item \texttt{room}: a string
+                    \end{compactenum}
+                \end{compactenum}
+            \end{compactitem}
+        \item \texttt{roster}: a list, each element of which is:
+            \begin{compactitem}
+            \item a dictionary, with key/value pairs:
+                \begin{compactenum}
+                \item \texttt{first}: a string
+                \item \texttt{last}: a string
+                \item \texttt{email}: a string
+                \end{compactenum}
+            \end{compactitem}
+        \item ...and possibly other stuff...
+        \end{compactenum}
+
+\normalsize
+
+\pagebreak
+
+This kind of structure is called \textbf{hierarchical} data. This is in
+contrast to so-called \textbf{flat} data, like a CSV:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+Prefix,Num,Instructor,Creds,Bldg,Room,Day,Time
+DATA,219,Davies,3,Trinkle,B6,TR,2pm
+ENGL,286,Rigsby,3,Combs,112,MWF,11am
+CPSC,305,Finlayson,4,Trinkle,B52,MWF,8am
+\end{Verbatim}
+
+It should be clear that hierarchical data is intrinsically \textit{more
+expressive} than flat data. Rather than each data record being a strict,
+identical-length sequence of values, the whole nested structure communicates
+order and relationships between subcomponents, like an outline.
+
+It's not even always possible, let alone straightforward, to convert from a
+hierarchical format to a flat format. Consider the JSON file above: it permits
+any number of \texttt{meetings} for a single course, each of which has
+embedded structure. In this case, the structure for each meeting is regular,
+since it's apparently composed of a fixed number of fields with unique names.
+(This won't always be the case, and if it's not, we would \textit{lose
+information} in collapsing it to a flat format.) Even so, though, it's not
+clear what to do with the multiple meeting times/locations for a course. Do we
+make each \texttt{Bldg/Room/Day/Time} group into its own set of headings in
+the flat format? This brings with it its own problems, such as:
+
+\begin{compactenum}
+\item How do we associate each group of buildings/rooms/days/times together,
+since they're now all individual top-level fields? (Naming conventions seem
+like the only solution, and it's awkward.)
+\item How do we know the maximum number of such meetings, so as to specify the
+width of the table?
+\item What do we do for rows which don't have the maximum number of meetings?
+Leave the others blank?
+\item How do we perform standard queries like ``find all courses that have at
+least one meeting in Trinkle?'' (We have to split this up into an awkward query
+that separately queries each of the columns and unions the answer.)
+\end{compactenum}
+
+There are better ways to organize such data, such as the \textbf{relational
+model} that has been ubiquitous in database schema design since Ted Codd
+invented it in the 1960's. It allows us to ``normalize'' such data sets and
+represent them in multiple, interrelated tables. We'll take a look at this
+when we look at SQLite later in the course. Some irregular structures defy
+even the relational model, however, which is why some newer database paradigms
+(like NoSQL databases) have been developed to get around its limitations.
+
+One big reality to grasp, however, is that at this point in time,
+\textit{almost all machine learning algorithms are based on a \textbf{flat}
+data structure}. There are some quite advanced, cutting-edge exceptions to
+this, but really the field of mining hierarchical (and other non-flat) data
+formats is still in its infancy. Lots of opportunity to make a name for
+yourself here!
