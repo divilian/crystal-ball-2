@@ -595,14 +595,18 @@ the same student/dancer/citizen/whatever -- they weren't actually in a
 \index{[]@\texttt{[]} (boxies)}
 \index{boxies (square brackets)}
 
+\label{mentionDictionary}
 
-The syntax seems a little strange if you've never seen a Python
-``\textbf{dictionary}'' before, but this helpful little data structure will
-come up later. You can think of a dictionary as a stripped-down,
-less-feature-rich version of a Pandas \texttt{Series}. In other words, it's a
-repository of key-value pairs. To create one, you use a pair of \textbf{curly
-braces}, inside of which you list the key-value pairs, each pair separated by a
-comma, and the key and value separated by a colon. An example would be:
+The syntax seems a little strange if you've never seen a Python ``dictionary''
+before, but this helpful little data structure will come up a lot later
+(\textit{e.g.}, in Chapter~\ref{ch:JSON}.) You can think of a dictionary as a
+stripped-down, less-feature-rich version of a Pandas \texttt{Series}. In other
+words, it's a repository of key-value pairs. To create one, you use a pair of
+\textbf{curly braces}, inside of which you list the key-value pairs, each pair
+separated by a comma, and the key and value separated by a colon. An example
+would be:
+
+\label{mentionDictionary2}
 
 \index{WNBA}
 \index{Seattle Storm}
@@ -700,7 +704,7 @@ that? Just to have a complete set of examples, how about we use ``the year the
 sport was invented.''
 
 \index{where@\texttt{where()} (NumPy)}
-\index{nested}
+\index{nested!function calls}
 We'll use good ol' \texttt{np.where()} again, although there's a bit of a catch
 (pun intended) since we have \textit{three} different values for \texttt{sport}
 instead of just two. The key is to use \textbf{nested} function calls. Check it

@@ -57,6 +57,8 @@ then you get a plain-ol \textbf{list} instead of a NumPy array. It isn't nearly
 as fast, nor can it store nearly as many items, and you can't do broadcasting
 operations and such with it, but it does the basic job. For example:
 
+\index{len@\texttt{len()} function!for lists}
+
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 print("Captain {} initiating roll call for {} officers:".format(
     crew[0], len(crew)))
@@ -80,7 +82,7 @@ Working with small lists of items is very, very similar to working with NumPy
 arrays, so I'm sure you'll pick this right up.
 
 Incidentally, we've actually used lists several times already, without knowing
-it. For instance, this very line:
+it. For instance, this very line of code:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 good = np.array(["Janet", "Chidi", "Eleanor", "Michael", "Tahani"])
@@ -98,12 +100,253 @@ creates two separate lists, one for the data and one for the index, and passes
 those to \texttt{pd.Series()} to build a \texttt{Series} out of them. Lists are
 super-lightweight and super-common.
 
+\subsection{Dictionaries}
 
-\pagebreak
+\index{series@\texttt{Series} (Pandas)}
+\index{dictionary}
+\index{key-value pair}
+
+As mentioned in section~\ref{mentionDictionary}
+(p.~\pageref{mentionDictionary}), \textbf{dictionaries} are like stripped-down
+Pandas \texttt{Series}es, in the same way that lists are like stripped-down
+NumPy arrays. Dictionaries contain key-value pairs, accessed in the same sort
+of way (with the boxie \texttt{[]} syntax). You create a dictionary by
+using the syntax from p.~\pageref{mentionDictionary2}:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+alter_egos = { 'Bruce':'Batman', 'Dick':'Robin', 'Diana':'Wonder Woman',
+    'Clark':'Superman' }
+\end{Verbatim}
+
+Then, just like with \texttt{Series}es, you can retrieve the value for a key,
+change the value for a key, add a new key-value pair, and so forth:
+
+\index{len@\texttt{len()} function!for dictionaries}
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+caped_crusaders = [ alter_egos['Bruce'], alter_egos['Dick'] ]
+alter_egos['Clark'] = 'Man of Steel'
+alter_egos['Victor'] = 'Cyborg'
+
+print("There are now {} heroes, {} of which are the caped crusaders.".format(
+    len(alter_egos), len(caped_crusaders)))
+print("The dynamic duo is: {} and {}!".format(caped_crusaders[0],
+    caped_crusaders[1]))
+for key, value in alter_egos.items():
+    print("Psssst, {} is really {}...".format(key,value))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+There are now 5 heroes, 2 of which are the caped crusaders.
+The dynamic duo is: Batman and Robin!
+Psssst, Bruce is really Batman...
+Psssst, Dick is really Robin...
+Psssst, Diana is really Wonder Woman...
+Psssst, Clark is really Man of Steel...
+Psssst, Victor is really Cyborg...
+\end{Verbatim}
+
+\subsection{Nesting...and nesting, and nesting...}
+
+\index{nested!data structures}
+
+All that was easy so far. The only thing left to tell you -- and man, it can
+pack a whammy when you first see it -- is that both lists and dictionaries can
+be \textbf{nested} indefinitely. This means that one of a list's elements might
+well be another list, or a dictionary. And the value for one of a dictionary's
+keys might well be a list, or another dictionary.
+
+Sometimes you have to stare hard at the printout of a nested structure to
+figure out how to unpack it. Here are some examples:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+a = [ 7, 1, [9, 5], 6 ]
+\end{Verbatim}
+
+\index{[]@\texttt{[]} (boxies)}
+\index{boxies (square brackets)}
+
+The \texttt{a} variable is a list (you can tell because it starts with a boxie)
+and one of its elements happens to be another list (ditto). Stare hard at that,
+and then stare hard at this output, and make sure you see why it's so:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print("a[1] is {}".format(a[1]))
+print("len(a) is {}".format(len(a)))
+print("a[3] is {}".format(a[3]))
+print("len(a[2]) is {}".format(len(a[2])))
+print("a[2][1] is {}".format(a[2][1]))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+a[1] is 1
+len(a) is 4
+a[3] is 6
+len(a[2]) is 2
+a[2][1] is 5
+\end{Verbatim}
+
+The first one was a warmup. But the second output may have surprised you:
+aren't there \textit{five} numbers in that list, not four? The answer is
+\textit{no}, there are exactly four:
+
+\begin{compactitem}
+\item Item \#0 is the number 7.
+\item Item \#1 is the number 1.
+\item Item \#2 is a list, which has two elements: 9 and 5.
+\item Item \#3 is the number 6.
+\end{compactitem}
+
+Once you grasp that, you can probably understand the other outputs from that
+example as well. Of particular note is the last one: \texttt{a[2][1]} means
+``get element \#2 from \texttt{a}, and since it is itself a list, get element
+\#1 from \textit{that}.'' And since all lists are numbered starting with 0,
+that's effectively the second element of the third element of \texttt{a}, which
+is the number 5.
+
+Next one:
+
+\index{apple}
+\index{banana}
+\index{cherry}
+\index{bing cherry}
+\index{rainier cherry}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+b = { "apple": 54, "banana": [14, 67], "cherry": { "bing": [ 13, 17,
+21], "rainier": { "sweet": "yes", "juicy": "yes" } } }
+\end{Verbatim}
+
+\index{\{\}@\texttt{\{\}} (curlies)}
+\index{curlies (curly braces)}
+
+The \texttt{b} variable is a dictionary (you can tell because it starts with a
+curly) and it contains several key-value pairs. How many, you ask?
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(len(b))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+3
+\end{Verbatim}
+
+The three key-value pairs are:
+
+\begin{compactitem}
+\item \texttt{"apple"}, whose value is the number 54.
+\item \texttt{"banana"}, whose value is a list, whose elements are 14 and 67.
+\item \texttt{"cherry"}, whose value is another dictionary. \textit{That}
+dictionary has two key-value pairs:
+    \begin{compactitem}
+    \item \texttt{"bing"}, whose value is a list with 13, 17, and 21.
+    \item \texttt{"rainier"}, whose value is yet another dictionary, with keys
+\texttt{"sweet"} and \texttt{"juicy"}.
+    \end{compactitem}
+\end{compactitem}
+
+Now test yourself and make sure you can predict the right output from these
+lines of code:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print("b['apple'] is {}".format(b['apple']))
+print("b['banana'] is {}".format(b['banana']))
+print("len(b['banana']) is {}".format(len(b['banana'])))
+print("len(b['cherry']) is {}".format(len(b['cherry'])))
+print("len(b['cherry']['bing']) is {}".format(len(b['cherry']['bing'])))
+print("b['cherry']['bing'][0]) is {}".format(b['cherry']['bing'][0]))
+print("b['cherry']['rainier']['sweet']) is {}".format(
+    b['cherry']['rainier']['sweet']))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+b['apple'] is 54
+b['banana'] is [14, 67]
+len(b['banana']) is 2
+len(b['cherry']) is 2
+len(b['cherry']['bing']) is 3
+b['cherry']['bing'][0]) is 13
+b['cherry']['rainier']['sweet']) is yes
+\end{Verbatim}
+
+\index{len@\texttt{len()} function!for lists}
+
+Remember, \texttt{len()} plays several roles. When called on a list or array,
+it gives the number of elements; on a dictionary or \texttt{Series}, the number
+of key-value pairs; on a string, the number of characters; and on a
+\texttt{DataFrame}, the number of rows. That's why \texttt{len(b['banana'])}
+and \texttt{len(b['cherry'])} both return 2, even though they're very different
+types of things.
+
+\index{type@\texttt{type()}}
+
+Note this general rule, too: every time the thing you have is a \textit{list},
+you must follow it with an \textit{integer} in boxies. Every time the thing you
+have is a \textit{dictionary}, you must follow it with a \textit{key} (often a
+string) in boxies. Always.
+
+And now's a good time to mention how to find out what type of thing something
+\textit{is} -- the \texttt{type()} function:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print("b['apple'] is a {}".format(type(b['apple'])))
+print("b['banana'] is a {}".format(type(b['banana'])))
+print("b['cherry'] is a {}".format(type(b['cherry'])))
+print("b['cherry']['rainier']['juicy'] is a {}".format(
+    type(b['cherry']['rainier']['juicy'])))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+b['apple'] is a int
+b['banana'] is a list
+b['cherry'] is a dict
+b['cherry']['rainier']['juicy'] is a str
+\end{Verbatim}
+
+This is super useful when plunging deep through nested data sets.
+
+One last example:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+c = [ { 'x': 5 }, [ 14, 'bob', [ 11, { 'duck': 'donuts', 'five':
+'guys' }, [ 17, 6 ] ] ] ]
+\end{Verbatim}
+
+\index{[]@\texttt{[]} (boxies)}
+\index{boxies (square brackets)}
+
+Can you visually line up all those boxies? If so, then you can probably get
+these answers correct:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print("len(c) is {}".format(len(c)))
+print("c[0]['x'] is {}".format(c[0]['x']))
+print("c[1][1] is {}".format(c[1][1]))
+print("c[1][2][1]['five'] is {}".format(c[1][2][1]['five']))
+print("c[1][2][2][1] is {}".format(c[1][2][2][1]))
+print(\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+len(c) is 2
+c[0]['x'] is 5
+c[1][1] is bob
+c[1][2][1]['five'] is guys
+c[1][2][2][1] is 6
+\end{Verbatim}
+
+
 
 \section{JSON}
 
 \index{JSON}
+
+Okay, now about JSON proper.
 
 The really nice things are (1) it's simple, and easy on the eyes (unlike
 binary formats, or XML), and (2) it structures information hierarchically in
@@ -174,6 +417,56 @@ We could parse and access the Luke Skywalker file just like this:
 
 \normalsize
 Simple as that!
+
+\subsection{``Pretty printing''}
+
+\index{import@\texttt{import}}
+
+First, you have to do the import:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+from pprint import pprint
+\end{Verbatim}
+
+\index{print()@\texttt{print()} function}
+\index{pretty printing@``pretty printing''}
+\index{pprint()@\texttt{pprint()} function}
+
+and then, instead of \texttt{print()}ing a variable, you can \texttt{pprint()}
+it. I think you'll agree, the latter is easier to make sense of:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(luke)
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+{'name': 'Luke Skywalker', 'rank': 'Jedi', 'lightsaber color':
+'blue', 'episodes': ['IV', 'V', 'VI', 'VIII', 'IX'], 'relations':
+{'Leia': 'sister', 'Han': 'friend', 'Lando': 'friend', 'Artoo':
+'servant', 'Rey': 'student'}}
+\end{Verbatim}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+pprint(luke)
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+{'episodes': ['IV', 'V', 'VI', 'VIII', 'IX'],
+ 'lightsaber color': 'blue',
+ 'name': 'Luke Skywalker',
+ 'rank': 'Jedi',
+ 'relations': {'Artoo': 'servant',
+               'Han': 'friend',
+               'Lando': 'friend',
+               'Leia': 'sister',
+               'Rey': 'student'}}
+\end{Verbatim}
+
+As a bonus, it even puts dictionary keys in alphabetical order, so you can find
+them easily.
+
 
 \section{``Hierarchical'' vs. ``flat'' data}
 
