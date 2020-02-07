@@ -1,6 +1,6 @@
 
-\chapter{JSON}
-\label{ch:JSON}
+\chapter{JSON (1 of 2)}
+\label{ch:JSON1}
 
 JSON (pronounced like the name ``Jason'') is a simple, human-readable text file
 format that is very commonly used for information storage and interchange. (It
@@ -348,21 +348,20 @@ c[1][2][2][1] is 6
 
 Okay, now about JSON proper.
 
-The really nice things are (1) it's simple, and easy on the eyes (unlike
-binary formats, or XML), and (2) it structures information hierarchically in
-list-ish, dictionary-ish, string-ish type elements that will be instantly
-familiar to you. A JSON ``document'' is, in fact, \textit{essentially a Python
-list or dictionary with embedded contents.}
+The really nice things about JSON are (1) it's a simple format, and relatively
+easy on the eyes (unlike binary formats, or XML), and (2) it structures
+information in nested list-ish, dictionary-ish, string-ish type
+elements that are exactly like what we covered in the previous section. A JSON
+``document'' is, in fact, \textit{essentially a Python list or dictionary with
+embedded contents.}
 
 Here's an example file in JSON format:
 
-\small
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=lines,framesep=3mm]
 {"name": "Luke Skywalker", "rank": "Jedi", "lightsaber color": "blue",
-"episodes": ["IV", "V", "VI", "VII", "VIII"], "relations": {"Leia": "sister",
-"Han": "friend", "Artoo": "servant", "Rey": "student"}}
+"episodes": ["IV", "V", "VI", "VIII", "IX"], "relations": {"Leia": "sister",
+"Han": "friend", "Artoo": "servant", "Threepio": "servant", "Rey": "student"}}
 \end{Verbatim}
-\normalsize
 
 Its structure is instantly apparent: a dictionary whose values are strings,
 lists, and other dictionaries, as appropriate.
@@ -374,45 +373,45 @@ treat in the ordinary way.
 In Python, we have the \texttt{json} package, which you can import like any
 other:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-    import json
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+import json
 \end{Verbatim}
 
 There are four functions that matter:
-\small
 \begin{compactitem}
-\item \texttt{json.dump}(\textit{someObject}, \textit{aFile}) - Dump the Python
-object to a file in JSON text format.
-\item \texttt{json.dumps}(\textit{someObject}) - Dump the Python
-object to a string in JSON text format (and return it).
+
+\item \texttt{json.dump}(\textit{someVariable}, \textit{aFile}) - Dump the
+Python variable to a file in JSON text format.
+
+\item \texttt{json.dumps}(\textit{someVariable}) - Dump the Python
+variable to a string in JSON text format (and return it).
+
 \item \texttt{json.load}(\textit{aFile}) - Build and return a Python
-object from the contents of the JSON text file.
-\item \texttt{json.loads}(\textit{someString}) - Build and return a Python object
-from the JSON text string.
+variable from the contents of the JSON text file.
+
+\item \texttt{json.loads}(\textit{someString}) - Build and return a Python
+variable from the JSON text string.
+
 \end{compactitem}
 
-\normalsize
-So, for instance, to load a file \texttt{info.json} into a Python object
+So, for instance, to load a file \texttt{info.json} into a Python variable
 called ``\texttt{my\_stuff}'':
 
-\small
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-    with open('info.json','r') as f:
-        my_stuff = json.load(f)
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+with open('info.json','r') as f:
+    my_stuff = json.load(f)
 \end{Verbatim}
 
-\normalsize
 We could parse and access the Luke Skywalker file just like this:
 
-\small
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-    with open('luke.json','r') as f:
-        luke = json.load(f)
-    print(luke['lightsaber color'])
-    blue
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+with open('luke.json','r') as f:
+    luke = json.load(f)
+print(luke['lightsaber color'])
+blue
 
-    print(luke['episodes'][2])
-    VI
+print(luke['episodes'][2])
+VI
 \end{Verbatim}
 
 \normalsize
@@ -420,31 +419,41 @@ Simple as that!
 
 \subsection{``Pretty printing''}
 
-\index{import@\texttt{import}}
+\index{pretty printing@``pretty printing''}
+\index{wall of text}
 
-First, you have to do the import:
+One thing I think you'll find useful is the ability to ``\textbf{pretty
+print}'' a nested Python structure, like one you read from a JSON file. Instead
+of a monolithic wall of text, like many \texttt{.json} files look out of the
+box, a pretty printer attempts to format, indent, and put linebreaks in, so
+that you can more readily perceive its structure and figure out how to pick out
+the parts you want.
+
+A good package for this is the \texttt{pprint} package. First, you have to do
+the import:
+
+\index{import@\texttt{import}}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 from pprint import pprint
 \end{Verbatim}
 
 \index{print()@\texttt{print()} function}
-\index{pretty printing@``pretty printing''}
 \index{pprint()@\texttt{pprint()} function}
 
-and then, instead of \texttt{print()}ing a variable, you can \texttt{pprint()}
-it. I think you'll agree, the latter is easier to make sense of:
+From then on, instead of \texttt{print()}ing a variable, you can
+\texttt{pprint()} it. I think you'll agree, the latter is easier to make sense
+of:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 print(luke)
 \end{Verbatim}
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-{'name': 'Luke Skywalker', 'rank': 'Jedi', 'lightsaber color':
-'blue', 'episodes': ['IV', 'V', 'VI', 'VIII', 'IX'], 'relations':
-{'Leia': 'sister', 'Han': 'friend', 'Lando': 'friend', 'Artoo':
-'servant', 'Rey': 'student'}}
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+{"name": "Luke Skywalker", "rank": "Jedi", "lightsaber color": "blue",
+"episodes": ["IV", "V", "VI", "VIII", "IX"], "relations": {"Leia": "sister",
+"Han": "friend", "Artoo": "servant", "Threepio": "servant", "Rey": "student"}}
 \end{Verbatim}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
@@ -459,23 +468,26 @@ pprint(luke)
  'rank': 'Jedi',
  'relations': {'Artoo': 'servant',
                'Han': 'friend',
-               'Lando': 'friend',
                'Leia': 'sister',
-               'Rey': 'student'}}
+               'Rey': 'student',
+               'Threepio': 'student'}}
 \end{Verbatim}
 
 As a bonus, it even puts dictionary keys in alphabetical order, so you can find
-them easily.
+them more easily.
 
 
 \section{``Hierarchical'' vs. ``flat'' data}
 
-You can see that the JSON file format is essentially a textual representation
+So you see that the JSON file format is essentially a textual representation
 of an arbitrarily nested Python object. This object can be a list or a
 dictionary, and have embedded lists and dictionaries to any arbitrary level of
 nesting. Here's another example:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\index{courses}
+\label{coursesJson}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=lines,framesep=3mm]
 [{"prefix": "DATA", "num": 219, "creds": 3, "instructor": "Davies",
 "meetings": [{"time": {"day": "TR", "time": "2pm"}, "location": {"bldg":
 "Trinkle", "room": "B6"}}], "roster": [{"first": "Lady", "last": "Gaga",
@@ -485,12 +497,13 @@ nesting. Here's another example:
 
 When you disentangle this, you'll realize that what you have is:
 
-\vspace{.2in}
+\vspace{.1in}
 
-\large
-\noindent A list, each element of which is:\\
-$\bullet$ a dictionary, with key/value pairs:
-        \begin{compactenum}
+A list, each element of which is:
+\vspace{-.1in}
+\begin{compactitem}
+\item a dictionary, with key/value pairs:
+        \begin{compactitem}
         \item \texttt{prefix}: a string
         \item \texttt{num}: an int
         \item \texttt{creds}: an int
@@ -498,30 +511,33 @@ $\bullet$ a dictionary, with key/value pairs:
         \item \texttt{meetings}: a list, each element of which is:
             \begin{compactitem}
             \item a dictionary, with key/value pairs:
-                \begin{compactenum}
+                \begin{compactitem}
                 \item \texttt{time}: a dictionary, with key/value pairs:
-                    \begin{compactenum}
-                    \item \texttt{day}: a string
-                    \item \texttt{time}: a string
-                    \end{compactenum}
+
+\quad\quad \texttt{day}: a string
+
+\quad\quad \texttt{time}: a string
+
                 \item \texttt{location}: a dictionary, with key/value pairs:
-                    \begin{compactenum}
-                    \item \texttt{bldg}: a string
-                    \item \texttt{room}: a string
-                    \end{compactenum}
-                \end{compactenum}
+
+\quad\quad \texttt{bldg}: a string
+
+\quad\quad \texttt{room}: a string
+
+                \end{compactitem}
             \end{compactitem}
         \item \texttt{roster}: a list, each element of which is:
             \begin{compactitem}
             \item a dictionary, with key/value pairs:
-                \begin{compactenum}
+                \begin{compactitem}
                 \item \texttt{first}: a string
                 \item \texttt{last}: a string
                 \item \texttt{email}: a string
-                \end{compactenum}
+                \end{compactitem}
             \end{compactitem}
         \item ...and possibly other stuff...
-        \end{compactenum}
+        \end{compactitem}
+\end{compactitem}
 
 \normalsize
 
@@ -530,7 +546,7 @@ $\bullet$ a dictionary, with key/value pairs:
 This kind of structure is called \textbf{hierarchical} data. This is in
 contrast to so-called \textbf{flat} data, like a CSV:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\normalsize,samepage=true,frame=lines,framesep=3mm]
 Prefix,Num,Instructor,Creds,Bldg,Room,Day,Time
 DATA,219,Davies,3,Trinkle,B6,TR,2pm
 ENGL,286,Rigsby,3,Combs,112,MWF,11am
@@ -543,15 +559,16 @@ identical-length sequence of values, the whole nested structure communicates
 order and relationships between subcomponents, like an outline.
 
 It's not even always possible, let alone straightforward, to convert from a
-hierarchical format to a flat format. Consider the JSON file above: it permits
-any number of \texttt{meetings} for a single course, each of which has
-embedded structure. In this case, the structure for each meeting is regular,
-since it's apparently composed of a fixed number of fields with unique names.
-(This won't always be the case, and if it's not, we would \textit{lose
-information} in collapsing it to a flat format.) Even so, though, it's not
-clear what to do with the multiple meeting times/locations for a course. Do we
-make each \texttt{Bldg/Room/Day/Time} group into its own set of headings in
-the flat format? This brings with it its own problems, such as:
+hierarchical format to a flat format. Consider the JSON file on
+p.~\pageref{coursesJson}: it permits any number of \texttt{meetings} for a
+single course, each of which has embedded structure. In this case, the
+structure for each meeting is regular, since it's apparently composed of a
+fixed number of fields with unique names. (This won't always be the case, and
+if it's not, we would \textit{lose information} in collapsing it to a flat
+format.) Even so, though, it's not clear what to do with the multiple meeting
+times/locations for a course. Do we make each \texttt{Bldg/Room/Day/Time} group
+into its own set of headings in the flat format? This brings with it its own
+problems, such as:
 
 \begin{compactenum}
 \item How do we associate each group of buildings/rooms/days/times together,
@@ -574,9 +591,9 @@ when we look at SQLite later in the course. Some irregular structures defy
 even the relational model, however, which is why some newer database paradigms
 (like NoSQL databases) have been developed to get around its limitations.
 
-One big reality to grasp, however, is that at this point in time,
-\textit{almost all machine learning algorithms are based on a \textbf{flat}
-data structure}. There are some quite advanced, cutting-edge exceptions to
-this, but really the field of mining hierarchical (and other non-flat) data
-formats is still in its infancy. Lots of opportunity to make a name for
-yourself here!
+One important fact to grasp, however, is that at the present state of
+technology, \textit{almost all machine learning algorithms are based on a
+\textbf{flat} data structure}. There are some quite advanced, cutting-edge
+exceptions to this, but really the field of mining hierarchical (and other
+non-flat) data formats is still in its infancy. Lots of opportunity to make a
+name for yourself here!
