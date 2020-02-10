@@ -59,3 +59,25 @@ print("c[0]['x'] is {}".format(c[0]['x']))
 print("c[1][1] is {}".format(c[1][1]))
 print("c[1][2][1]['five'] is {}".format(c[1][2][1]['five']))
 print("c[1][2][2][1] is {}".format(c[1][2][2][1]))
+
+
+
+import json
+
+with open("courses.json") as f:
+    c = json.load(f)
+
+for student in c[16]['roster']: 
+    print("{} {} is in {} {}.".format(student['first'], 
+        student['last'], c[16]['prefix'], c[16]['num'])) 
+
+
+for course in c:
+    roster = course['roster']
+    for student in roster:
+        if 'last' in student:
+            print("{} {} is in {} {}.".format(student['first'], 
+                student['last'], course['prefix'], course['num'])) 
+        else:
+            print("{} is in {} {}.".format(student['first'], 
+                course['prefix'], course['num'])) 

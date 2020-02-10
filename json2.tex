@@ -2,3 +2,306 @@
 \chapter{JSON (2 of 2)}
 \label{ch:JSON2}
 
+% TODO: A big-ol' memory diagram of the entire "courses" nested structure.
+
+In this chapter we'll cover some common techniques for dealing with JSON data.
+Most often, what you end up doing is writing Python code that combs
+systematically through the data, surgically extracting the parts you need for
+analysis. These parts can then be assembled in NumPy arrays, Pandas
+\texttt{DataFrame}s, or whatever, and probed as you're accustomed to.
+
+\index{pretty printing@``pretty printing''}
+
+\label{coursesJsonPretty}
+
+Let's go back to the college courses example from p.\pageref{coursesJson},
+pretty printed here:
+
+\index{courses (JSON file)}
+\index{json file@\texttt{.json} file}
+\index{DATA 219}
+\index{Lady Gaga}
+\index{Rock, The}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=lines,framesep=3mm]
+[{'creds': 3,
+  'instructor': 'Davies',
+  'meetings': [{'location': {'bldg': 'Trinkle', 'room': 'B6'},
+                'time': {'day': 'TR', 'time': '12:30pm'}}],
+  'num': 219,
+  'prefix': 'DATA',
+  'roster': [{'email': 'lgaga@umw.edu', 'first': 'Lady', 'last': 'Gaga'},
+             {'email': 'trock@umw.edu', 'first': 'The', 'last': 'Rock'},
+             ...,
+             ...]
+ },
+ ...
+]
+\end{Verbatim}
+
+\index{[]@\texttt{[]} (boxies)}
+\index{boxies (square brackets)}
+\index{\{\}@\texttt{\{\}} (curlies)}
+\index{curlies (curly braces)}
+\index{list}
+\index{dictionary}
+
+The first brute fact to grasp is that whatever its internal complexities, this
+whole thing is \textit{a list of dictionaries}. Not a list of lists, or a
+dictionary of dictionaries, or a dictionary of lists, but: a list of
+dictionaries. How do we know this? Because the first character is a boxie
+(``\texttt{[}'') and the second one is a curly (``\texttt{\{}'').
+
+\section{Printing a class roster}
+
+As a first example of working with this data set, let's say we wanted to simply
+print the full names of all the students in the 17th course in this list.
+First, let's load the \texttt{.json} file into Python:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+import json
+
+with open("courses.json") as f:
+    c = json.load(f)
+\end{Verbatim}
+
+\index{loop}
+
+Here we've called the outermost structure ``\texttt{c}'', which stands for
+``courses'' but is shortened since we'll type it a lot. (Remember that
+\texttt{c} is a list -- a very long and complicated list, but still a list.)
+
+And then we do a deep think. Printing all the names clearly requires a loop.
+But what exactly do we want to loop through? The answer, after scrutinizing the
+above structure, is: we need to find the value of the \texttt{"roster"} key of
+the 17th dictionary in the \texttt{c} list. That in turn will be a list, and it
+will contain dictionaries, one for each student. (Pause before continuing, look
+at the JSON contents from p.~\pageref{coursesJsonPretty}, and see if you agree
+with every word of this paragraph.)
+
+So, the loop we want is something like this:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+for student in c[16]['roster']: 
+    print("{} {} is in {} {}.".format(student['first'], 
+        student['last'], c[16]['prefix'], c[16]['num'])) 
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+Lady Gaga is in DATA 219.
+The Rock is in DATA 219.
+Obi-wan Kenobi is in DATA 219.
+Amy Klobuchar is in DATA 219.
+...
+\end{Verbatim}
+
+Success. (Don't worry if you don't get this loop right the first time; it often
+takes some tweaking and refinement before it works.) Notice how this code
+operates:
+
+\begin{compactenum}
+
+\item We dig fairly deep into \texttt{c} (which is a list), finding its 17th
+element (at index 16 of course), which is a dictionary. Then we get the value
+of that dictionary's \texttt{"roster"} key. As you can see above, that key's
+value is a list.
+
+\item Every time through the loop, the ``\texttt{student}'' variable is set
+equal to the next element of this list. And that element, as you can see above,
+is a dictionary. The dictionary has two items of interest: \texttt{"first"} and
+\texttt{"last"}. We then print the values of these two keys, plus the course
+prefix and number. (Note that the course prefix and number come directly from
+the \texttt{c[16]} dictionary itself, whereas the first and last names come
+from keys of the elements of the inner \texttt{"roster"} list that we're
+iterating through.)
+
+\end{compactenum}
+
+\section{Printing \textit{all} the class rosters}
+
+That printed the roster for one class. What about printing the roster for
+\textit{all} the classes?
+
+If you think about it, the structure is much the same -- except that instead of
+merely iterating through class \#17's list of dictionaries, we want to do it
+for \textit{every} class.
+
+\index{nested!loops}
+
+You'll probably realize that this necessitates \textit{another}. All the stuff
+we did for class \#17, we now want to do for all the classes, one after
+another. So in essence, we wrap the previous code in a nested, outer loop which
+will perform it once for each course. Check out the following:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+for course in c:
+    roster = course['roster']
+    for student in roster:
+        print("{} {} is in {} {}.".format(student['first'], 
+            student['last'], course['prefix'], course['num'])) 
+\end{Verbatim}
+
+Observe the nested structure (a \texttt{for} within a \texttt{for}), and the
+use of a temporary helper variable (\texttt{"roster"}) to make the code
+clearer. Also notice how the \texttt{print()} statement includes information
+from both the \texttt{student} and \texttt{course} variables, as appropriate.
+
+This is just the right thing. However, when we run it, we get an error after a
+while:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+Lady Gaga is in DATA 219.
+The Rock is in DATA 219.
+Obi-wan Kenobi is in DATA 219.
+...
+Elizabeth Jennings is in PSCI 401.
+Stan Beeman is in PSCI 401.
+Phillip Jennings is in PSCI 401.
+...
+Tyrion Lannister is in ENGL 101.
+Jon Snow is in ENGL 101.
+Daenerys Targaryen is in ENGL 101.
+...
+Han Solo is in CHEM 211.
+Poe Dameron is in CHEM 211.
+---------------------------------------------------------------------------
+KeyError                              Traceback (most recent call last)
+     77     for student in roster:
+     78         print("{} {} is in {} {}.".format(student['first'], 
+---> 79             student['last'], course['prefix'], course['num'])) 
+     80 
+
+KeyError: 'last'
+\end{Verbatim}
+
+Whoaaaa, what's \textit{dat}?
+
+\subsection{Encountering erroneous/missing data}
+
+This kind of error will happen all the time when you're working with JSON. The
+first step is not to panic. The second step is to calmly observe that
+apparently, everything was working fine up to a point...and then it suddenly
+broke. The third step is to look at that error message and see if you can make
+sense out of it. (Often, you can.) And the fourth step is to introduce some
+tactical debugging messages into your code, so that you can narrow down the
+source of the error.
+
+I assume you've done those first two steps. On to the third: the error message.
+It says, quote:
+
+\begin{Verbatim}[fontsize=\normalsize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+KeyError: 'last'
+\end{Verbatim}
+
+and it evidently happened on line 79, which was in the middle of the
+\texttt{print()} statement. Put 2 and 2 together and you'll realize that when
+we attempted to extract the value of the \texttt{"last"} key for one of the
+dictionaries, \textit{it wasn't there.} That's what ``\texttt{KeyError}'' turns
+out to mean: you asked for a particular key but there wasn't one in the
+dictionary.
+
+The fourth step is crucial. It marks the difference between fledgling, flailing
+novices and cool, critical-thinking experts. We need to insert (temporarily)
+one or more \textit{print()} statements into our loop, so that \textit{right
+before the program crashes,} we get some crucial insight into what was about
+to go wrong.
+
+This takes some practice and some intuition, but in this case let me simply
+observe what it makes sense to do. If we were about to access a non-existent
+key from a dictionary, it might illuminate things if we printed out the
+dictionary immediately before trying that stunt. That way, we'll see the state
+of affairs just before the error.
+
+Here's the key line, inserted into the inner loop:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+for course in c:
+    roster = course['roster']
+    for student in roster:
+        print("The dict is: {}".format(student))
+        print("{} {} is in {} {}.".format(student['first'], 
+            student['last'], course['prefix'], course['num'])) 
+\end{Verbatim}
+
+Now look at the revised output, below:
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+The dict is: {'email': 'han.solo@corellia.gov', 'first': 'Han', 'last': 'Solo'}
+Han Solo is in CHEM 211.
+The dict is: {'email': 'dameron@resistance.org', 'first': 'Poe', 'last': 'Dameron'}
+Poe Dameron is in CHEM 211.
+The dict is: {'email': 'root@dagobah.net', 'first': 'Yoda'}
+---------------------------------------------------------------------------
+KeyError                                  Traceback (most recent call last)
+     78         print("The dict is: {}".format(student))
+     79         print("{} {} is in {} {}.".format(student['first'], 
+---> 80             student['last'], course['prefix'], course['num'])) 
+     81 
+
+KeyError: 'last'
+\end{Verbatim}
+
+\index{Yoda}
+\index{CHEM 211}
+\index{DATA 219}
+
+Aha! Our problem is \texttt{Yoda}, a student in CHEM 211 who doesn't have a
+last name.
+
+It takes practice and experience to get a feel for where to insert meaningful
+debugging statements. The key question to ask is: ``what do I wish I had known
+right before the error occurred?'' Add lines of code to shed light on that
+question.
+
+
+\subsection{Dealing with erroneous/missing data}
+
+Once you've discovered the absence of something you were looking for, you need
+to ask yourself what the implications are of it being missing. Sometimes it's a
+bona fide data error that means you need to investigate the source of the
+information, discard some data points, or something else. Other times (as in
+the Yoda case) it's innocuous -- not everyone has a last name, after all -- but
+you still have to \textit{deal} with the problem somehow so your program can
+continue.
+
+In the case of a missing key which you can sensibly ignore, you can code around
+it as follows:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+for course in c:
+    roster = course['roster']
+    for student in roster:
+        if 'last' in student:
+            print("{} {} is in {} {}.".format(student['first'], 
+                student['last'], course['prefix'], course['num'])) 
+        else:
+            print("{} is in {} {}.".format(student['first'], 
+                course['prefix'], course['num'])) 
+\end{Verbatim}
+
+\index{in@\texttt{in}}
+
+The important line is the fourth one: ``\texttt{if \textquotesingle
+last\textquotesingle~in student:}''. The ``\texttt{in}'' keyword checks to see
+whether a dictionary has a certain key or not. In this case, if there is no
+\texttt{"last"} key, we want to simply print the first name and go on, not
+crash. The output is now satisfactory:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+...
+Han Solo is in CHEM 211.
+Poe Dameron is in CHEM 211.
+Yoda is in CHEM 211.
+Emperor Palpatine is in CHEM 211.
+Chewie is in CHEM 211.
+Rey is in CHEM 211.
+...
+\end{Verbatim}
+
+The appropriate way to deal with an error like this varies depending on the
+situation. This is why you need to back away from the keyboard, take a walk,
+and ask yourself, ``what does it \textit{mean} when this value is absent or
+corrupt? Does that imply that I need to throw out that data point? Or that
+something deep and sinister is going on? Or is there a way to safely ignore
+it?''
