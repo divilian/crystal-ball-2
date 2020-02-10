@@ -81,3 +81,23 @@ for course in c:
         else:
             print("{} is in {} {}.".format(student['first'], 
                 course['prefix'], course['num'])) 
+
+prefixes = np.empty(len(c), dtype=object)
+sizes = np.empty(len(c), dtype=int)
+
+for x in np.arange(0,len(c)):
+    prefixes[x] = c[x]['prefix']
+    sizes[x] = len(c[x]['roster'])
+
+prefixes = np.empty(0, dtype=object)
+sizes = np.empty(0, dtype=int)
+
+for course in c:
+    prefixes = np.append(prefixes, course['prefix'])
+    sizes = np.append(sizes, len(course['roster']))
+
+course_info = pd.DataFrame({'prefix': prefixes, 'size':sizes})
+
+course_info.boxplot("size", by="prefix")
+plt.savefig('courseinfo.png')
+
