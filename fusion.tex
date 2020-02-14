@@ -1,0 +1,443 @@
+
+\chapter{Data fusion}
+
+\index{data fusion}
+
+In this chapter we'll introduce the cool-sounding technique of \textbf{data
+fusion}. Data fusion means combining and integrating multiple data sources into
+a single data set. This can give you richer, more useful information than any
+of the individual data sets could on their own.
+
+\section{Merge operations}
+
+As we've learned, the \textit{lingua franca} of the data science world is the
+rectangular table perfectly reflected by a CSV file: it has (heterogeneous)
+rows, it has (homogeneous) columns, and is otherwise flat. Nearly all machine
+learning algorithms (including those for prediction and modeling) are based on
+such a structure. In Pandas we speak of this structure as a DataFrame, of
+course, and we'll sometimes also use the word \textbf{table} to describe this
+conceptual format for organizing data.
+
+More complicated data sets sometimes consist of \textit{multiple} such tables.
+This is especially true if there are different aspects to the data, each of
+which is deserving of its own table. The tables are often implicitly related,
+as we'll see, through some piece of common information that links them
+together logically.
+
+Moreover, there will be times in your career when you want to integrate
+multiple \textit{different} data sets in some way, perhaps because each gives
+you information on some related aspect of a common phenomenon. Imagine if you
+found a data source giving vote totals for various political candidates, and a
+different data source documenting the financial donations that their campaigns
+received. An obvious question would be: ``to what extent do a candidate's
+contributions relate to his/her vote count?'' This kind of analysis is only
+possible if the two data sets can be merged in a coherent way, so that the
+vote totals for a candidate are properly associated with the contributions to
+that same candidate's campaign.
+
+We'll use the term \textbf{merge} (or \textbf{join}) to describe the operation
+of connecting two tables/DataFrames into one, based on a common linking piece
+of information. The term \textbf{fusion} is usually restricted to the case
+described in the previous paragraph; namely, when the two tables to be joined
+are from different data sets entirely.
+
+\subsection{Merging in Pandas}
+
+The basic idea is that in order to meaningfully merge two DataFrames, one (or
+more) columns in the first table must be logically linked to one (or more)
+columns in the second. ``Logically linked'' usually means ``having the same
+values in them.'' 
+
+\label{originalDFs}
+\begin{figure}[ht]
+\centering
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+                                  actors:
+          actor           film                   salary (millions)
+          --------------------------------------------------------
+          Downey Jr.      The Avengers           50
+          Johansson       The Avengers           20
+          DiCaprio        Inception              59
+          Hanks           Forrest Gump           70
+          Bullock         Gravity                77
+          Downey Jr.      Iron Man 3             51
+          Hanks           Saving Private Ryan    40
+          ...
+          
+                                  movies:
+          title           director               year
+          -------------------------------------------
+          Inception       Nolan                  2010
+          The Avengers    Whedon                 2012
+          Forrest Gump    Zemeckis               1994
+          Gravity         Cuaron                 2013
+          Star Wars       Lucas                  1977
+          ...
+\end{Verbatim}
+\caption{Two DataFrames from an IMDB-like source.}
+\label{fig:imdb}
+\end{figure}
+ 
+For example, consider Figure~\ref{fig:imdb}, which contain two DataFrames from
+a data source like IMDB. There are clearly questions we'd like to ask which
+involve both DataFrames together, rather than each in isolation. For instance,
+``have actor salaries been going up over time?'' or ``how often have various
+actors worked with specific directors?''
+
+Merging here is simple: we simply identify \textit{the common column} which
+unites rows from the two tables. Clearly, it's the film title: we know that
+Robert Downey Jr. was directed by Joss Whedon because a Downey-Jr. row in the
+\texttt{actors} table has the same film name as a film in a Whedon row in the
+\texttt{movies} table.
+
+In database parlance, we call the \texttt{title} column of the \texttt{movies}
+table its \textbf{primary key} (PK), and we call the \texttt{film} column of
+the \texttt{actors} table a \textbf{foreign key} (FK). The primary key /
+foreign key relationship is supposed to suggest that for every row in the
+\texttt{actors} table, its \texttt{film} value \textit{will} appear in one row
+of the \texttt{movies} table (namely, in that row's \texttt{title} column).
+
+To ``join'' these two DataFrames all in one fell swoop, we execute a command
+like this:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+actors_movies = pd.merge(actors,movies,left_on="film",right_on="title")
+\end{Verbatim}
+
+This produces a \textit{new} DataFrame that contains (1) all the columns of
+the two, and (2) a row for each pair of original rows that match on their
+movie title. Notice we had to specify \textit{two} arguments (besides the
+table names) to \texttt{pd.merge()}: ``\texttt{left\_on}'' (for the name of the
+merging column in the first DataFrame) and ``\texttt{right\_on}'' (for the
+second). If these two columns had the same name, we could just specify a
+single argument called ``\texttt{on}'' for the two.
+
+The \texttt{actors\_movies} will look like Figure~\ref{fig:merge}. (The
+sequence of the rows is not in general reliable, and you should not depend on
+them being in the order you expect.)
+
+\begin{figure}[ht]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+                            actors_movies:
+actor      film         salary (millions)  title         director     year
+--------------------------------------------------------------------------
+Bullock    Gravity      77                 Gravity       Cuaron       2013
+DiCaprio   Inception    59                 Inception     Nolan        2010
+Johansson  The Avengers 20                 The Avengers  Whedon       2010
+Downey Jr. The Avengers 50                 The Avengers  Whedon       2010
+....
+\end{Verbatim}
+\caption{The result of a merge operation on the DataFrames on p.~\pageref{originalDFs}.}
+\label{fig:merge}
+\end{figure}
+
+This DataFrame can be used to answer either of the questions we posed above,
+and others.
+
+Note that our new table has some redundant information (the \texttt{film} and
+\texttt{title} columns are identical) which you can remove using normal Pandas
+operations if you wish.
+
+\subsubsection{Odds and ends}
+
+\begin{enumerate}
+\itemsep1em
+\item Sometimes we want to merge on more than one column; for instance:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+df = pd.merge(votes,contributions,left_on=['first_name','last_name'],
+        right_on=['candidate_first','candidate_last'])
+\end{Verbatim}
+which has the expected result.
+
+\item The default merge operation (as we did above) is sometimes called an
+``\textbf{inner join}''. This means that \textit{if there is no corresponding
+match for a row in one of the DataFrames, there will be no associated row in
+the result.} This is normally what we want. In the movies example, if we don't
+have a row in the \texttt{movies} table for a particular film, then we don't
+know the year for that film, and it's (perhaps) pointless to include any of
+the actors in that film in the resulting merged DataFrame.
+
+Sometimes, we want to make sure that every row in the left (or right, or
+both) DataFrame appears in the result \textit{at least once}, though, with
+corresponding null values if necessary. We can do this by specifying
+\texttt{'left'}, \texttt{'right'}, or \texttt{'outer'} as the value of the
+\texttt{'how'} argument to \texttt{pd.merge()}:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+df = pd.merge(votes,contributions,left_on=['first_name','last_name'],
+        right_on=['candidate_first','candidate_last'],how='outer')
+\end{Verbatim}
+
+\item Sometimes merging two data frames will result in column name
+collisions. Suppose, for example, that our \texttt{actors} table had had a
+\texttt{year} column indicating the birth year of the actor:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+                            actors:
+    actor           year   film                   salary (millions)
+    ---------------------------------------------------------------
+    Downey Jr.      1965   The Avengers           50
+    Johansson       1984   The Avengers           20
+    DiCaprio        1974   Inception              59
+    Hanks           1956   Forrest Gump           70
+    Bullock         1964   Gravity                77
+    ...
+\end{Verbatim}
+
+Then the resulting DataFrame would need to have two columns named
+``\texttt{year}'', with different meanings. Pandas solves this by renaming the
+conflicting columns with a ``\texttt{\_x}'' or ``\texttt{\_y}'' suffix,
+corresponding to the left/right tables in the join:
+
+\footnotesize
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=none]
+                            actors_movies:
+actor      year_x   film       salary (millions)   title      director   year_y
+-------------------------------------------------------------------------------
+Bullock    1964     Gravity    77                  Gravity    Cuaron     2013
+DiCaprio   1974     Inception  59                  Inception  Nolan      2010
+\end{Verbatim}
+\normalsize
+
+(which, of course, you can rename at will via
+``\texttt{actors\_movies.columns}''.)
+
+\item Finally, the above examples have all featured ``one-to-many''
+relationships between the two tables. (\textit{Many} actors star in
+\textit{one} movie.) But sometimes we have a ``many-to-many'' relationship.
+
+Consider the example in Figure~\ref{fig:costumes}. In order to dress every
+child in their Halloween costume, we need \textit{multiple} matches from
+\textit{both} data frames for each costume value. Each \texttt{Princess} has
+more than one accessory, and there are multiple children who want to
+\textit{be} princesses. Therefore, we can potentially end up with a lot of
+rows in our result.
+
+
+\begin{figure}
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
+>>> costumes = pd.DataFrame(
+    {'costume':['Darth Vader','Darth Vader','Princess','Princess'],
+     'accessory':['helmet','lightsaber','crown','wand']})
+    accessory      costume
+0      helmet  Darth Vader
+1  lightsaber  Darth Vader
+2       crown     Princess
+3        wand     Princess
+
+>>> children = pd.DataFrame(
+    {'child':['Johnny','Sam','Betty Lou','Wendell','Kiara'],
+     'costume':['Darth Vader','Darth Vader','Princess','Student','Princess']})
+       child      costume
+0     Johnny  Darth Vader
+1        Sam  Darth Vader
+2  Betty Lou     Princess
+3    Wendell      Student
+4      Kiara     Princess
+
+>>> pd.merge(costumes,children,on="costume")
+    accessory      costume      child
+0      helmet  Darth Vader     Johnny
+1      helmet  Darth Vader        Sam
+2  lightsaber  Darth Vader     Johnny
+3  lightsaber  Darth Vader        Sam
+4       crown     Princess  Betty Lou
+5       crown     Princess      Kiara
+6        wand     Princess  Betty Lou
+7        wand     Princess      Kiara
+\end{Verbatim}
+\caption{Merging DataFrames with a many-to-many relationship.}
+\label{fig:costumes}
+\end{figure}
+
+Btw, notice that poor \texttt{Wendell} was left out of the merged DataFrame
+entirely, since his costume did not have any accessories. We can include him
+by doing a ``\textbf{right join}'' (or full ``\textbf{outer join}''), as shown
+in Figure~\ref{fig:outerJoin}.
+
+\begin{figure}
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
+pd.merge(costumes,children,on="costume",how="outer")
+    accessory      costume      child
+0      helmet  Darth Vader     Johnny
+1      helmet  Darth Vader        Sam
+2  lightsaber  Darth Vader     Johnny
+3  lightsaber  Darth Vader        Sam
+4       crown     Princess  Betty Lou
+5       crown     Princess      Kiara
+6        wand     Princess  Betty Lou
+7        wand     Princess      Kiara
+8         NaN      Student    Wendell
+\end{Verbatim}
+\caption{Including costume-less \texttt{Wendell} with an outer join.}
+\label{fig:outerJoin}
+\end{figure}
+
+\end{enumerate}
+
+\subsection{``By the way...why?''}
+
+At this point you may be asking, ``if we just have to merge the DataFrames to
+do our analysis, why were they stored that way in the first place? Why not
+just have everything in one big CSV file?''
+
+The answer has to do with \textit{redundancy of information}. Consider the
+merged table in Figure~\ref{fig:merge} (p.~\pageref{fig:merge}). It's not the
+most compact way of expressing the information, because certain pieces of
+information are repeated unnecessarily.
+
+For instance, \textit{The Avengers} was released in 2012. Our data source
+needs to record that. But in the merged table, this year would be repeated
+\textit{for every actor/actress in the movie.} The same is true for the
+director of the film. By performing the merge, we have duplicated lots of
+values. In database terms, the data set has become \textbf{unnormalized}. This
+isn't always a bad thing, and in terms of performing standard ML (machine
+learning) algorithms, it's necessary. But you can see why we wouldn't want the
+data permanently stored that way. It consumes extra storage, plus it opens a
+Pandora's Box of possible contradictions: what if \texttt{Downey Jr.}'s
+\texttt{The Avengers} row said 2012, while \texttt{Johansson}'s said 2014. Who
+would we believe?
+
+Database normalization is a larger topic than we have time to fully cover in
+this class, but the basics are very simple. Conceptually: \textit{each piece
+of information should be stored in one and only one place.} Generally
+speaking, when that's true, you have a \textbf{normalized} data set, which is
+most appropriate for storage and for communication to other potential users.
+Analysts will proceed to unnormalize select parts of it in order to perform
+certain analyses.
+
+\section{``Tidy'' data}
+
+The term ``tidy'' to describe a data set has sprung into prominence recently
+as a result of the excellent paper by Hadley Wickham (of R fame) who neatly
+captured the perils of various data formatting choices.
+
+\begin{compactitem}
+\item \textbf{variable} -- a category of something, for which individual
+objects have a value. For example: height, gender, center\_field\_distance,
+name.
+\item \textbf{value} -- an actual individual piece of data corresponding to a
+variable for one object. For example: 5'6", female, 390 feet, Kylo Ren.
+\item \textbf{observation} -- a particular measurement that comprises all the
+information necessary to interpret that measurement. For example: Jeff's
+weight was 165 lbs., Jenny's golf score at Field \& Cross Links in the rain
+was 88. (In the first example, ``all the information necessary'' includes
+``Jeff'' and ``165''; in the second, it includes ``Jenny'', ``Field \& Cross
+Links'', ``rainy'', and ``88''.)
+\item \textbf{observational unit} -- a collection of all the observations of a
+particular type. (``Golf performances'' would be an observational unit,
+separate from a ``golfers'' unit which contains information about golfers
+themselves, not their particular performances.)
+\end{compactitem}
+
+\vspace{.2in}
+The rule is: a data set is considered \textbf{tidy} if and only if:
+\begin{compactenum}
+\item Each observational unit is in its own table. (This is essentially
+the same as ``normalized,'' from the previous section.)
+\item In each table, each observation forms a row.
+\item In each table, each column header is a variable, and the column contains
+values.
+\end{compactenum}
+
+\vspace{.2in}
+This is best visualized by looking at examples of \textit{un}tidy data sets
+and rectifying them. Here's one:
+\small
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+            religion   <$10k   $10-20k  $20-30k  $30-40k   $40-50k  $50-75k
+0           Agnostic      27        34       60       81        76      137
+1            Atheist      12        27       37       52        35       70
+2           Buddhist      27        21       30       34        33       58
+3           Catholic     418       617      732      670       638     1116
+4  Dont know/refused      15        14       15       11        10       35
+...
+\end{Verbatim}
+\normalsize
+
+The problem here is that \textit{the column headings are actually values, not
+variables}. Think about it: ``\texttt{\$10-20k}'' isn't the name of a variable
+which might have actual values, but the value (range) itself of some variable.
+
+Two questions: (1) What would the variable be for these column values? Answer:
+\textit{Income.} (2) What are the cells themselves representing? Answer:
+\textit{Frequency.} (\textit{i.e.}, the number of people polled in the survey
+who had that religion and that income level.)
+
+We tidy this with the \texttt{pd.melt()} function:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+tdf = pd.melt(df, ['religion'], var_name='income', value_name='frequency')
+\end{Verbatim}
+
+which gives us the tidy version:
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+                               religion    income  frequency
+           0                   Agnostic     <$10k         27
+           1                    Atheist     <$10k         12
+           2                   Buddhist     <$10k         27
+           3                   Catholic     <$10k        418
+          ...
+\end{Verbatim}
+
+(Sometimes you'll hear the terms ``\textbf{wide}'' and ``\textbf{long}'' to
+refer to the untidy and tidy formats in this sort of example, respectively.)
+
+By the way, the inverse operation of ``melt'' is often called
+``\textbf{pivot}''. To reverse the above transformation in Pandas, you should
+use:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+df = tdf.pivot(index='religion',columns='income')
+\end{Verbatim}
+
+for this operation.
+
+
+% Exercise:
+% load http://cs.umw.edu/~stephen/data219/students.csv and tidy it to:
+%
+%                      students
+%            name  year major    school  creds
+%   Mal A. Kenobi  Soph  ECON       UMW     32
+%  Jay O. Aniston   Sen  ECON  Richmond     92
+%
+%               gpas
+%             name year   GPA
+%   Mal A. Kenobi   So  2.47
+%  Jay O. Aniston   Sr  2.30
+%      (no NaNs)
+%
+%           schools
+%    school     type   mascot
+%       UMW   public   Eagles
+%  Richmond  private  Spiders
+%
+% DELETE the original table.
+% now add a column for "urban/rural" to schools table. (We'll call Richmond,
+% Fredericksburg, and Charlottesville urban, and the others rural.)
+%
+% how many students are there?
+% how many total year-GPA measurements are there?
+% what's the overall GPA?
+% how many students in rural vs. urban schools?
+% average freshman GPA in rural vs. urban schools?
+% visual: do freshmen vs. non-freshmen GPAs differ? (will require another col)
+% visual: does avg GPA vary by major? by school? (will require another col)
+% scatterplot of creds vs. average-yearly-GPA (ditto)
+%
+% helpful:
+% 1) after splitting out school into separate df:
+%  df.drop_duplicates()
+% 2) to remove NaN's from GPAs once melted:
+%  np.isnan(...)   <-- a ufunc
+%  ~   <-- boolean "not" operator
+%  (to set up: "gpas = gpas[~np.isnan(gpas.GPA)]")
+%  (could also do: "gpas.drop(gpas.index[np.isnan(gpas.GPA)])")
+% 3) df.col.str   to perform string operations as ufunc
+%  (to set up: "gpa.year = gpa.year.str[3:]")
+%
+% 
+
+
