@@ -13,12 +13,14 @@ of the individual data sets could on their own.
 \index{table}
 \index{merge}
 \index{join!inner}
+\index{flat data}
+\index{DataFrame@\texttt{DataFrame} (Pandas)}
 
-On the ground, data fusion usually necessitates \textit{merging} multiple
-tables together. As we've learned, the \textit{lingua franca} of the data
-science world is the rectangular table perfectly reflected by a CSV file: it
-has (heterogeneous) rows, it has (homogeneous) columns, and is otherwise flat.
-In Pandas we speak of this structure as a \texttt{DataFrame}, of course.
+On the ground, data fusion usually necessitates merging multiple tables
+together. As we've learned, the \textit{lingua franca} of the data science
+world is the rectangular table perfectly reflected by a CSV file: it has
+(heterogeneous) rows, it has (homogeneous) columns, and is otherwise flat. In
+Pandas we speak of this structure as a \texttt{DataFrame}, of course.
 
 More complicated data sets sometimes consist of \textit{multiple} such tables.
 This is especially true if there are different aspects to the data, each of
@@ -104,9 +106,12 @@ actors worked with specific directors?''
 Merging here is simple: we simply identify \textit{the common column} which
 unites rows from the two tables. Clearly, it's the film title: we know that
 Robert Downey Jr. was directed by Joss Whedon because a Downey-Jr. row in the
-\texttt{roles} table has the same film name as a film in a Whedon row in the
+\texttt{roles} table has the same film name as a Whedon row in the
 \texttt{movies} table.
 
+\index{primary key (PK)}
+\index{foreign key (PK)}
+\index{key}
 In database parlance, we call the \texttt{title} column of the \texttt{movies}
 table its \textbf{primary key} (PK), and we call the \texttt{film} column of
 the \texttt{roles} table a \textbf{foreign key} (FK). The primary key /
@@ -118,7 +123,7 @@ To ``join'' these two \texttt{DataFrame}s all in one fell swoop, we execute a co
 like this:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-roles_movies = pd.merge(roles,movies,left_on="film",right_on="title")
+roles_movies = pd.merge(roles, movies, left_on="film", right_on="title")
 \end{Verbatim}
 
 This produces a new \texttt{DataFrame} that contains (1) all the columns of the
@@ -161,7 +166,7 @@ operations if you wish.
 \item Sometimes we want to merge on more than one column; for instance:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-df = pd.merge(votes,contribs,left_on=['first_name','last_name'],
+df = pd.merge(votes, contribs, left_on=['first_name','last_name'],
         right_on=['candidate_first','candidate_last'])
 \end{Verbatim}
 
@@ -191,15 +196,15 @@ corresponding null values if necessary. We can do this by specifying
 \texttt{\textquotesingle how\textquotesingle } argument to \texttt{pd.merge()}:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-df = pd.merge(votes,contribs,left_on=['first_name','last_name'],
-        right_on=['candidate_first','candidate_last'],how='outer')
+df = pd.merge(votes, contribs, left_on=['first_name','last_name'],
+        right_on=['candidate_first','candidate_last'], how='outer')
 \end{Verbatim}
 
 \index{name collision}
 
 \item Sometimes merging two \texttt{DataFrame}s will result in column
 \textbf{name collision}s. Suppose, for example, that our \texttt{roles} table
-had had a \texttt{year} column indicating the birth year of the actor:
+had also had a \texttt{year} column indicating the birth year of the actor:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
                             roles:
@@ -231,39 +236,70 @@ DiCaprio   1974     Inception  59                  Inception  Nolan      2010
 (which, of course, you can rename at will via
 ``\texttt{roles\_movies.columns}''.)
 
-\item Finally, the above examples have all featured ``one-to-many''
-relationships between the two tables. (\textit{Many} actors star in
-\textit{one} movie.) But sometimes we have a ``many-to-many'' relationship.
-Consider the Halloween costumes data set below:
+\end{enumerate}
+
+\section{One-to-many and many-to-many relationships}
+
+\index{one-to-many@``one-to-many'' relationship}
+\index{many-to-many@``many-to-many'' relationship}
+
+The above examples have featured ``\textbf{one-to-many}'' relationships between
+the two tables. This means that one of the \texttt{DataFrame}'s columns (the
+one with the primary key) has only \textit{one} row for each matching value:
+\textit{many} actors star in \textit{one} movie, for instance. But sometimes we
+have a ``\textbf{many-to-many}'' relationship, in which both
+\texttt{DataFrame}s can have multiple rows with values that match the other.
+Consider the Halloween costumes data set below, with \texttt{costumes} and
+\texttt{children} tables:
 
 %\begin{samepage}
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 print(costumes)
 \end{Verbatim}
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-    accessory      costume
-0      helmet  Darth Vader
-1  lightsaber  Darth Vader
-2       crown     Princess
-3        wand     Princess
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+       accessory      costume
+0          crown     Princess
+1           wand     Princess
+2          dress     Princess
+3         helmet  Darth Vader
+4          boots  Darth Vader
+5     lightsaber  Darth Vader
+6           cape  Darth Vader
+7           cape         Elsa
+8           wand         Elsa
+9     lightsaber          Rey
+10  utility belt       Batman
+11         boots       Batman
+12          cape       Batman
+13          mask       Batman
+14          cape         Anna
+15           wig         Anna
+16         boots         Anna
+17          sack        Ghost
+18    pointy hat       Wizard
+19          wand       Wizard
 \end{Verbatim}
 %\end{samepage}
 
 \begin{samepage}
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 print(children)
 \end{Verbatim}
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-       child      costume
-0     Johnny  Darth Vader
-1        Sam  Darth Vader
-2  Betty Lou     Princess
-3    Wendell      Student
-4      Kiara     Princess
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+       child  age   costume
+0    Allison   12      Elsa
+1      Kiara    8  Princess
+2      Mason   12    Batman
+3      Jenny   12    Wizard
+4    Wendell   11   Student
+5  Betty Lou   10  Princess
+6   Hermione   11    Wizard
+7      Faith   13    Wizard
+8      Julie   11      Elsa
 \end{Verbatim}
 \end{samepage}
 
@@ -273,21 +309,34 @@ because each \texttt{Princess} has more than one accessory, and there are also
 multiple children who want to \textit{be} princesses. Therefore, we can
 potentially end up with a lot of rows in our result.
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-print(pd.merge(costumes, children, on="costume"))
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+children_costumes = pd.merge(children, costumes, on="costume")
+print(children_costumes)
 \end{Verbatim}
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-    accessory      costume      child
-0      helmet  Darth Vader     Johnny
-1      helmet  Darth Vader        Sam
-2  lightsaber  Darth Vader     Johnny
-3  lightsaber  Darth Vader        Sam
-4       crown     Princess  Betty Lou
-5       crown     Princess      Kiara
-6        wand     Princess  Betty Lou
-7        wand     Princess      Kiara
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+        child  age   costume     accessory
+0     Allison   12      Elsa          cape
+1     Allison   12      Elsa          wand
+2       Julie   11      Elsa          cape
+3       Julie   11      Elsa          wand
+4       Kiara    8  Princess         crown
+5       Kiara    8  Princess          wand
+6       Kiara    8  Princess         dress
+7   Betty Lou   10  Princess         crown
+8   Betty Lou   10  Princess          wand
+9   Betty Lou   10  Princess         dress
+10      Mason   12    Batman  utility belt
+11      Mason   12    Batman         boots
+12      Mason   12    Batman          cape
+13      Mason   12    Batman          mask
+14      Jenny   12    Wizard    pointy hat
+15      Jenny   12    Wizard          wand
+16   Hermione   11    Wizard    pointy hat
+17   Hermione   11    Wizard          wand
+18      Faith   13    Wizard    pointy hat
+19      Faith   13    Wizard          wand
 \end{Verbatim}
 
 \index{Wendell}
@@ -299,31 +348,139 @@ print(pd.merge(costumes, children, on="costume"))
 
 Btw, notice that poor \texttt{Wendell} was left out of the merged
 \texttt{DataFrame} entirely, since his costume did not have any accessories. We
-can include him by doing a ``\textbf{right join}'' (or full ``\textbf{outer
-join}'') like this:
+can include him by doing a ``\textbf{left join}'' (or even a full
+``\textbf{outer join}'') like this:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-pd.merge(costumes, children, on="costume", how="outer")
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+children_costumes = pd.merge(children, costumes, on="costume", how="left"))
+print(children_costumes)
+\end{Verbatim}
+
+\index{NaN@\texttt{NaN} (``not a number'')}
+This produces the output in Figure~\ref{withWendell}. \texttt{Wendell}'s entry
+can now be found on line 11. The ``\texttt{NaN}'' is the placeholder Pandas
+uses for rows that didn't match when doing a left/right/outer join.
+
+\begin{figure}[ht]
+\centering
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+                    child  age   costume     accessory
+            0     Allison   12      Elsa          cape
+            1     Allison   12      Elsa          wand
+            2       Kiara    8  Princess         crown
+            3       Kiara    8  Princess          wand
+            4       Kiara    8  Princess         dress
+            5       Mason   12    Batman  utility belt
+            6       Mason   12    Batman         boots
+            7       Mason   12    Batman          cape
+            8       Mason   12    Batman          mask
+            9       Jenny   12    Wizard    pointy hat
+            10      Jenny   12    Wizard          wand
+            11    Wendell   11   Student           NaN
+            12  Betty Lou   10  Princess         crown
+            13  Betty Lou   10  Princess          wand
+            14  Betty Lou   10  Princess         dress
+            15   Hermione   11    Wizard    pointy hat
+            16   Hermione   11    Wizard          wand
+            17      Faith   13    Wizard    pointy hat
+            18      Faith   13    Wizard          wand
+            19      Julie   11      Elsa          cape
+            20      Julie   11      Elsa          wand
+\end{Verbatim}
+\caption{The result of a left join, which includes even children whose costumes
+have no accessories (and therefore are not present in the \texttt{accessories}
+\texttt{DataFrame}.}
+\label{withWendell}
+\end{figure}
+
+We're now in a position to perform our analyses. For instance, we could
+assemble a grand shopping list:
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+print(children_costumes.accessory.value_counts())
 \end{Verbatim}
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-    accessory      costume      child
-0      helmet  Darth Vader     Johnny
-1      helmet  Darth Vader        Sam
-2  lightsaber  Darth Vader     Johnny
-3  lightsaber  Darth Vader        Sam
-4       crown     Princess  Betty Lou
-5       crown     Princess      Kiara
-6        wand     Princess  Betty Lou
-7        wand     Princess      Kiara
-8         NaN      Student    Wendell
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+wand            7
+cape            3
+pointy hat      3
+crown           2
+dress           2
+mask            1
+utility belt    1
+boots           1
+Name: accessory, dtype: int64
 \end{Verbatim}
 
-\end{enumerate}
+If the wand product turns out to have a safety hazard, we could find all
+children younger than a certain age who were issued wands:
 
-The ``\texttt{NaN}'' is the placeholder Pandas uses for rows that didn't match
-when doing a left/right/outer join.
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+print(children_costumes[(children_costumes.age < 10) & 
+    (children_costumes.accessory=="wand")])
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+3  Kiara    8  Princess      wand
+\end{Verbatim}
+
+Or, if we had another \texttt{DataFrame} with \texttt{accessory} prices:
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+print(accessories)
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+       accessory  cost
+0          boots    14
+1           cape    11
+2          crown    12
+3          dress    22
+4         helmet    20
+5     lightsaber     9
+6           mask    10
+7     pointy hat    12
+8           sack     1
+9   utility belt     9
+10          wand     6
+11           wig    12
+\end{Verbatim}
+
+we could merge \textit{this} \texttt{DataFrame} with our previously merged one,
+thereby producing a three-way merge:
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+full = pd.merge(children_costumes, accessories, on="accessory")
+print(full)
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+        child  age   costume     accessory  cost
+0     Allison   12      Elsa          cape    11
+1       Mason   12    Batman          cape    11
+2       Julie   11      Elsa          cape    11
+                        .
+                        .
+                        .
+\end{Verbatim}
+
+Now we could, say, compute the total cost of clothing these trick-or-treaters:
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+print("These kids will cost a total of ${}.".format(full.cost.sum()))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+These kids will cost a total of $212.
+\end{Verbatim}
+
+Ouch.
+
 
 \section{``By the way...why?''}
 
@@ -334,11 +491,13 @@ first place? Why not just have everything in one big CSV file?''
 \index{redundancy (of information)}
 
 The answer has to do with \textbf{redundancy of information}. Consider the
-merged table on p.~\pageref{roles_movies}). It's not the most compact way of
+merged table on p.~\pageref{roles_movies}. It's not the most compact way of
 expressing the information, because certain pieces of data are repeated
 unnecessarily.
 
 \index{unnormalized (data set)}
+\index{Pandora's Box}
+\index{contradiction}
 
 For instance, \textit{The Avengers} was released in 2012. Our data source
 needs to record that. But in the merged table, this year would be repeated
@@ -349,7 +508,7 @@ isn't always a bad thing, and in terms of performing standard ML (machine
 learning) algorithms, it's necessary. But you can see why we wouldn't want the
 data permanently stored that way. It consumes extra storage, plus it opens a
 Pandora's Box of possible contradictions: what if \texttt{Downey Jr.}'s
-\texttt{The Avengers} row said 2012, while \texttt{Johansson}'s said 2014. Who
+\texttt{Avengers} row said 2012, while \texttt{Johansson}'s said 2014. Who
 would we believe?
 
 \index{normalized (data set)}
@@ -361,138 +520,4 @@ speaking, when that's true, you have a \textbf{normalized} data set, which is
 most appropriate for storage and for communication to other potential users.
 Analysts will proceed to unnormalize select parts of it in order to perform
 certain analyses.
-
-\section{``Tidy'' data}
-
-The term ``tidy'' to describe a data set has sprung into prominence recently
-as a result of the excellent paper by Hadley Wickham (of R fame) who neatly
-captured the perils of various data formatting choices.
-
-\begin{compactitem}
-\item \textbf{variable} -- a category of something, for which individual
-objects have a value. For example: height, gender, center\_field\_distance,
-name.
-\item \textbf{value} -- an actual individual piece of data corresponding to a
-variable for one object. For example: 5'6", female, 390 feet, Kylo Ren.
-\item \textbf{observation} -- a particular measurement that comprises all the
-information necessary to interpret that measurement. For example: Jeff's
-weight was 165 lbs., Jenny's golf score at Field \& Cross Links in the rain
-was 88. (In the first example, ``all the information necessary'' includes
-``Jeff'' and ``165''; in the second, it includes ``Jenny'', ``Field \& Cross
-Links'', ``rainy'', and ``88''.)
-\item \textbf{observational unit} -- a collection of all the observations of a
-particular type. (``Golf performances'' would be an observational unit,
-separate from a ``golfers'' unit which contains information about golfers
-themselves, not their particular performances.)
-\end{compactitem}
-
-\vspace{.2in}
-The rule is: a data set is considered \textbf{tidy} if and only if:
-\begin{compactenum}
-\item Each observational unit is in its own table. (This is essentially
-the same as ``normalized,'' from the previous section.)
-\item In each table, each observation forms a row.
-\item In each table, each column header is a variable, and the column contains
-values.
-\end{compactenum}
-
-\vspace{.2in}
-This is best visualized by looking at examples of \textit{un}tidy data sets
-and rectifying them. Here's one:
-\small
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-            religion   <$10k   $10-20k  $20-30k  $30-40k   $40-50k  $50-75k
-0           Agnostic      27        34       60       81        76      137
-1            Atheist      12        27       37       52        35       70
-2           Buddhist      27        21       30       34        33       58
-3           Catholic     418       617      732      670       638     1116
-4  Dont know/refused      15        14       15       11        10       35
-...
-\end{Verbatim}
-\normalsize
-
-The problem here is that \textit{the column headings are actually values, not
-variables}. Think about it: ``\texttt{\$10-20k}'' isn't the name of a variable
-which might have actual values, but the value (range) itself of some variable.
-
-Two questions: (1) What would the variable be for these column values? Answer:
-\textit{Income.} (2) What are the cells themselves representing? Answer:
-\textit{Frequency.} (\textit{i.e.}, the number of people polled in the survey
-who had that religion and that income level.)
-
-We tidy this with the \texttt{pd.melt()} function:
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-tdf = pd.melt(df, ['religion'], var_name='income', value_name='frequency')
-\end{Verbatim}
-
-which gives us the tidy version:
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-                               religion    income  frequency
-           0                   Agnostic     <$10k         27
-           1                    Atheist     <$10k         12
-           2                   Buddhist     <$10k         27
-           3                   Catholic     <$10k        418
-          ...
-\end{Verbatim}
-
-(Sometimes you'll hear the terms ``\textbf{wide}'' and ``\textbf{long}'' to
-refer to the untidy and tidy formats in this sort of example, respectively.)
-
-By the way, the inverse operation of ``melt'' is often called
-``\textbf{pivot}''. To reverse the above transformation in Pandas, you should
-use:
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-df = tdf.pivot(index='religion',columns='income')
-\end{Verbatim}
-
-for this operation.
-
-
-% Exercise:
-% load http://cs.umw.edu/~stephen/data219/students.csv and tidy it to:
-%
-%                      students
-%            name  year major    school  creds
-%   Mal A. Kenobi  Soph  ECON       UMW     32
-%  Jay O. Aniston   Sen  ECON  Richmond     92
-%
-%               gpas
-%             name year   GPA
-%   Mal A. Kenobi   So  2.47
-%  Jay O. Aniston   Sr  2.30
-%      (no NaNs)
-%
-%           schools
-%    school     type   mascot
-%       UMW   public   Eagles
-%  Richmond  private  Spiders
-%
-% DELETE the original table.
-% now add a column for "urban/rural" to schools table. (We'll call Richmond,
-% Fredericksburg, and Charlottesville urban, and the others rural.)
-%
-% how many students are there?
-% how many total year-GPA measurements are there?
-% what's the overall GPA?
-% how many students in rural vs. urban schools?
-% average freshman GPA in rural vs. urban schools?
-% visual: do freshmen vs. non-freshmen GPAs differ? (will require another col)
-% visual: does avg GPA vary by major? by school? (will require another col)
-% scatterplot of creds vs. average-yearly-GPA (ditto)
-%
-% helpful:
-% 1) after splitting out school into separate df:
-%  df.drop_duplicates()
-% 2) to remove NaN's from GPAs once melted:
-%  np.isnan(...)   <-- a ufunc
-%  ~   <-- boolean "not" operator
-%  (to set up: "gpas = gpas[~np.isnan(gpas.GPA)]")
-%  (could also do: "gpas.drop(gpas.index[np.isnan(gpas.GPA)])")
-% 3) df.col.str   to perform string operations as ufunc
-%  (to set up: "gpa.year = gpa.year.str[3:]")
-%
-% 
-
 
