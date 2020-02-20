@@ -44,6 +44,7 @@ us to ask many questions easily, like:
 (\texttt{g[g.name=="Mal"].mean(axis=1)})
 \end{compactitem}
 
+\smallskip
 Other kinds of questions, though, defy easy answers, like these:
 
 \begin{compactitem}
@@ -223,12 +224,11 @@ these terms:
 
 \begin{compactitem}
 \item \textbf{variable} -- a category of something, for which individual
-objects have a value. For example: height, gender, center\_field\_distance,
-name.
+objects have a value. Examples: name, height, gender, center field distance.
 \item \textbf{value} -- an actual individual piece of data corresponding to a
-variable for one object. For example: 5'6", female, 390 feet, Kylo Ren.
+variable for one object. Examples: Kylo Ren, 5'6", female, 390 feet.
 \item \textbf{observation} -- a particular measurement that comprises all the
-information necessary to interpret that measurement. For example: Jeff's
+information necessary to interpret that measurement. Examples: Jeff's
 weight was 165 lbs., Jenny's golf score at Field \& Cross Links in the rain
 was 88. (In the first example, ``all the information necessary'' includes
 ``Jeff'' and ``165''; in the second, it includes ``Jenny'', ``Field \& Cross
@@ -246,12 +246,15 @@ themselves, not their particular performances.)
 Then, he outlined one simple rule. A data set is considered \textbf{tidy} if
 and only if:
 
+\definecolor{shadecolor}{rgb}{.9,.9,.9}
+\begin{shaded}
 \begin{compactenum}
 \item \label{ownTable} Each observational unit is in its own table.
 \item \label{obsRow} In each table, each observation forms a row.
 \item \label{colHeader} In each table, each column header is a variable, and
 the column contains values.
 \end{compactenum}
+\end{shaded}
 
 \index{normalized (data set)}
 
