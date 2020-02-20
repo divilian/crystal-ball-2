@@ -1,0 +1,414 @@
+
+\chapter{Long, wide, and ``tidy'' data}
+
+\section{Wide form data}
+
+Consider the following \texttt{DataFrame} (called ``\texttt{g}''), which
+contains a professor's grade book for his students:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(g)
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+       name year    Q1    Q2    Q3    Q4    Q5    Q6    Q7    Q8
+0   Beyonce   So   9.0  10.0   7.0  10.0   8.0  10.0   9.0  10.0
+1     Jay-Z   Jr   7.0  10.0   4.0  10.0  10.0   8.0   3.0  10.0
+2    Bortis   Sr   8.0  10.0   7.0   3.0   7.0   7.0   7.0   9.0
+3       Han   So   NaN   1.0   NaN  10.0   7.0   8.0   7.0   2.0
+4       Mal   Jr   5.0   4.0   9.0   NaN   7.0   2.0   5.0  10.0
+5     Inara   Jr   3.0   3.0   4.0  10.0   6.0   4.0   7.0   5.0
+6   Obi-wan   So   5.0  10.0   9.0   4.0   1.0   4.0   NaN   2.0
+7      Finn   Jr   6.0   3.0   5.0   6.0  10.0   NaN   NaN   3.0
+\end{Verbatim}
+
+It's not hard to tell what's going on: each student's name and year in school
+is recorded, as is their grade on the eight class quizzes. Some students took
+zeroes on one of more quizzes (like \texttt{Han} did for quizzes 1 and 3), and
+the quiz grades range from 0 to 10.
+
+\index{wide form}
+
+The structural style for this kind of \texttt{DataFrame} is called \textbf{wide
+form}. Each piece of a student's data is in its own column, making the
+\texttt{DataFrame} quite ``wide,'' and comparatively not very long (tall).
+
+Now there's nothing wrong with wide form. All the data is there, and it allows
+us to ask many questions easily, like:
+
+\begin{compactitem}
+\item[\leftthumbsup] What was Inara's score on Quiz \#5? \ (\texttt{g[g.name=="Inara"].Q5})
+\item[\leftthumbsup] What was the high score on Quiz \#3? \ (\texttt{g.Q3.max()})
+\item[\leftthumbsup] What was Mal's average quiz score? \ 
+(\texttt{g[g.name=="Mal"].mean(axis=1)})
+\end{compactitem}
+
+Other kinds of questions, though, defy easy answers, like these:
+
+\begin{compactitem}
+\item[\leftthumbsdown] What was the overall average score (for all quizzes)? \ (?)
+\item[\leftthumbsdown] How did class performance compare between the first half
+of the semester (quizzes 1-4) and the second half (quizzes 5-8)? \ (?)
+\item[\leftthumbsdown] How did freshmen, sophomores, juniors, and seniors
+compare? \ (?)
+\end{compactitem}
+
+The reason these questions are difficult are that we have quiz scores spread
+across different columns. As long as we're happy treating them in groups like
+that, it's easy, but as soon as we want to carve up the quiz scores in some
+other way, it becomes hard.
+
+\section{Long form data}
+
+\index{melt@\texttt{melt()} (Pandas)}
+
+The solution is to convert the \texttt{DataFrame} to a structure which
+collapses all the quiz data into a single column. For this, we use the
+\texttt{melt()} function from the Pandas package:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+gl = pd.melt(g, ["name","year"], var_name="quiz", value_name="score")
+\end{Verbatim}
+
+Now this is kind of complicated so pay attention. 
+
+\index{list}
+
+\begin{compactitem}
+
+\item The first argument is the name of the wide-form \texttt{DataFrame} you
+want to ``melt.''
+
+\item The second argument is a list of the columns \textit{that you want to
+leave alone.} In other words, a list of ``off-limits'' columns that you want
+Pandas \textit{not} to melt.
+
+\item The third argument, named \texttt{var\_name}, is \textit{the name you
+want for your new column whose values will be the old column
+\underline{names}.} It can be hard to get your head around this one. You have
+to imagine all the current column names that you're melting being put in a
+column, and ask yourself: ``what is the right name for that new column?'' In
+this case, since we're melting \texttt{Q1}, \texttt{Q2}, \textit{etc.}, the
+right name for the column is something like ``\texttt{quiz},'' since those are
+the quiz numbers.
+
+\item Finally, the fourth argument, named \texttt{value\_name}, is \textit{the
+name you want for your new column whose values will be the old column's
+\underline{values}.} You have to ask yourself: ``what are those 'things' that
+are currently values in the \texttt{Q1}, \texttt{Q2}, \textit{etc.} columns?''
+A reasonable answer would be ``\texttt{score},'' since each one is a quiz
+score.
+
+\end{compactitem}
+
+We set the result of the \texttt{melt()} call to a variable called \texttt{gl}
+(where ``\texttt{l}'' stands for ``long.'') Here's what it looks like:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(gl)
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm,xleftmargin=2cm]
+       name year quiz  score
+0   Beyonce   So   Q1    9.0
+1     Jay-Z   Jr   Q1    7.0
+2    Bortis   Sr   Q1    8.0
+3       Han   So   Q1    NaN
+4       Mal   Jr   Q1    5.0
+5     Inara   Jr   Q1    3.0
+6   Obi-wan   So   Q1    5.0
+7      Finn   Jr   Q1    6.0
+8   Beyonce   So   Q2   10.0
+9     Jay-Z   Jr   Q2   10.0
+10   Bortis   Sr   Q2   10.0
+11      Han   So   Q2    1.0
+12      Mal   Jr   Q2    4.0
+13    Inara   Jr   Q2    3.0
+14  Obi-wan   So   Q2   10.0
+15     Finn   Jr   Q2    3.0
+16  Beyonce   So   Q3    7.0
+17    Jay-Z   Jr   Q3    4.0
+18   Bortis   Sr   Q3    7.0
+19      Han   So   Q3    NaN
+20      Mal   Jr   Q3    9.0
+21    Inara   Jr   Q3    4.0
+22  Obi-wan   So   Q3    9.0
+23     Finn   Jr   Q3    5.0
+            . . .
+60      Mal   Jr   Q8   10.0
+61    Inara   Jr   Q8    5.0
+62  Obi-wan   So   Q8    2.0
+63     Finn   Jr   Q8    3.0
+\end{Verbatim}
+
+\index{long form}
+
+This is called \textbf{long form}, for obvious reasons. We now have one row for
+every single quiz score. It might seem wordy, and I'll admit it's not as
+easy to locate and eyeball a single result. However, all our ``hard'' questions
+from above can be easily answered:
+
+\begin{compactitem}
+\item[\leftthumbsup] What was the overall average score (for all quizzes)? \
+(\texttt{gl.score.mean()})
+\item[\leftthumbsup] How did class performance compare between the first half
+of the semester (quizzes 1-4) and the second half (quizzes 5-8)? \\
+(\texttt{gl[gl.quiz.isin(["Q1","Q2","Q3","Q4"])].mean()})
+\item[\leftthumbsup] How did freshmen, sophomores, juniors, and seniors
+compare? \\ (\texttt{gl.groupby("year").score.mean()})
+\end{compactitem}
+
+Turning what were column headings into \textit{values} gave us all the
+flexibility we needed. We can still treat all the scores individually by quiz
+if we want to, but we can also treat them as a whole, or aggregate them in
+other ways (like by school year).
+
+As an aside, one thing I'd probably do to this \texttt{DataFrame} is get rid of
+the leading ``\texttt{Q}'' before each \texttt{quiz} value, and convert that
+column to integers to boot:
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm,xleftmargin=1cm]
+gl.quiz = gl.quiz.str[1]
+gl.quiz = gl.quiz.astype(int)
+print(gl)
+\end{Verbatim}
+
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm,xleftmargin=1cm]
+       name year  quiz  score
+0   Beyonce   So     1    9.0
+1     Jay-Z   Jr     1    7.0
+2    Bortis   Sr     1    8.0
+3       Han   So     1    NaN
+4       Mal   Jr     1    5.0
+5     Inara   Jr     1    3.0
+6   Obi-wan   So     1    5.0
+7      Finn   Jr     1    6.0
+8   Beyonce   So     2   10.0
+9     Jay-Z   Jr     2   10.0
+10   Bortis   Sr     2   10.0
+11      Han   So     2    1.0
+12      Mal   Jr     2    4.0
+13    Inara   Jr     2    3.0
+14  Obi-wan   So     2   10.0
+15     Finn   Jr     2    3.0
+16  Beyonce   So     3    7.0
+17    Jay-Z   Jr     3    4.0
+18   Bortis   Sr     3    7.0
+\end{Verbatim}
+
+\index{str suffix@\texttt{.str} suffix (Pandas)}
+
+The ``\texttt{.str}'' suffix, you'll recall, lets us perform standard string
+operations (like \texttt{len()}, \texttt{contains()}, or indexing) on entire
+\texttt{DataFrame} columns. Here, by saying ``\texttt{gl.quiz.str[1]}'', we're
+requesting only the \textit{second} character (character \#1) of each string,
+which extracts the ``\texttt{1}'' from ``\texttt{Q1}'' and so forth.
+
+Treating quiz numbers like the integers they are is conceptually correct, and
+also allows us to do things like query for things like ``quizzes after quiz
+\#3'' instead of having to list a bunch of categorical values.
+
+\section{``Tidy'' data}
+
+\index{Wickham, Hadley}
+
+The term ``tidy'' to describe a data set has sprung into prominence recently
+as a result of the excellent paper by Hadley Wickham (of R fame) who neatly
+captured the perils of various data formatting choices. Hadley first defines
+these terms:
+
+\begin{compactitem}
+\item \textbf{variable} -- a category of something, for which individual
+objects have a value. For example: height, gender, center\_field\_distance,
+name.
+\item \textbf{value} -- an actual individual piece of data corresponding to a
+variable for one object. For example: 5'6", female, 390 feet, Kylo Ren.
+\item \textbf{observation} -- a particular measurement that comprises all the
+information necessary to interpret that measurement. For example: Jeff's
+weight was 165 lbs., Jenny's golf score at Field \& Cross Links in the rain
+was 88. (In the first example, ``all the information necessary'' includes
+``Jeff'' and ``165''; in the second, it includes ``Jenny'', ``Field \& Cross
+Links'', ``rainy'', and ``88''.)
+\item \textbf{observational unit} -- a collection of all the observations of a
+particular type. (``Golf performances'' would be an observational unit,
+separate from a ``golfers'' unit which contains information about golfers
+themselves, not their particular performances.)
+\end{compactitem}
+
+\index{tidy@``tidy'' data}
+
+\vspace{.2in}
+
+Then, he outlined one simple rule. A data set is considered \textbf{tidy} if
+and only if:
+
+\begin{compactenum}
+\item \label{ownTable} Each observational unit is in its own table.
+\item \label{obsRow} In each table, each observation forms a row.
+\item \label{colHeader} In each table, each column header is a variable, and
+the column contains values.
+\end{compactenum}
+
+\index{normalized (data set)}
+
+Point \#\ref{ownTable} is essentially the same as ``normalized,'' from
+section~\ref{normalized} (p.\pageref{normalized}). Points \#\ref{obsRow} and
+\#\ref{colHeader} are essentially ``long form,'' as described in the previous
+section. Hence, I usually think of ``tidy'' as meaning ``normalized and long.''
+
+Our \texttt{gl} grade book was long, but not tidy, because it had repeated
+information in it: namely, every student's \texttt{year} was repeated for every
+one of their quiz scores. To normalize it, we'd want to divide it into two
+tables; say, \texttt{student\_years} and \texttt{grades}:
+
+\index{double boxies@``double boxies''}
+\index{drop\_duplicates@\texttt{.drop\_duplicates()} (Pandas)}
+\index{drop@\texttt{.drop()} (Pandas)}
+\index{axis argument@\texttt{axis} argument}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+student_years = gl[['name','year']].drop_duplicates()
+grades = gl.drop('year',axis=1)
+\end{Verbatim}
+
+The \texttt{.drop\_duplicates()} method gets rid of identical rows, retaining
+only one. The \texttt{.drop()} method keeps all columns except for one, which
+is convenient if you don't want to type all the names of the ones you want to
+keep. (``\texttt{axis=1}'' means ``I'm talking about columns here, not rows.'')
+
+Our two remaining (tidy!) \texttt{DataFrames} are now:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm,xleftmargin=1cm]
+print(student_years)               print(grades)
+\end{Verbatim}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm,xleftmargin=1cm]
+      name year                           name  quiz  score
+0  Beyonce   So                    0   Beyonce     1    9.0
+1    Jay-Z   Jr                    1     Jay-Z     1    7.0
+2   Bortis   Sr                    2    Bortis     1    8.0
+3      Han   So                    3       Han     1    NaN
+4      Mal   Jr                    4       Mal     1    5.0
+5    Inara   Jr                    5     Inara     1    3.0
+6  Obi-wan   So                    6   Obi-wan     1    5.0
+7     Finn   Jr                    7      Finn     1    6.0
+                                   8   Beyonce     2   10.0
+                                   9     Jay-Z     2   10.0
+                                   10   Bortis     2   10.0
+                                   11      Han     2    1.0
+                                   12      Mal     2    4.0
+                                   13    Inara     2    3.0
+                                   14  Obi-wan     2   10.0
+                                   15     Finn     2    3.0
+                                   16  Beyonce     3    7.0
+                                   17    Jay-Z     3    4.0
+                                   18   Bortis     3    7.0
+\end{Verbatim}
+
+Every piece of information in one and only one place. Very tidy indeed.
+
+\subsection{Messy data sets}
+
+Some data sets don't make it easy on us. Check out this decidedly
+\textit{un}tidy one, which contains survey results about income and religious
+affiliation:
+
+\small
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+            religion   <$10k   $10-20k  $20-30k  $30-40k   $40-50k  $50-75k
+0           Agnostic      27        34       60       81        76      137
+1            Atheist      12        27       37       52        35       70
+2           Buddhist      27        21       30       34        33       58
+3           Catholic     418       617      732      670       638     1116
+4  Dont know/refused      15        14       15       11        10       35
+...
+\end{Verbatim}
+\normalsize
+
+As before, the problem here is that \textit{the column headings are actually
+values, not variables}. Think about it: ``\texttt{\$10-20k}'' isn't the name of
+a variable which might have actual values, but the value (range) itself of some
+variable.
+
+Again the two questions: (1) What would the variable be for these column
+values? Answer: \textit{Income.} (2) What are the cells themselves
+representing? Answer: \textit{Frequency.} (\textit{i.e.}, the number of people
+polled in the survey who had that religion and that income level.)
+
+Now we can tidy this with \texttt{melt()}:
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+tdf = pd.melt(df, ['religion'], var_name='income', value_name='frequency')
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+       religion    income  frequency
+  0    Agnostic     <$10k         27
+  1     Atheist     <$10k         12
+  2    Buddhist     <$10k         27
+  3    Catholic     <$10k        418
+ ...
+\end{Verbatim}
+
+\index{pivot}
+
+By the way, the inverse operation of ``melt'' is often called
+``\textbf{pivot}''. To reverse the above transformation in Pandas, you can use
+the \texttt{.pivot()} method:
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+wide = long.pivot(index='religion', columns='income', values='frequency')
+\end{Verbatim}
+
+and get back your original wide form \texttt{DataFrame}.
+
+
+% Exercise:
+% load http://cs.umw.edu/~stephen/data219/students.csv and tidy it to:
+%
+%                      students
+%            name  year major    school  creds
+%   Mal A. Kenobi  Soph  ECON       UMW     32
+%  Jay O. Aniston   Sen  ECON  Richmond     92
+%
+%               gpas
+%             name year   GPA
+%   Mal A. Kenobi   So  2.47
+%  Jay O. Aniston   Sr  2.30
+%      (no NaNs)
+%
+%           schools
+%    school     type   mascot
+%       UMW   public   Eagles
+%  Richmond  private  Spiders
+%
+% DELETE the original table.
+% now add a column for "urban/rural" to schools table. (We'll call Richmond,
+% Fredericksburg, and Charlottesville urban, and the others rural.)
+%
+% how many students are there?
+% how many total year-GPA measurements are there?
+% what's the overall GPA?
+% how many students in rural vs. urban schools?
+% average freshman GPA in rural vs. urban schools?
+% visual: do freshmen vs. non-freshmen GPAs differ? (will require another col)
+% visual: does avg GPA vary by major? by school? (will require another col)
+% scatterplot of creds vs. average-yearly-GPA (ditto)
+%
+% helpful:
+% 1) after splitting out school into separate df:
+%  df.drop_duplicates()
+% 2) to remove NaN's from GPAs once melted:
+%  np.isnan(...)   <-- a ufunc
+%  ~   <-- boolean "not" operator
+%  (to set up: "gpas = gpas[~np.isnan(gpas.GPA)]")
+%  (could also do: "gpas.drop(gpas.index[np.isnan(gpas.GPA)])")
+% 3) df.col.str   to perform string operations as ufunc
+%  (to set up: "gpa.year = gpa.year.str[3:]")
+%
+% 
