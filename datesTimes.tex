@@ -461,8 +461,39 @@ sign, this gets rid of it. We then convert the column type from string to
 quantities they actually are.
 
 
+\subsubsection{Converting strings to dates with \texttt{to\_datetime()}}
+
+The above technique works if you're reading dates directly from a \texttt{.csv}
+file. But if you already have some data in memory that consists of strings in
+date format, you need a different solution.
+
+Pandas' \texttt{to\_datetime()} method is that solution. All you have to do is
+pass it a \texttt{Series} (or NumPy array) with your strings, and it returns
+the \texttt{datetime} equivalents:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+revolutions_strings = pd.Series(["March 8, 1917", "4-July-1776",
+    "5/5/1789", "Jan. 5 2011"])
+revolutions_actual_dates = pd.to_datetime(revolutions_strings)
+print(revolutions_actual_dates)
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+0   1917-03-08
+1   1776-07-04
+2   1789-05-05
+3   2011-01-05
+dtype: datetime64[ns]
+\end{Verbatim}
 
 \subsection{Parsing with \texttt{.strptime()}}
+
+Sometimes you're not so lucky. Perhaps the string data you're blessed with has
+some ungodly format to it that can't be automatically recognized. In these
+cases, you have to do it manually.
+
+\index{strptime@\texttt{.strptime()} method (datetime)}
 
 The \texttt{date}, \texttt{time}, and \texttt{datetime} types all have a
 (somewhat clunky) method called ``\texttt{.strptime()}'' that you can call,
@@ -470,12 +501,15 @@ passing (1) a string representing a date, time, or datetime, and (2) a
 formatting string telling the method how to interpret it. This is best seen
 through an example:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 my_string = "2/20/2019 14:00"
 start_of_class = dt.datetime.strptime(my_string, "%m/%d/%Y %H:%M")
+print(start_of_class)
+\end{Verbatim}
+\vspace{-.2in}
 
->>> print(start_of_class)
-    2019-02-20 14:00:00
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+2019-02-20 14:00:00
 \end{Verbatim}
 
 This example demonstrates a full ``round-trip'' operation: we started with a
@@ -486,32 +520,36 @@ internally to our program is that our date \& time variables \textit{represent}
 the right things, not that they are printed in certain ways.
 
 Now what are all those funky percent signs and junk in the second argument to
-\texttt{.strptime()}? They all have a special meaning. Here are some common
-ones (others are in the docs):
+\texttt{.strptime()}? They all have a special meaning. Figure~\ref{datetimeids}
+shows some common ones (others are in the docs).
 
-\begin{center}
+\begin{figure}[ht]
+\centering
 \begin{tabular}{|c|l|}
 \hline
-\%a & Weekday (abbreviated): Sun, Mon, \textit{etc.} \\
-\%A & Weekday (full): Sunday, Monday, \textit{etc.} \\
-\%w & Weekday (number): 0, 1, ..., 6 \\
-\%d & Day of month (number): 0, 1, ..., 31 \\
-\%b & Month (abbreviated): Jan, Feb, \textit{etc.} \\
-\%B & Month (full): January, February, \textit{etc.} \\
-\%m & Month (number): 01, 02, ..., 12 \\
-\%y & \textbf{Two}-digit year: 00, 01, ..., 99 \\
-\%Y & \textbf{Four}-digit year: ..., 1999, 2000, 2001, ...\\
+\texttt{\%a} & Weekday (abbreviated): Sun, Mon, \textit{etc.} \\
+\texttt{\%A} & Weekday (full): Sunday, Monday, \textit{etc.} \\
+\texttt{\%w} & Weekday (number): 0, 1, ..., 6 \\
+\texttt{\%d} & Day of month (number): 0, 1, ..., 31 \\
+\texttt{\%b} & Month (abbreviated): Jan, Feb, \textit{etc.} \\
+\texttt{\%B} & Month (full): January, February, \textit{etc.} \\
+\texttt{\%m} & Month (number): 01, 02, ..., 12 \\
+\texttt{\%y} & \textbf{Two}-digit year: 00, 01, ..., 99 \\
+\texttt{\%Y} & \textbf{Four}-digit year: ..., 1999, 2000, 2001, ...\\
 \hline
-\%H & Hour on \textbf{24-hour} clock: 01, 02, ..., 23 \\
-\%I & Hour on \textbf{12-hour} clock: 01, 02, ..., 12 \\
-\%p & AM/PM (only used in conjunction with \textbf{\%I}) \\
-\%M & Minute: 01, 02, ..., 59 \\
-\%S & Second: 01, 02, ..., 59 \\
+\texttt{\%H} & Hour on \textbf{24-hour} clock: 01, 02, ..., 23 \\
+\texttt{\%I} & Hour on \textbf{12-hour} clock: 01, 02, ..., 12 \\
+\texttt{\%p} & AM/PM (only used in conjunction with \textbf{\%I}) \\
+\texttt{\%M} & Minute: 01, 02, ..., 59 \\
+\texttt{\%S} & Second: 01, 02, ..., 59 \\
 \hline
 \end{tabular}
-\end{center}
+\medskip
+\caption{Common date/time indicators used by \texttt{.strptime()} and
+\texttt{.strftime()}.}
+\label{datetimeids}
+\end{figure}
 
-\pagebreak
 You have to be really careful here and just go slow. Examine the date and/or
 time input that you have in your data set, and work out which bits of info,
 combined with which literal characters (like ``\texttt{/}'' and ``\texttt{:}''
@@ -519,32 +557,37 @@ in the example above), appear in which order.
 
 \subsection{Formatting with \texttt{.strftime()}}
 
-Complementarily to \texttt{.strptime()} is ``\texttt{.strftime()}''. (Note that
+\index{strptime@\texttt{.strftime()} method (datetime)}
+
+Complementary to \texttt{.strptime()} is ``\texttt{.strftime()}''. (Note that
 the ``p'' stands for ``\textbf{p}arse,'' while the ``f'' stands for
 ``\textbf{f}ormat.'') This is the reverse operation: given a \texttt{date},
 \texttt{time}, or \texttt{datetime} variable, spit it out as a string of
 characters. This isn't used nearly as often, but it occasionally is, and it's
 useful to know as a translation mechanism.
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
->>> print(start_of_class.strftime("%A, %B the %dth at %I%p."))
-    Tuesday, February the 20th at 02PM.
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(start_of_class.strftime("%A, %B the %dth at %I%p."))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+Tuesday, February the 20th at 02PM.
 \end{Verbatim}
 
 One common error: note that you call \texttt{.strptime()} directly on the
 \textit{type} (\texttt{date}, \texttt{time}, or \texttt{datetime}), passing
 two arguments:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-an_object = dt.datetime.strptime(my_birthday_string, "%m/%d/%Y %H:%M")
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+a_datetime = dt.datetime.strptime(my_birthday_string, "%m/%d/%Y %H:%M")
 \end{Verbatim}
 
-but you call \texttt{.strftime()} on the object in question
-(a \texttt{date}, \texttt{time}, or \texttt{datetime}), passing
-one argument:
+but you call \texttt{.strftime()} on the variable in question (a specific
+\texttt{date}, \texttt{time}, or \texttt{datetime} variable), passing one
+argument:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-a_string = my_birthday_object.strftime("%m/%d/%Y %H:%M")
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+a_string = my_birthday_datetime.strftime("%m/%d/%Y %H:%M")
 \end{Verbatim}
-
 
