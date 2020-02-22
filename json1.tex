@@ -372,7 +372,7 @@ Its structure is instantly apparent: a dictionary whose values are strings,
 lists, and other dictionaries, as appropriate.
 
 Probably the best thing about JSON is that once we read and parse a JSON file
-or other information source, we have a bona fide Python object that we can
+or other information source, we have a bona fide Python variable that we can
 treat in the ordinary way.
 
 In Python, we have the \texttt{json} package, which you can import like any
@@ -489,10 +489,10 @@ them more easily.
 \index{flat data}
 \index{hierarchical data}
 
-So you see that the JSON file format is essentially a textual representation
-of an arbitrarily nested Python object. This object can be a list or a
-dictionary, and have embedded lists and dictionaries to any arbitrary level of
-nesting. Here's another example:
+So you see that the JSON file format is essentially a textual representation of
+an Python variable with arbitrarily nested inner structure. This variable can
+be a list or a dictionary, and have embedded lists and dictionaries to any
+level of nesting. Here's another example:
 
 \index{courses (JSON file)}
 \label{coursesJson}
