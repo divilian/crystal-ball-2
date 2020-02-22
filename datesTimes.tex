@@ -1,0 +1,331 @@
+
+\chapter{Dates and times}
+
+\index{time@``time''}
+
+One of the most common categories of information you'll ever deal with are
+those dealing with various aspects of \textit{time}. It turns out this is
+considerably more complex than you might think at first. For one thing, the
+English word ``time'' can mean several different things -- a point in time
+(12:05pm on Feb.~20, 2020), an abstract wall clock time (12:05pm), a duration
+of time (1 hour and 15 minutes), and possibly other things.
+
+For another, the clock and calendar systems that humans have devised are just
+plain weird. Why does the break between ``am'' and ``pm'' occur between 11 and
+12 (11am, 12\underline{\textbf{p}}m, 1pm) instead of between 12 and 1 where any
+sane person would put it? Why do some months have more days than others? Heck,
+they don't even follow the moon. And why do some \textit{years} have more days
+than others? And why doesn't every month start over on a Monday? And so forth.
+There are good answers to some of these questions, and lousy answers to others,
+but they all make dealing with time a major pain.
+
+\section{The \texttt{datetime} package}
+
+\index{import@\texttt{import}}
+\index{datetime@\texttt{datetime} package}
+
+Python helps deal with the pain through the \texttt{datetime} package. You have
+to import it, of course, which I usually do via:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+import datetime as dt
+\end{Verbatim}
+
+The package has these goodies:
+
+\begin{itemize}
+\itemsep1em
+
+\index{timedelta@\texttt{timedelta} type (datetime)}
+
+\item \textbf{The \texttt{timedelta} type}. Variables of this type represent
+\textit{durations in time}. You can create them like this:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+one_semester = dt.timedelta(weeks=15)
+one_year = dt.timedelta(weeks=52)
+this_class = dt.timedelta(hours=1, minutes=15)
+finger_snap = dt.timedelta(seconds=.1)
+\end{Verbatim}
+
+\vspace{-.15in}
+
+You can also use \texttt{days}, \texttt{milliseconds}, and
+\texttt{microseconds}. Anything else is ambiguous. (Ask yourself: why?)
+
+\medskip
+
+Don't think of the \texttt{timedelta} variable you create as being
+intrinsically ``in'' any particular unit -- just think of it as an ``amount of
+time,'' which could then be expressed in any units.
+
+\texttt{timedelta}s can be positive or negative, by the way, and you can add or
+subtract them to/from each other to get other \texttt{timedelta}s:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(one_semester - this_class)
+print(this_class + finger_snap)
+print(one_semester - one_year)
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+104 days, 22:45:00
+1:15:00.100000
+-259 days, 0:00:00
+\end{Verbatim}
+
+After printing the number of whole days (if any), the rest of the output gives
+time in \textsl{hours}:\textsl{minutes}:\textsl{seconds}:\textsl{microseconds}. Note that the last of these three
+outputs is negative, since \texttt{one\_semester} is obviously shorter than
+\texttt{one\_year}.
+
+\index{date@\texttt{date} type (datetime)}
+
+\item \textbf{The \texttt{date} type}. Each \texttt{date} variable represents a
+date in an idealized Gregorian calendar. You can create them via:
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+election_day = dt.date(year=2020, month=11, day=3)
+primary_day = dt.date(year=2020, month=3, day=4)
+here_we_are = dt.date.today()
+\end{Verbatim}
+
+If you \textit{subtract} two \texttt{date}s, you get a \texttt{timedelta}. If
+you \textit{add} a \texttt{date} to a \texttt{timedelta}, you get another
+\texttt{date}.
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(type(election_day - primary_day))
+print(election_day - primary_day)
+print(type(primary_day + one_semester))
+print(primary_day + one_semester)
+\end{Verbatim}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+datetime.timedelta
+244 days, 0:00:00
+datetime.date
+2020-06-17
+\end{Verbatim}
+
+Note that if your \texttt{timedelta} has precision more granular than days, it
+is lost in these operations:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+if dt.date.today() == dt.date.today() + finger_snap:
+    print("It'll still be the same day a finger snap from now.")
+if dt.date.today() == dt.date.today() + this_class:
+    print("It'll still be the same day one lecture from now.")
+if dt.date.today() == dt.date.today() + one_semester:
+    print("It'll still be the same day one semester from now.")
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+It'll still be the same day a finger snap from now.
+It'll still be the same day one lecture from now.
+\end{Verbatim}
+\normalsize
+
+You can also compare dates with comparison operators like \texttt{<} and
+\texttt{>=}:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+if primary_day < election_day:
+    print("The primary occurs before the election, duh!")
+else:
+    print("Wuuuut??")
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+The primary occurs before the election, duh!
+\end{Verbatim}
+
+\index{time@\texttt{time} type (datetime)}
+
+\item \textbf{The \texttt{time} type.} A ``time,'' by itself, represents an
+abstract wall clock time, independent of any particular day. It doesn't mean
+``5pm this afternoon'' but rather ``5pm's in general.''
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+start_of_class = dt.time(hour=12, minute=30)
+dinner_time = dt.time(hour=18, minute=0)
+\end{Verbatim}
+
+These can also be compared in expected ways, but \textit{not} added or
+subtracted (which actually wouldn't make sense -- why?)
+
+\index{datetime@\texttt{datetime} type (datetime)}
+
+\item Finally, we have \textbf{the \texttt{datetime} type}, which as its name
+suggests, combines features of both dates and times. In fact, a
+\texttt{datetime} variable represents \textit{an absolute, specific point in
+history}. Creation options include:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+this_exact_moment = dt.datetime.now()
+terrorist_attack = dt.datetime(2001, 9, 11, 10, 33)
+print("Right now it's: {}".format(this_exact_moment))
+print("A horrible thing occurred at: {}".format(terrorist_attack))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+Right now it's: 2020-03-10 09:33:57.015432
+A horrible thing occurred at: 2001-09-11 10:33:00
+\end{Verbatim}
+
+\index{combine@\texttt{.combine()} method (\texttt{datetime})}
+
+We can also use the \texttt{datetime}'s \texttt{.combine()} method to put a
+\texttt{date} and a \texttt{time} together into a \texttt{datetime}:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+todays_class = dt.datetime.combine(here_we_are, start_of_class)
+print("Today's lecture is at: {}".format(todays_class))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+Today's lecture is at: 2020-03-10 12:30:00
+\end{Verbatim}
+
+\index{time@\texttt{.time()} method (of a \texttt{datetime} variable)}
+\index{date@\texttt{.date()} method (of a \texttt{datetime} variable)}
+
+\texttt{datetime}s can be subtracted from each other, and \texttt{timedelta}s
+can be added or subtracted to/from them to produce other \texttt{datetime}s.
+They can also be compared. Finally, \texttt{.time()} and \texttt{.date()}
+methods will produce the constituent parts as \texttt{time} or \texttt{date}
+variables, accordingly.
+
+%\index{timestamp@\texttt{timestamp} type (datetime)}
+%
+%\small
+%\item Oh, and for completeness, there's also a thing called a
+%``\texttt{timestamp},'' which is really just a \texttt{float} value. A
+%\texttt{timestamp} is -- get this -- \textit{the number of seconds that have
+%elapsed since the stroke of midnight Jan.~1, 1970 UTC} (Coordinated Universal
+%Time -- the Greenwich Mean Timezone).\footnote{That particular instant in time
+%is sometimes called ``The Epoch.'' It's an arbitrary reference point, but was
+%chosen in part to be approximately equal to Stephen's original birthday.} This
+%will occasionally come up, since even though it's gibberish to humans, it is
+%easy to work with mathematically.
+%\normalsize
+
+\end{itemize}
+
+
+\section{Parsing and formatting}
+
+Now most of the time we won't be creating \texttt{datetime} variables using the
+techniques above. Instead, we'll be \textit{parsing} them from string data.
+
+There are a seemingly unlimited number of ways that dates and times can be
+expressed in strings. Just consider a few possibilities:
+
+\small
+\begin{compactitem}
+\item Feb. 20, 2019 2pm
+\item Feb 20, 2019 2:00pm
+\item Feb 20, 2019 2:00 P.M.
+\item 2/20/19 2:00 P.M.
+\item 2/20/19 14:00
+\item 02/20/19 14:00:00
+\item 20-Feb-2019 2:00pm
+\item 2019-Feb-20 14:00:00
+\item ...
+\end{compactitem}
+\normalsize
+
+and on it goes. It's a testimony to the power of the human mind that we can
+look at these and at a glance infer what date/time was intended. Getting a
+computer to automatically do so is somewhat of a challenge.
+
+\subsection{Parsing with \texttt{.strptime()}}
+
+The \texttt{date}, \texttt{time}, and \texttt{datetime} types all have a
+(somewhat clunky) method called ``\texttt{.strptime()}'' that you can call,
+passing (1) a string representing a date, time, or datetime, and (2) a
+formatting string telling the method how to interpret it. This is best seen
+through an example:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+my_string = "2/20/2019 14:00"
+start_of_class = dt.datetime.strptime(my_string, "%m/%d/%Y %H:%M")
+
+>>> print(start_of_class)
+    2019-02-20 14:00:00
+\end{Verbatim}
+
+This example demonstrates a full ``round-trip'' operation: we started with a
+\texttt{string}, parsed it into a \texttt{datetime}, and then printed it back
+to the screen as a \texttt{string}. Note that the format of the printout
+didn't match the format of ``\texttt{my\_string}''; this is okay. What matters
+internally to our program is that our date \& time variables \textit{represent}
+the right things, not that they are printed in certain ways.
+
+Now what are all those funky percent signs and junk in the second argument to
+\texttt{.strptime()}? They all have a special meaning. Here are some common
+ones (others are in the docs):
+
+\begin{center}
+\begin{tabular}{|c|l|}
+\hline
+\%a & Weekday (abbreviated): Sun, Mon, \textit{etc.} \\
+\%A & Weekday (full): Sunday, Monday, \textit{etc.} \\
+\%w & Weekday (number): 0, 1, ..., 6 \\
+\%d & Day of month (number): 0, 1, ..., 31 \\
+\%b & Month (abbreviated): Jan, Feb, \textit{etc.} \\
+\%B & Month (full): January, February, \textit{etc.} \\
+\%m & Month (number): 01, 02, ..., 12 \\
+\%y & \textbf{Two}-digit year: 00, 01, ..., 99 \\
+\%Y & \textbf{Four}-digit year: ..., 1999, 2000, 2001, ...\\
+\hline
+\%H & Hour on \textbf{24-hour} clock: 01, 02, ..., 23 \\
+\%I & Hour on \textbf{12-hour} clock: 01, 02, ..., 12 \\
+\%p & AM/PM (only used in conjunction with \textbf{\%I}) \\
+\%M & Minute: 01, 02, ..., 59 \\
+\%S & Second: 01, 02, ..., 59 \\
+\hline
+\end{tabular}
+\end{center}
+
+\pagebreak
+You have to be really careful here and just go slow. Examine the date and/or
+time input that you have in your data set, and work out which bits of info,
+combined with which literal characters (like ``\texttt{/}'' and ``\texttt{:}''
+in the example above), appear in which order.
+
+\subsection{Formatting with \texttt{.strftime()}}
+
+Complementarily to \texttt{.strptime()} is ``\texttt{.strftime()}''. (Note that
+the ``p'' stands for ``\textbf{p}arse,'' while the ``f'' stands for
+``\textbf{f}ormat.'') This is the reverse operation: given a \texttt{date},
+\texttt{time}, or \texttt{datetime} variable, spit it out as a string of
+characters. This isn't used nearly as often, but it occasionally is, and it's
+useful to know as a translation mechanism.
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+>>> print(start_of_class.strftime("%A, %B the %dth at %I%p."))
+    Tuesday, February the 20th at 02PM.
+\end{Verbatim}
+
+One common error: note that you call \texttt{.strptime()} directly on the
+\textit{type} (\texttt{date}, \texttt{time}, or \texttt{datetime}), passing
+two arguments:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+an_object = dt.datetime.strptime(my_birthday_string, "%m/%d/%Y %H:%M")
+\end{Verbatim}
+
+but you call \texttt{.strftime()} on the object in question
+(a \texttt{date}, \texttt{time}, or \texttt{datetime}), passing
+one argument:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+a_string = my_birthday_object.strftime("%m/%d/%Y %H:%M")
+\end{Verbatim}
+
+
