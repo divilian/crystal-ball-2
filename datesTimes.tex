@@ -225,23 +225,242 @@ techniques above. Instead, we'll be \textit{parsing} them from string data.
 There are a seemingly unlimited number of ways that dates and times can be
 expressed in strings. Just consider a few possibilities:
 
-\small
 \begin{compactitem}
-\item Feb. 20, 2019 2pm
-\item Feb 20, 2019 2:00pm
-\item Feb 20, 2019 2:00 P.M.
-\item 2/20/19 2:00 P.M.
-\item 2/20/19 14:00
-\item 02/20/19 14:00:00
-\item 20-Feb-2019 2:00pm
-\item 2019-Feb-20 14:00:00
+\item Feb. 29, 2020 4pm
+\item Feb 29, 2020 4:00pm
+\item Feb 29, 2020 4:00 P.M.
+\item 4/29/19 4:00 P.M.
+\item 4/29/19 16:00
+\item 02/29/19 16:00:00
+\item 29-Feb-2020 4:00pm
+\item 2020-Feb-29 16:00:00
 \item ...
 \end{compactitem}
-\normalsize
 
 and on it goes. It's a testimony to the power of the human mind that we can
 look at these and at a glance infer what date/time was intended. Getting a
 computer to automatically do so is somewhat of a challenge.
+
+\index{Pandas}
+
+\subsection{Pandas' auto-parsing}
+
+The great news is that in many cases, Pandas can auto-parse common date formats
+and convert strings into the proper kinds of objects. There are two ways of
+doing this: as you're loading a file with \texttt{read\_csv()}, and after the
+fact.
+
+\subsubsection{Parsing dates with \texttt{read\_csv()}}
+
+\index{read\_csv@\texttt{read\_csv()} (Pandas)}
+\index{parse\_dates@\texttt{parse\_dates} argument (to \texttt{read\_csv()})}
+\index{list}
+
+With \texttt{read\_csv()}, you can pass an argument called
+\texttt{parse\_dates}, whose value should be a \textit{list} of the columns you
+want it to auto-parse. Suppose we had a CSV file that looked like this:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=lines,framesep=3mm]
+Donor,Date,Amt,Party
+Barack X. Tyrell,Tue 09/05/17,$3370,I
+Gandalf A. Trump,Tue 07/18/17,$70,R
+Jay-Z G. Targaryen,18-Dec-2017,$170,D
+Brad T. Bolton,Thu 01/26/17,$1840,R
+Luke T. Obama,29-Sep-2017,$4230,D
+Matt Y. Kenobi,Sun 12/25/16,$3695,I
+Gandalf Z. Pitt,07-Jun-2017,$6375,I
+            .  .  .
+\end{Verbatim}
+
+This is a record of campaign contributions from various donors, which includes
+the date of the donation as well as the amount. Both columns are going to be
+problematic for us: the amount because of the leading dollar sign, and the date
+because it's in a god-awful mixed format.
+
+If we just read it normally, we'd get this:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+contribs = pd.read_csv("contribs.csv")
+print(contribs)
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+                   Donor          Date    Amt Party
+0       Barack X. Tyrell  Tue 09/05/17  $3370     I
+1       Gandalf A. Trump  Tue 07/18/17    $70     R
+2     Jay-Z G. Targaryen   18-Dec-2017   $170     D
+3         Brad T. Bolton  Thu 01/26/17  $1840     R
+4          Luke T. Obama   29-Sep-2017  $4230     D
+...                  ...           ...    ...   ...
+7179       Zoe N. Tyrell   10-Jun-2016  $5460     R
+7180    Taylor T. Thrace   10-Mar-2016  $4365     D
+7181      Katy I. Tyrell  Thu 11/02/17   $140     R
+7182     Katy T. Baggins  Fri 01/22/16  $1255     R
+7183    Taylor E. Thrace  Sun 02/26/17  $3235     D
+\end{Verbatim}
+
+This has all the information in it, but not in a format we can do anything
+with. See, the dates and the amounts are just strings:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(contribs.Date)
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+0    Tue 09/05/17
+1    Tue 07/18/17
+2     18-Dec-2017
+3    Thu 01/26/17
+4     29-Sep-2017
+Name: Date, dtype: object
+\end{Verbatim}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(contribs.Amt)
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+0    $3370
+1      $70
+2     $170
+3    $1840
+4    $4230
+Name: Amt, dtype: object
+\end{Verbatim}
+
+\index{object@``\texttt{object}'' (a.k.a. \texttt{str}) \texttt{dtype}}
+
+(Recall that ``\texttt{object}'' -- as we saw on p.~\pageref{objectDtype} -- is
+just a dumb way of saying ``string.'' Both these columns, therefore, are
+strings.)
+
+It might not be obvious to you what the problem is with that. After all, isn't
+\texttt{str} the correct type for text sequences like ``\texttt{Tue 07/18/17}''
+and ``\texttt{\$1840}'' and ``\texttt{18-Dec-2018}''?
+
+Sure it is, but realize that we can't \textit{do} anything interesting with
+dates or amounts if they're in that format. For example, we can't do any of the
+following:
+
+\begin{compactitem}
+\item[\leftthumbsdown] take the average or add up all the amounts (because they're not numbers!)
+\item[\leftthumbsdown] sort the transactions chronologically (because you can't
+simply alphabetize strings like ``\texttt{Tue 07/18/17}'' and get chronological
+order!)
+\item[\leftthumbsdown] ask basic questions like ``how did the average donation
+amount change before and after the 2016 Presidential election?''
+\item[\leftthumbsdown] ...
+\end{compactitem}
+
+The problem is that even though a human looks at a string like ``\texttt{Mon
+05/14/19}'' and instantly recognizes a date (and a string like
+``\texttt{\$1800}'' and recognizes a numerical amount in dollars), we don't
+actually \textit{have} dates or amounts to work with. We have sequences of
+characters.
+
+\index{read\_csv@\texttt{read\_csv()} (Pandas)}
+\index{parse\_dates@\texttt{parse\_dates} argument (to \texttt{read\_csv()})}
+
+So we fix all this in an instant by simply passing a \texttt{parse\_dates}
+argument with the names of the column(s) we want it to parse:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+contribs = pd.read_csv("contribs.csv", parse_dates=['Date'])
+\end{Verbatim}
+
+Now, our \texttt{Date} column looks like this:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(contribs.Date)
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+0   2017-09-05
+1   2017-07-18
+2   2017-12-18
+3   2017-01-26
+4   2017-09-29
+Name: Date, dtype: datetime64[ns]
+\end{Verbatim}
+
+\index{dtype@\texttt{dtype}}
+
+which, as you can see by the \texttt{dtype}, is full of useful
+\texttt{datetime} variables instead of useless strings.
+
+Now we can do stuff like sort by dates:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(contribs.sort_values(['Date']))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+                      Donor       Date   Amt Party
+6698         Wash T. Thrace 2015-06-28  1365     I
+2561        Frodo X. Tyrell 2015-06-28  3500     R
+4149      Katy U. Skywalker 2015-06-28  1855     I
+1623          Bilbo R. Pitt 2015-06-28  5130     R
+4656          Lady K. Obama 2015-06-29   775     R
+...                     ...        ...   ...   ...
+5031  Jennifer W. Lannister 2020-02-21  1455     R
+179       Aragorn Q. Thrace 2020-02-21  2625     R
+5651         Rey U. Aniston 2020-02-21  2915     D
+2408        Tyrion M. Perry 2020-02-21  4755     I
+6735       Taylor W. Tyrell 2020-02-21  2780     D
+\end{Verbatim}
+
+or query by dates:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(contribs[contribs.realdate < dt.date(year=2016, month=11, day=8)])
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+                   Donor       Date   Amt Party
+8         Wash Q. Thrace 2016-05-24  1475     D
+9      Matt I. Skywalker 2016-09-12  7215     R
+10         Matt K. Stark 2015-09-06   405     R
+11         Tywin X. Pitt 2016-04-06  5530     R
+12         Zoe T. Tyrell 2016-04-08  4610     D
+                    .  .  .
+\end{Verbatim}
+
+or even do a date-based histogram:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+contribs.Date.hist(bins=50)
+\end{Verbatim}
+
+\begin{center}
+\includegraphics[width=0.9\textwidth]{datehist.png}
+\end{center}
+
+Looks like donations spiked sharply immediately following the 2016 election,
+and stayed that way through the end of the data set.
+
+\bigskip
+\index{str suffix@\texttt{.str} suffix (Pandas)}
+
+Btw, if you're wondering how to fix the \texttt{Amt} column, you can do so
+with the same \texttt{.str} suffix we used on p.~\pageref{strSuffix}:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+contribs.Amt = contribs.Amt.str[1:].astype(int)
+\end{Verbatim}
+
+The ``\texttt{1:}'' in the boxies says ``take characters 1 through the end of
+each value''; since the first character (character \#0) is the ``\texttt{\$}''
+sign, this gets rid of it. We then convert the column type from string to
+\texttt{int}, and we're able to treat donation amounts as the numerical
+quantities they actually are.
+
+
 
 \subsection{Parsing with \texttt{.strptime()}}
 
