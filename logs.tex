@@ -15,6 +15,8 @@
 
 \chapter{Using logarithms}
 
+\index{logarithms}
+
 Recall that the logarithm is the inverse operation of exponentiation. What is
 $10^3$? 1,000. So what is the log of 1,000? 3. It's really that simple.
 Instead of asking, ``what is ten to this particular power?'' I'm asking ``what
@@ -49,6 +51,8 @@ logarithm, but jumping from 10 all the way to 100 (a difference of
 \textit{90}) \textit{also} only got us one higher. It's this property that
 makes logarithms useful.
 
+\index{order of magnitude}
+
 Another way to think of logarithms is ``the logarithm of $x$ is the order of
 magnitude of $x$.''
 
@@ -72,9 +76,12 @@ A natural consequence of the above property is this one:
 
 \section{Logarithmic plots}
 
+\index{semi-log plot}
+\index{log-log plot}
+
 A common plotting technique is to use not the raw values of the independent
 variable on the $x$ axis, but rather their logarithms. If we do this, we have
-a \textbf{semilog plot}. If we do this for both the $x$ and the $y$ axis, we
+a \textbf{semi-log plot}. If we do this for both the $x$ and the $y$ axis, we
 have a \textbf{log-log plot}.
 
 Why would we do this? There are three reasons:
@@ -85,6 +92,9 @@ points are orders of magnitude larger than others, the detail of the smaller
 points gets completely swamped in trying to plot the larger points. Plotting
 orders-of-magnitude instead of raw values solves this problem, though you have
 to remember you did this when interpreting the plot!
+
+\index{celebrities}
+\index{UK}
 
 Here's a (fictitious) example of some American and British celebrities, and
 their total Instagram ``likes'':
@@ -109,6 +119,8 @@ have far more ``likes'' than anyone else. Hence most people are crushed
 against the bottom of the plot and we can't (say) compare the UK people with
 the US people easily.
 
+\index{scatter plot!logarithmic scale}
+
 We can dramatically improve the readability and analyze-ability by plotting
 the $y$ axis on a log scale. Just add this line before \texttt{plt.show()}:
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
@@ -127,6 +139,11 @@ but log-number-of-likes.
 \end{figure}
 
 \pagebreak
+
+\index{relative vs.~absolute time series changes}
+\index{absolute vs.~relative time series changes}
+\index{stock prices}
+\index{Stephen, Inc.}
 
 \item \textbf{A semi-log plot shows \textbf{relative} (multiplicative) changes
 instead of \textbf{absolute} (additive) changes.} Consider
@@ -160,6 +177,7 @@ bought \$1000 worth of stock in March 2017 and sold it the following day,
 you'd have sold it for \$$1000 \times \frac{110}{90} = $\$1222. Nice, but not
 nearly the windfall of event A.
 
+\index{semi-log plot}
 For this reason, stocks and other investments are nearly always shown on a
 semi-log plot, like the one in Figure~\ref{fig:stock2}. it has the advantage
 that \textit{same-size increases on the (log) $y$ axis correspond to identical
@@ -167,6 +185,8 @@ that \textit{same-size increases on the (log) $y$ axis correspond to identical
 the stock rises an inch somewhere on the plot, and it rises an inch somewhere
 else, these represent equal gains for investors \textit{no matter how high the
 stock value is in absolute terms.} Such is the magic of logs.
+
+\index{windfall}
 
 In this example, you can easily see from the semi-log plot that event A was a
 bigger windfall for investors than event B.
@@ -178,6 +198,9 @@ bigger windfall for investors than event B.
 \label{fig:stock2}
 \end{figure}
 \pagebreak
+
+\index{exponential relationship}
+\index{power-law relationship}
 \item \textbf{It reveals exponential and power-law relationships.} This
 requires a little math to understand. Suppose we have two variables, $x$ and
 $y$, and they are related according to something like this:
@@ -206,6 +229,8 @@ This is just a linear equation with a slope ($m$) of 2.96 and a $y$-intercept
 ($b$) of 1.649. So plotting this relationship on a semi-log plot will give us
 a straight line.
 
+\index{rate of increase}
+
 Why do we care? Because it turns out that exponential relationships like this
 come up a lot in the world. One ubiquitous pattern is that of exponential
 growth or decay: any time that \textit{the rate of increase of a quantity}
@@ -216,6 +241,7 @@ a quantity (like the number of mechanical parts that wear out) is proportional
 to the quantity itself (the total number of mechanical parts owned by the
 company), we have exponential decay.
 
+\index{power-law relationship}
 Another important kind of relationship is often mistaken for exponential
 growth, but is emphatically \textit{not}. It's called a ``power-law''
 relationship, and has caused much buzz in the scientific community over the
