@@ -47,7 +47,7 @@
 \usepackage{wrapfig}
 \usepackage{upquote}
 \usepackage{framed}
-\usepackage{xcolor}
+\usepackage[svgnames]{xcolor}
 \usepackage[hidelinks]{hyperref}
 \usepackage[width=.9\textwidth,singlelinecheck=true,skip=1pt,font=small,labelfont=bf]{caption}
 
@@ -99,6 +99,19 @@ j 1 J 6 w
 \setlength{\baselineskip}{1.5pt}
 \setlength{\parskip}{6pt}
 
+\makeatletter
+\newif\ifFV@bgcolor
+\newbox\FV@bgbox
+\define@key{FV}{bgcolor}{\FV@bgcolortrue\def\FV@bgcolor{#1}}
+
+\def\FV@BeginVBox{%
+  \leavevmode\ifFV@bgcolor\setbox\FV@bgbox=\fi
+  \hbox\ifx\FV@boxwidth\relax\else to\FV@boxwidth\fi\bgroup
+  \ifcase\FV@baseline\vbox\or\vtop\or$\vcenter\fi\bgroup}
+\def\FV@EndVBox{\egroup\ifmmode$\fi\hfil\egroup
+  \ifFV@bgcolor\colorbox{\FV@bgcolor}{\box\FV@bgbox}\fi}
+\makeatother
+
 \VerbatimFootnotes
 
 \begin{document}
@@ -135,6 +148,7 @@ DATA 219 Course notes
 \include{longWideTidy}
 \include{datesTimes}
 \include{logs}
+\include{databases}
 
 \backmatter
 \printindex

@@ -1,0 +1,344 @@
+
+\chapter{Accessing databases}
+
+\index{database}
+\index{DBMS}
+
+``Database'' is a very loose term for ``a repository of information that can
+be readily accessed.'' When we use that term in Data Science, we mean a data
+source that is managed by a piece of software called a \textbf{DBMS}, or
+\textbf{database management system}. (True, plain-old lists, dictionaries, or
+Pandas \texttt{DataFrame}s are also ``repositories of information that can be
+accessed,'' but when we use the term \textbf{database} we're not talking about
+that.)
+
+There are principally two reasons to learn how to access data from databases:
+
+\begin{itemize}
+\itemsep.1em
+\item Sometimes, our data is simply available in that form only. We may want
+to import it into Python/Pandas and deal with it using the techniques from the
+first half of the semester, but in order to get it in there, we need to
+(briefly) interface with the database and issue the proper commands.
+\item Sometimes, our data is just flat \textit{big}. There's a limit to how
+much data Spyder can store in memory and deal with on the spot. Suppose
+you had to analyze all the eBay transactions over the past two years? Or all
+the tweets made in the world over the last month? That stuff can't remotely
+fit in your system's memory. Hence, we have to access it through a database
+which will manage the sheer size and scope for us, and work with it a little
+at a time.
+\end{itemize}
+
+\section{Two kinds of databases}
+
+\index{relational database}
+\index{NoSQL database}
+
+There are essentially two kinds of databases in the world:
+\textbf{relational}, and \textbf{NoSQL}.
+
+\index{table (database)}
+\index{SQL}
+\index{RDBMS}
+
+Previously this semester, we've worked with data spread across multiple
+\texttt{DataFrame}s that we need to join together in some way. This structure
+is extremely common, so much so that most of traditional database schema theory
+is based directly on it. A \textbf{relational database} is a repository of
+information in which the data is stored in \textbf{tables} (a table is pretty
+much \textit{exactly} a \texttt{DataFrame} in spirit), and on which the
+language \textbf{SQL}\footnote{Some people pronounce the acronym SQL as the
+three letters ``ess-queue-ell,'' and others as the word ``sequel.'' Either one
+is acceptable (I do the former).} can be used to query it and manipulate it. A
+software system that enables a user to create and work with relational
+databases is called an \textbf{RDBMS}, or \textbf{relational database
+management system}.
+
+\index{Oracle}
+\index{Sybase}
+\index{Microsoft SQL Server}
+\index{MySQL}
+\index{MariaDB}
+\index{PostgreSQL}
+\index{Codd, Ted}
+
+There are many, many RDBMS's out there: Oracle, Sybase, Microsoft SQL Server,
+MySQL, MariaDB, PostgreSQL, and literally dozens of others. They all work in
+very much the same way: they store data in tables, and they are manipulated via
+SQL. Ever since Ted Codd invented the relational model in 1970, this
+organizational paradigm has proven to be so powerful and computationally
+efficient that it has dominated the database world. Only recently have some
+alternate paradigms gained some traction (so-called ``NoSQL'' databases), but
+even so, the majority of the world's structured data is all in relational
+databases of some sort.
+
+\index{Cassandra}
+\index{MongoDB}
+\index{Redis}
+\index{Neo4j}
+\index{key-value pair}
+\index{graph (network)}
+
+Relational DBMS's are much more similar to each other than NoSQL systems are to
+each other. The wide variety of NoSQL DBMS's (Cassandra, MongoDB, Redis, Neo4j,
+\textit{etc.}) means that learning how to use one doesn't give you much
+knowledge about how to use one of the others. Some store key/value pairs;
+others store objects and binary data; some store information as a graph
+(network). Part of the great power of the relational model is that SQL has
+proven to be a common, flexible, broadly-applicable query language that many
+different vendors have adopted and which suits many data needs.
+
+\section{SQLite}
+
+\index{SQLite}
+\index{RDBMS}
+
+SQLite is a really slim, trim RDBMS that stores all of its data \textit{in a
+single file.} When you work with SQLite (or any RDBMS), though, you don't think
+in terms of files, but in terms of tables. The fact that the tables are stored
+in file(s) in some strange format is invisible to you as the user of the data,
+and this is in fact one of the great powers of the relational model: separating
+the conceptual data from the storage implementation.
+
+\subsection{Interfacing to SQLite}
+
+\index{connect@\texttt{connect()} (SQLite)}
+
+``\textbf{Connecting}'' to a relational database basically means establishing a
+communication path over which you can talk SQL. In Python, this is pretty easy:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+import sqlite3
+
+conn = sqlite3.connect('my_local_file.db')
+\end{Verbatim}
+\label{connectSqlite}
+
+\index{extension (filename)}
+\index{db file@\texttt{.db} file}
+
+As indicated, SQLite-compatible files typically have a \texttt{.db} extension
+(for ``database.'')
+
+\index{query (database)}
+
+The return value from \texttt{connect()} that we're calling \texttt{conn} is
+``a connection to the database.'' We'll use it every time we want to perform an
+\textbf{SQL query}. SQL is a new language, but it's not nearly as complex as
+something like Python because it's not a programming language, but a
+\textbf{query language}. You don't write entire programs in it; you merely
+specify queries in it. This means that the range of things you can do in SQL is
+much more restricted, and hence the language is easier to learn.
+
+\subsection{Browsing the tables}
+
+\index{read\_sql@\texttt{read\_sql()} (Pandas)}
+\index{table (database)}
+
+The first thing you'll normally want to do is figure out which tables exist in
+the database. You can run this command:
+
+\index{sqlite\_master@\texttt{sqlite\_master}}
+\label{sqlite_master}
+\index{SELECT statement@\texttt{SELECT} statement (SQL)}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(pd.read_sql("SELECT name FROM sqlite_master WHERE type='table'"))
+\end{Verbatim}
+
+to find out. If this were the output:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+          name
+0        songs
+1       albums
+2      artists
+3       labels
+\end{Verbatim}
+
+that would tell us that the SQLite database has four tables in it, named
+\texttt{songs}, \texttt{albums}, \texttt{artists}, and \texttt{labels}. Each
+one can be queried using SQL statements, or simply imported wholesale into a
+Pandas \texttt{DataFrame} (see below).
+
+\section{Querying the database}
+
+\index{read\_sql@\texttt{read\_sql()} (Pandas)}
+
+By far the most common thing you'll do with a relational database like SQLite
+is execute an SQL query, and get a \texttt{DataFrame} back:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+df_name = pd.read_sql("YOUR SQL QUERY GOES HERE", conn)
+\end{Verbatim}
+
+\index{embedded statement@``embedded'' statement}
+
+The string inside the call to \texttt{pd.read\_sql()} is called ``an embedded
+SQL statement.'' This means we have code in one language (SQL) ``embedded''
+inside another (Python). Do not be alarmed at this.
+
+
+\subsection{Inhaling an entire table}
+
+Now \textit{if} the data is small enough to load into memory, you don't need to
+know much SQL at all. You can simply use this one-liner:
+
+\index{SELECT statement@\texttt{SELECT} statement (SQL)}
+\index{*@\texttt{*} (splat) (SQL)}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+df = pd.read_sql("SELECT * FROM table_name", conn)
+\end{Verbatim}
+
+This reads one of the database's tables (whose names you learned from the
+command in Section~\ref{sqlite_master}) into a new, fully-fledged
+\texttt{DataFrame}, with column names, a reasonable guess at their types,
+\textit{etc.} 
+
+That's literally all you need to know about working with a (smallish) SQLite
+database. Just to connect to it, get all the table names, read each one into a
+\texttt{DataFrame}, and continue in Pandas Land, forgetting all about SQLite.
+You can then leverage all the knowledge you've learned up to this point. Bingo!
+
+
+\subsection{(Slightly) more complex SQL}
+
+\index{SQL}
+
+Sometimes, however, the data is too large to do this. So it's worth learning a
+little SQL so you can make the RDBMS do some of the heavy lifting, and give you
+trimmed results for your Python program to work with.
+
+\index{SELECT statement@\texttt{SELECT} statement (SQL)}
+
+The workhorse is the SQL \texttt{SELECT} statement. Here are some common
+variants:
+
+\index{*@\texttt{*} (splat) (SQL)}
+\begin{itemize}
+\itemsep1em
+\item To compute the \textit{number} of rows, or individual values, without
+returning the entire result, use \texttt{COUNT(*)}, \texttt{MAX()},
+\texttt{MIN()}, \textit{etc.}:
+
+\index{COUNT@\texttt{COUNT()} (SQL)}
+\index{MAX@\texttt{MAX()} (SQL)}
+\index{MIN@\texttt{MIN()} (SQL)}
+\begin{BVerbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm,bgcolor=AliceBlue]
+SELECT COUNT(*) FROM table_name
+SELECT MAX(col1) FROM table_name
+\end{BVerbatim}
+
+\index{LIMIT clause@``\texttt{LIMIT}'' clause (SQL)}
+\item To get only the first few rows (similar to Pandas' \texttt{.head()}
+operation) tack on a ``\texttt{LIMIT}'' expression:
+
+\begin{BVerbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm,bgcolor=AliceBlue]
+SELECT * FROM table_name LIMIT 10
+\end{BVerbatim}
+
+\item To get only certain columns, change the ``\texttt{*}'' to a
+comma-separated list of column names:
+
+\begin{BVerbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm,bgcolor=AliceBlue]
+SELECT col1 FROM table_name
+SELECT col1,col2,col3 FROM table_name LIMIT 10
+\end{BVerbatim}
+
+\index{WHERE clause@``\texttt{WHERE}'' clause (SQL)}
+\item To get only certain rows, add a ``\texttt{WHERE} clause'' after the table
+name:
+
+\begin{BVerbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm,bgcolor=AliceBlue]
+SELECT * FROM table_name WHERE col1==val1
+SELECT col2 FROM table_name WHERE col1==val1 AND col2>val2
+SELECT col1,col2 FROM table_name WHERE col1==val1 AND NOT col2>val2 LIMIT 10
+\end{BVerbatim}
+
+(The usual boolean operations work with keywords \texttt{AND}, \texttt{OR},
+and \texttt{NOT}, and parentheses for grouping.)
+
+\index{IN keyword@``\texttt{IN}'' keyword (SQL)}
+\item The ``\texttt{IN}'' keyword can be useful in a \texttt{WHERE} clause
+for querying membership in a set:
+
+\begin{BVerbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm,bgcolor=AliceBlue]
+SELECT * FROM table_name WHERE col1 IN (val1,val2)
+SELECT col1,col2 FROM table_name WHERE col1==val1 AND
+            NOT col2 IN (val1,val2,val3) LIMIT 10
+\end{BVerbatim}
+
+\index{DISTINCT@\texttt{DISTINCT} (SQL)}
+\item To get only unique rows (similar to Pandas' \texttt{.drop\_duplicates()}
+functionality) use the word \texttt{DISTINCT} before the column names:
+
+\begin{BVerbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm,bgcolor=AliceBlue]
+SELECT DISTINCT * FROM table_name
+SELECT col1,col2 FROM table_name WHERE not col1 in (val1,val2,val3) or
+            col2!=val4 LIMIT 5
+\end{BVerbatim}
+
+\index{DISTINCT@\texttt{DISTINCT} (SQL)}
+\index{COUNT@\texttt{COUNT()} (SQL)}
+The \texttt{DISTINCT} option is useful in conjunction with \texttt{COUNT()}:
+
+\begin{BVerbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm,bgcolor=AliceBlue]
+SELECT COUNT(DISTINCT col1) FROM table_name
+\end{BVerbatim}
+
+\pagebreak
+\index{ORDER BY@\texttt{ORDER BY} (SQL)}
+\item You can have SQLite do sorting with ``\texttt{ORDER BY}'':
+
+\index{DESC@\texttt{DESC} (``descending'') (SQL)}
+\begin{BVerbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm,bgcolor=AliceBlue]
+SELECT * FROM table_name ORDER BY col1
+SELECT DISTINCT col1,col2 FROM table_name WHERE col3==val1
+            ORDER BY col2,col1 DESC LIMIT 5
+\end{BVerbatim}
+
+As you can see, you can sort on multiple columns, and sort in reverse order
+with the \texttt{DESC} keyword.
+
+\index{GROUP BY@\texttt{GROUP BY} (SQL)}
+\index{groupby@\texttt{.groupby()} (Pandas)}
+\item SQL supports a ``GROUP BY'' operation very much like Pandas'
+\texttt{.groupby()} method:
+
+\begin{BVerbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm,bgcolor=AliceBlue]
+SELECT col1,count(*) FROM table_name GROUP BY col1
+SELECT col1,max(col2) FROM table_name WHERE col3==val1 GROUP BY col2
+            ORDER BY col1 DESC LIMIT 5
+\end{BVerbatim}
+
+\index{join!JOIN@\texttt{JOIN} (SQL)}
+\item Finally, to do a merge/join operation, use the \texttt{JOIN} keyword:
+
+\begin{BVerbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm,bgcolor=AliceBlue]
+SELECT * FROM table_1 join table_2 ON col1==col2
+SELECT col1,col2 FROM table_1 join table_2 ON table_1.x==table_2.q
+            WHERE col3>val1 LIMIT 5
+\end{BVerbatim}
+
+The \texttt{JOIN} keyword supports \texttt{LEFT}, \texttt{RIGHT}, and
+\texttt{OUTER} options.
+
+\end{itemize}
+
+\index{Oracle}
+\index{Sybase}
+\index{Microsoft SQL Server}
+\index{MySQL}
+\index{MariaDB}
+\index{PostgreSQL}
+\index{Informix}
+
+There are many, many other options as well. See the online documentation at
+\url{https://www.sqlite.org/docs.html}. Again, one of the great things about
+SQL is that with the exception of the initial commands to connect and to list
+all table names (p.~\pageref{sqlite_master}), \textit{all relational databases
+use essentially identical syntax.} So if you ever need to query an Oracle,
+Sybase, Informix, MySQL, PostgreSQL, or SQL Server database, you'll discover
+that everything in this section applies nearly identically.
+
