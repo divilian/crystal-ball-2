@@ -37,7 +37,7 @@ at a time.
 There are essentially two kinds of databases in the world:
 \textbf{relational}, and \textbf{NoSQL}.
 
-\index{table (database)}
+\index{table!relational database}
 \index{SQL}
 \index{RDBMS}
 
@@ -133,7 +133,7 @@ much more restricted, and hence the language is easier to learn.
 \subsection{Browsing the tables}
 
 \index{read\_sql@\texttt{read\_sql()} (Pandas)}
-\index{table (database)}
+\index{table!relational database}
 
 The first thing you'll normally want to do is figure out which tables exist in
 the database. You can run this command:
@@ -179,7 +179,9 @@ SQL statement.'' This means we have code in one language (SQL) ``embedded''
 inside another (Python). Do not be alarmed at this.
 
 
-\subsection{Inhaling an entire table}
+\subsection{The easy case: inhaling an entire table}
+\index{the easy case}
+\label{easy1}
 
 Now \textit{if} the data is small enough to load into memory, you don't need to
 know much SQL at all. You can simply use this one-liner:
@@ -202,7 +204,7 @@ database. Just to connect to it, get all the table names, read each one into a
 You can then leverage all the knowledge you've learned up to this point. Bingo!
 
 
-\subsection{(Slightly) more complex SQL}
+\subsection{The harder case: more complex SQL}
 
 \index{SQL}
 
