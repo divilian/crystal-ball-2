@@ -269,6 +269,8 @@ the_tables = pd.read_html("http://theURLtoTheWebpageIWantToScrape.html")
 
 \index{allAboutStephen@\texttt{allAboutStephen.html}}
 
+\label{downloading}
+
 This function takes just one argument: the \textbf{URL} of the page we want to
 scrape. (A URL -- which stands for Uniform Resource Locator -- is another word
 for a web page's address, or ``link.'') Sometimes you'll find it more
@@ -570,6 +572,8 @@ merge them. It now sucks to have the role be the index of the \texttt{areas}
 \texttt{DataFrame}, so let's make it a regular column again and then do the
 merge:
 
+\label{roles_df}
+
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 df = pd.merge(areas, adjectives_df)
 print(df)
@@ -660,5 +664,5 @@ you have to put in some elbow grease to bend it to your will. The good news is
 that as far as scraping the actual \textit{page}, all we needed was one
 command: \texttt{pd.read\_html()}. If the data you want from a page isn't in
 \texttt{<table>}s, though, you're in for the tougher case in
-Chapter~\ref{screenScraping2}. Stay tuned!
+Chapter~\ref{ch:screenScraping2}. Stay tuned!
 

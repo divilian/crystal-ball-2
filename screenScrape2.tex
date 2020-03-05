@@ -1,0 +1,588 @@
+
+\chapter{Screen scraping (2 of 2)}
+\label{ch:screenScraping2}
+
+\index{the easy case}
+\index{screen scraping}
+\index{worst of all possible worlds}
+
+\section{The harder case: picking through the HTML tree}
+
+Chapter~\ref{ch:screenScraping1} was the ``easy'' screen scraping case: if the
+data on the web page that you want to import is in \texttt{<table>} rows, you
+can (relatively) simply use Pandas' \texttt{read\_html()} function to suck it
+in to Python.
+
+For anything else, you'll have to comb through the HTML structure, figuring out
+how to surgically extract what you seek. It's a major pain, but there is a
+Python library by the outrageous name ``BeautifulSoup'' which makes it just a
+little bit less painful. This chapter contains an overview of how to work with
+it.
+
+
+\section{Web Developer Tools}
+
+\index{web developer tools}
+\index{element (HTML)}
+
+First, let me say that Firefox, Chrome, and several other browsers come
+equipped with very sophisticated ``web developer tools'' that let you browse
+the HTML, CSS, and rendered page, and figure out what elements got rendered via
+which portions of the screen. They're very handy, and when screen scraping you
+should get into the habit of using them. In Firefox, they're available via the
+``Tools | Web Developer | Toggle tools...'' menu option. In Chrome, you go to
+the little three vertical dots, then choose ``More Tools | Developer Tools.''
+
+
+\section{Parsing with BeautifulSoup}
+
+\index{BeautifulSoup}
+\index{web crawler}
+\index{URL}
+
+As I mentioned on p.~\pageref{downloading}, it's generally recommended to
+\textit{download} the web page you want to parse rather than having Python read
+it for you over the network. This eliminates one more possible source of error.
+(Exception: if you need a Python program to act as a \textbf{web crawler} and
+read pages on demand as it discovers their URLs. More on that later.) Note that
+you can still open the page in your browser even after downloading it: just go
+to ``File | Open File...'' or the equivalent operation in your browser.
+
+Once you've done this, and now have your HTML in a file called (say)
+``\texttt{myfile.htm}'', you can then parse it with BeautifulSoup using:
+
+\index{bs4@\texttt{bs4} (BeautifulSoup library)}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+from bs4 import BeautifulSoup
+soup = BeautifulSoup(open("myfile.htm"), "html.parser")
+\end{Verbatim}
+
+\index{soup@\texttt{soup}}
+\index{html.parser@\texttt{html.parser} (BeautifulSoup)}
+
+By convention, the variable for this parsed structure is called
+``\texttt{soup}''. The second argument to the \texttt{BeautifulSoup} function
+tells it which \textbf{parser} we want to use to analyze the code; there are
+other choices here, but stick with \texttt{"html.parser"} for now.
+
+One possibly useful command (though limited if your web page is large) is:
+
+\index{pretty printing@``pretty printing''}
+\index{prettify@\texttt{.prettify()} (BeautifulSoup)}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(soup.prettify())
+\end{Verbatim}
+
+This ``pretty prints'' out the entire contents of the page, but in a way that
+is properly indented according to the HTML's structure, rather than how it was
+indented in the raw page. You may have noticed that the HTML file may or may
+not be physically indented and spaced in a way reflective of the structure. The
+BeautifulSoup parser is smart enough to discern the implied structure from the
+tag sequence, and thus prints it how it will ``really'' be seen by a browser.
+
+\index{top-down navigation}
+\index{bottom-up navigation}
+
+At this point, I generally take one of two approaches: either I navigate the
+structure \textbf{top-down} looking for where the data I'm interested in is
+situated, or I find the data by searching through the file, and use a
+\textbf{bottom-up} approach to get it from there. You typically have to combine
+the two approaches to get your screen-scraping dirty work done.
+
+\subsection{The top-down approach}
+
+\index{root node (of an HTML file)}
+\index{contents@\texttt{.contents} (BeautifulSoup)}
+
+By using ``\texttt{soup.contents}'', you get the immediate descendants of
+the root node of the HTML hierarchy. Each of these could be examined for its
+type, like this:
+
+\index{type@\texttt{type()}}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+for child in soup.contents:
+    print(type(child))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+bs4.element.Tag
+bs4.element.NavigableString
+\end{Verbatim}
+
+\index{NavigableString@\texttt{NavigableString} (BeautifulSoup)}
+\index{tag (HTML)}
+
+So our entire document is composed of an element (misleadingly named ``Tag''
+here, but w/e) and a ``\texttt{NavigableString}'' which essentially just means
+``string of literal text''. For elements, it's useful to print out their
+``\texttt{.name}''. For strings, it's useful to print them out verbatim. Here,
+we see:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(soup.contents[0].name)
+print(soup.contents[1])
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+'html'
+'\n'
+\end{Verbatim}
+
+\index{html@\texttt{<html>} (HTML tag)}
+
+So the first child is the entire \texttt{html} element in all its embedded
+glory, and this is followed by a single, pesky newline. Now you know.
+
+Drilling down another level, we see:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+html_children = soup.contents[0]
+for child in html_children:
+    print(type(child))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+bs4.element.NavigableString
+bs4.element.Tag
+bs4.element.NavigableString
+bs4.element.Tag
+bs4.element.NavigableString
+\end{Verbatim}
+
+Two tags, with three strings interleaved. Let's examine them:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(html_children.contents[0])
+print(html_children.contents[1].name)
+print(html_children.contents[2])
+print(html_children.contents[3].name)
+print(html_children.contents[4])
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+'\n'
+'head'
+'\n'
+'body'
+'\n'
+\end{Verbatim}
+
+You're starting to see a pattern: a lot of the strings are just newline
+characters that split up the HTML text file and make it more readable. What we
+really care about is the content under the tags. Let's dig one deeper:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+head_children = html_children.contents[1].contents
+print(head_children[0])
+print(head_children[1].name)
+print(head_children[2])
+print(head_children[3].name)
+print(head_children[4])
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+'\n'
+'title'
+'\n'
+'style'
+'\n'
+\end{Verbatim}
+
+Okay, you get the idea. We can drill down to whatever level we want just by
+following the appropriate children. To get the title of the page, we could do:
+
+\index{title@\texttt{<title>} (HTML tag)}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(head_children[1].contents[0])
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+'All About Stephen'
+\end{Verbatim}
+
+\index{title@\texttt{<title>} (HTML tag)}
+\index{head@\texttt{<head>} (HTML tag)}
+
+(This is because the second element (element \#1) of the \texttt{<head>} element
+is the \texttt{<title>} element, and its only child is the string
+\texttt{\textquotesingle All About Stephen\textquotesingle}.)
+
+Sometimes a quicker method to find your way through the forest is to use this
+syntax\footnote{That thing in the boxies -- ``\texttt{[ x.name for x in
+body\_children ]}'' -- is called a ``\textbf{list comprehension},'' by the way,
+and is an advanced Python technique that is sometimes very useful.} at the
+interactive console:
+
+\index{list!comprehension}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print([ x.name for x in body_children ])
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+[None, 'h1', None, 'p', None, 'p', None, 'h2', None, 'table', None]
+\end{Verbatim}
+
+\index{p@\texttt{<p>} (HTML tag)}
+
+You can better see at a glance what's what. Now that we know the first
+``\texttt{p}'' (paragraph) is element \#3 of the body, we could find that
+hyperlink via:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print([ x.name for x in list(body_children)[3] ])
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+[ None, 'a', None, 'b', None, 'u', None]
+\end{Verbatim}
+
+and grab it via:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+dat_hyperlink =  list(list(body_children)[3])[1]
+\end{Verbatim}
+
+\index{dictionary}
+\index{attribute (of an HTML element)}
+\label{dictSyntax}
+
+BeautifulSoup lets you access the attributes of an HTML element by treating
+the element as a dictionary. Pretty cool. We can snag the actual link, then,
+with:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(dat_hyperlink['href'])
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+'http://buildings.umwblogs.org/trinkle-hall/'
+\end{Verbatim}
+
+\subsection{The bottom-up approach}
+
+Sometimes, when you try to dive from the top of the document all the way to
+what you want, you can find yourself in a tangled mess. In these cases it's
+easier to search for the data you want using BeautifulSoup's search facilities.
+
+Let's illustrate this by creating a simple \texttt{DataFrame} that contains
+each role and its percentage allocation of Stephen's time. We want \texttt{df}
+to look something like this:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+                role  perc
+0  College professor  50.0
+1                Dad  30.0
+           . . .
+\end{Verbatim}
+
+To find our way through the forest, we search through the HTML with developer
+tools, locating one of the pieces of data we know is there -- for instance, the
+number \texttt{50}, which we can see on the page is one of the percentages.
+When we click on this (or just search for it in a text file), we find ourselves
+in the middle of the HTML content in Figure~\ref{fig:bottomUpSearch}.
+
+\begin{figure}[ht]
+\centering
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=lines]
+...
+<table border=2 cellpadding=15>
+<tr><td class="pic"><img src="a.jpg"></td>
+    <td class="role">College professor</td>
+    <td class="description">
+    Stephen teaches computer science and data science to willing undergraduates,
+    shaping them into the heroes of tomorrow.
+    </td>
+    <td>
+    <ul>
+    <li>Super rewarding</li>
+    <li>Exciting</li>
+    <li>Ever-changing</li>
+    <li>Fun</li>
+    </ul>
+    </td>
+    <td>
+    <b>50%</b> of total time
+    </td>
+</tr>
+...
+\end{Verbatim}
+\caption{Using a bottom-up approach -- locating the text ``\texttt{50}'' in the
+HTML file (stare towards the bottom of that HTML text) and getting one's
+bearings regarding where it is in relation to other elements.}
+\label{fig:bottomUpSearch}
+\end{figure}
+\normalsize
+
+\index{td@\texttt{<td>} (HTML tag)}
+\index{b@\texttt{<b>} (HTML tag)}
+\index{class@\texttt{class} (HTML/CSS attribute)}
+
+Looks like the role name we want is the text under a \texttt{td} element whose
+class\footnote{In HTML, a ``\textbf{class}'' is an attribute used to classify
+certain elements to be picked up by CSS formatting instructions. If this were a
+Web development textbook, it would talk about when and how to use
+``\texttt{class}''. But for our purposes, it's just one of many handy things we
+might hook on to in order to find our data in the morass.} is
+``\texttt{role}''. And it looks like the percentage we want is (*groan*) in a
+boldface (\texttt{b}) tag, underneath the last \texttt{td} tag of the row,
+which has no \texttt{class}.
+
+\index{find\_all@\texttt{.find\_all()} (BeautifulSoup)}
+
+BeautifulSoup's \texttt{.find\_all()} method makes this slightly less of a
+headache. To quickly grab all the \texttt{tr} elements in the document, we can
+do this:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+trs = list(soup.find_all("tr"))
+\end{Verbatim}
+
+\index{td@\texttt{<td>} (HTML tag)}
+
+The variable \texttt{trs} is now a list of \textit{elements} (BeautifulSoup
+``\texttt{Tag}'' objects) each of which we can examine for (say) \texttt{td}
+children with a \texttt{role} \texttt{class} attribute. And you can call
+\texttt{.find\_all()} on \textit{any} tag (to search from that point in the
+hierarchy down), not just on the top-level \texttt{soup} element. So:
+
+\index{in@\texttt{in}}
+\index{array@\texttt{array()} (NumPy)}
+\index{dtype@\texttt{dtype}}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+roles = np.array([], dtype=object)
+trs = soup.find_all("tr")
+for tr in trs:
+    tds = tr.find_all("td")
+    for td in tds:
+        if "class" in td.attrs and "role" in td["class"]:
+            ...
+\end{Verbatim}
+
+\index{list}
+\index{dictionary}
+\index{key-value pair}
+\index{attribute (of an HTML element)}
+\index{attrs@\texttt{.attrs} (BeautifulSoup)}
+
+The ``\texttt{.attrs}'' syntax gives us a \textit{dictionary} of key-value
+pairs which represent the attributes of an element. So by saying
+``\texttt{"class" in td.attrs}'' we're first checking whether there is a
+\texttt{class} attribute in the current \texttt{td} element at \textit{all}
+before then attempting to get its value using the dictionary syntax mentioned
+on p.~\pageref{dictSyntax}.
+
+\label{classIsAttribute}
+
+Btw, one slight surprise in the above \texttt{if} statement might be that we're
+checking whether \texttt{"role"} is \textit{\texttt{in}} \texttt{td["class"]}
+instead of simply being \texttt{==} to \texttt{td["class"]}. That's because in
+HTML, the \texttt{class} attribute of an tag can have \textit{multiple}
+(space-separated) values, not just one, and so \texttt{td["class"]} is actually
+a \textit{list}, not a single string.
+
+\index{get\_text@\texttt{.get\_text()} (BeautifulSoup)}
+
+Okay, now when we reach the body of that \texttt{if} statement, we have
+successfully found one of the desired \texttt{td} attributes. How do we then
+get the text under it? Just call \texttt{.get\_text()} on it, and then append
+it to the list. This creates our desired list of roles that we can stick in our
+\texttt{DataFrame}.
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+            ...
+            roles.append(td.get_text())
+\end{Verbatim}
+
+To get the percentages, we just need a slightly different approach: first,
+we're going to assume the percentage is in the \textit{last} \texttt{td} tag,
+and second, we need to go inside that to retrieve the percentage from the
+embedded boldface tag. Adding this to our \texttt{for} loop almost gets us
+there:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+percs = []
+...
+    the_bold = tds[-1].find("b")
+    percs.append(the_bold.get_text())
+\end{Verbatim}
+
+although we'd like to also strip that percentage sign off and convert it to an
+actual numeric value, so we'll do this instead:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+percs = []
+...
+    the_bold = tds[-1].find("b")
+    percs.append(float(the_bold.get_text()[:-1]))
+\end{Verbatim}
+
+\index{find@\texttt{.find()} (BeautifulSoup)}
+\index{find\_all@\texttt{.find\_all()} (BeautifulSoup)}
+
+and now we can create our DataFrame with both columns. (Note that
+``\texttt{.find()}'' does the same thing as ``\texttt{.find\_all()}'' except
+that it only grabs the first matching element rather than all of them.) The
+complete code is shown in Figure~\ref{fig:getRolesComplete}.
+
+\begin{figure}[ht]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+roles = []
+percs = []
+
+trs = soup.find_all("tr")
+for tr in trs:
+    tds = tr.find_all("td")
+    for td in tds:
+        if 'class' in td.attrs and 'role' in td['class']:
+            roles.append(td.get_text())
+    the_bold = tds[-1].find("b")
+    percs.append(float(the_bold.get_text()[:-1]))
+
+df = pd.DataFrame({'role':roles, 'perc':percs})[['role','perc']]
+\end{Verbatim}
+\caption{The complete code example to screen scrape the roles and percentages
+from the web page in Figure~\ref{fig:allAboutStephen}
+(p.~\pageref{fig:allAboutStephen}).}
+\label{fig:getRolesComplete}
+\end{figure}
+
+\subsection{Other BeautifulSoup features}
+
+The BeautifulSoup library has a myriad of alternatives for navigating and
+searching the tree. Here are a few.
+
+\subsubsection{Searching by id or class}
+
+\index{find@\texttt{.find()} (BeautifulSoup)}
+\index{find\_all@\texttt{.find\_all()} (BeautifulSoup)}
+\index{id@\texttt{id} (BeautifulSoup)}
+\index{class\_@\texttt{class\_} (BeautifulSoup)}
+
+\texttt{.find()} and \texttt{.find\_all()} each have optional \texttt{id} and
+\texttt{class\_} (note the trailing underscore!) parameters that can be used
+to restrict a search to only elements with matching attributes.
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+soup.find_all("td", class_="pic")
+\end{Verbatim}
+
+\subsubsection{Using the Python ``dot'' syntax}
+
+If we know the names of the tags, we can navigate a structure by using a
+Pandas-like ``dot'' syntax. Check it out:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(soup.head.title)
+print(soup.head.name)
+print(soup.head.title.string)
+print(soup.body.table.td.img['src'])
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+<title>All About Stephen</title>
+title
+'All About Stephen'
+'a.jpg'
+\end{Verbatim}
+
+
+\subsubsection{Accessing all attributes}
+
+\index{tag (HTML)}
+\index{attrs@\texttt{.attrs} (BeautifulSoup)}
+\index{dictionary}
+
+As we've seen, in addition to treating an element (``\texttt{Tag}'') as a
+dictionary to retrieve its element values, you can also use the
+``\texttt{.attrs}'' syntax to get the dictionary directly:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(soup.body.find("a").attrs)
+print(soup.body.find("td").attrs)
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+{'href': 'http://buildings.umwblogs.org/trinkle-hall/'}
+{'class': ['pic']}
+\end{Verbatim}
+
+(As noted on p.~\pageref{classIsAttribute}, see how the value of the
+``\texttt{class}'' attribute is a list here.)
+
+\subsubsection{Getting just text with \texttt{.get\_text()}}
+
+\index{get\_text@\texttt{.get\_text()} (BeautifulSoup)}
+
+The aforementioned \texttt{.get\_text()} method is actually a bit more
+powerful than just extracting the contents of a single plain text element
+underneath an element. It can also be used to get \textit{all the text} from
+that point down in the hierarchy, ignoring all tags. Check it out:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+soup.body.find("p").get_text()
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+'Deep in the bowels of Trinkle Hall resides a\ncarbon-based life form known to
+outsiders only as Stephen. This\nmysterious being fulfills several roles not
+widely known to\nhumankind.'
+\end{Verbatim}
+
+\subsubsection{Finding more than one tag name at once}
+
+\index{find\_all@\texttt{.find\_all()} (BeautifulSoup)}
+\index{list}
+
+You can pass a \textit{list} to \texttt{.find\_all()} to match more than one
+type of tag in a search:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+soup.find_all(["td", "th", "p"])
+\end{Verbatim}
+
+\index{regex (regular expression)}
+
+And if you know how to use \textbf{regular expressions} (outside the scope of
+this class) you can use them as arguments to \texttt{.find\_all()} and
+friends:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+import re
+soup.find_all(re.compile("^q"))
+soup.find_all(re.compile("r"))
+soup.find_all(re.compile("s$"))
+\end{Verbatim}
+
+(finds all tags whose name begin with \texttt{q}, contain \texttt{r}, or end
+with \texttt{s}, respectively.)
+
+\subsubsection{CSS selectors}
+
+\index{CSS}
+\index{select@\texttt{.select()} (BeautifulSoup)}
+
+Finally, if you're familiar with CSS selector syntax, you can do all that jazz
+by calling the \texttt{.select()} method:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+soup.select("div#master, tr td.data")
+\end{Verbatim}
+
