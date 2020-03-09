@@ -1,0 +1,246 @@
+\chapter{About probability}
+\label{ch:prob}
+
+\index{probability}
+
+\textbf{Probability theory} is an area of mathematics that deals with
+\textit{quantifying uncertainty}. We may not be sure that something is going to
+happen, but we want to be precise about \textit{how} sure we are, given
+everything else we may know.
+
+\index{random value}
+\index{distribution}
+
+It turns out that probability theory is a crucial concept in Data Science.
+We've already used some of it in Chapters~\ref{ch:random} and
+\ref{ch:synthetic} when we generated random values from distributions. In this
+chapter, we'll zoom out from programming language details and consider how to
+reason about the probabilities of various values occurring and the
+relationships between random variables.
+
+\section{Terms}
+
+\index{outcome (probability)}
+\index{redheads}
+\index{Girl on the Train, The@\textit{Girl on the Train, The}}
+\index{Hawkins, Paula}
+\index{hardback edition}
+
+Some terms: an \textbf{outcome} is something that may (or may not) happen. This
+varies widely depending on the domain: a child that's born may or may not be
+male; an airline passenger may or may not have red hair; a customer may or may
+not buy a particular product. ``Male,'' ``red,'' and ``\textit{The Girl on the
+Train}, hardback edition'' are all outcomes in these examples.
+
+\index{event (probability)}
+\index{DVD}
+
+An \textbf{event}, by contrast, is a \textit{set} (group) of outcomes that
+we're interested in. Often we don't care so much whether or not the customer
+specifically bought ``\textit{The Girl on the Train}, hardback edition'' as
+whether they bought \textit{any} book by Paula Hawkins, or maybe any hardback
+book, or maybe any book at all (as opposed to a DVD).
+
+\index{sample space (probability)}
+\index{redheads}
+\index{bald}
+\index{brunettes}
+\index{blondes}
+\index{omega ($\Omega$)}
+\index{$\Omega$ (omega)}
+
+Sometimes we'll use the symbol $\Omega$ (``omega'') to refer to the
+\textbf{sample space}, which is simply the set of \textit{all possible
+outcomes}. This will vary depending on what's under consideration; it might be
+\{ male, female \} in one case and \{ red, blonde, brunette, bald, other \} in
+another case.
+
+We'll also use the notation $\overline{\phantom{xx}}$ (overbar) to mean ``any
+outcome \textit{except} something.'' For instance, $\overline{\textrm{red}}$
+means ``the airline passenger had a hair color \textit{other than} red.''
+
+\section{Probability measures}
+
+\index{probability measure}
+
+A \textbf{probability measure} is a function that tells us intuitively how
+likely an outcome is to occur. We'll use the simple notation ``P($\cdot$)'' for
+this\footnote{Some authors use ``Pr()'' instead of ``P()'' for this. Same
+diff.}, read as ``the probability of (something).'' The probability of any
+outcome is always \textit{a number between 0 and 1}. 0 means it can never
+possibly occur, 1 means it will definitely occur, and there's a continuum in
+between. In our first example, we might say P(male) = .5, P(red) = .1, and
+P(\textit{The Girl on the Train}, hardback edition) = .0001.
+
+You can talk about the probability of an event too, of course, and it's simply
+the sum of the outcome probabilities. P(male-or-female) = 1, P(red or blonde
+or bald) = .6, P(any hardcover book) = .08. We'll say that P($\Omega$) will be
+1: after all, \textit{something} has to happen, even if it's ``the customer
+didn't buy anything,'' an outcome to which we'll assign a probability.
+
+\section{``Joint'' probability}
+\index{redheads}
+\index{joint probability}
+\index{,@, (comma) (joint probability)}
+%\index{pipe@\|\ (pipe) (conditional probability)}
+
+Very commonly, we'll be considering the likelihood that two different events
+\textit{both} occur. For instance, perhaps we're interested in the probability
+that an airline passenger is a red-headed female. We'll write this as P(red,
+female).\footnote{You may also run across the notation
+``P(red\textbf{\^{}}female),'' which means the same thing.} The comma signals
+\textbf{joint probability}, which simply means that both of these
+outcomes/events must occur in order for the combined event to be considered to
+have occurred. If we wrote P(red, $\overline{\textrm{female}}$), it would mean
+`the probability that the passenger is a red-headed \textit{non}-female.''
+
+If you think about it, you'll realize that the joint probability cannot be
+greater than either of the two individual probabilities. Adding another
+condition (not female) to the first (red-headed) can't possibly
+\textit{increase} the chance of it happening. Other than that, we don't know
+how to compute the joint probability from the individual ones, though (yet).
+
+Finally, note that P(A,B) is the same thing as P(B,A), guaranteed. Switching
+the order of terms in a \textit{joint} probability doesn't change the answer.
+(This will \textit{not} be true in the next section, so watch out!)
+
+\section{``Conditional'' probability}
+
+\index{conditional probability}
+\index{college degree}
+\index{unemployed}
+
+Another notion we'll use a great deal is \textbf{conditional probability},
+written with a ``pipe'' (vertical bar) like P(unemployed $|$\ college degree),
+or P(red $|\ \overline{\textrm{female}}$). The second of these means ``if I
+know for a fact that the passenger is not female, what's the probability that
+they're red-headed?'' Notice this is very different than the joint probability.
+With conditional probability, we're assuming that the second event
+\textit{does} occur, and then asking how that revises our original prediction.
+Unlike with joint probability, adding a vertical bar \textit{can} make the
+answer increase.
+
+\index{pinterest}
+
+Consider this example: what's the probability that a random U.S. citizen has a
+Pinterest account? Let's estimate that as P(pinterest) = .15. But what if we
+learned that the chosen person was female? What is P(pinterest $|$ female)?
+Just to shamelessly stereotype, I'm going to go out on a limb and say it's
+higher; perhaps .26. On the other hand, what if we learned the person was male?
+What is P(pinterest $|$ male)? I'll say it's more like .04. In both cases, we
+adjusted our estimated probability in light of additional information: up in
+one case, and down in the other.
+
+\index{Bayesian reasoning}
+
+This adjusting-our-estimates stuff is at the heart of what's called
+``\textbf{Bayesian reasoning}'' (you'll see why in section~\ref{sec:bayes},
+below).
+
+\index{prior (probability)}
+\index{posterior (probability)}
+
+Two other terms that come up frequently are ``\textbf{prior probability}'' and
+``\textbf{posterior probability}''. The ``\textbf{prior}'' is the probability of
+an event \textit{without} applying conditioning. In the previous example .15
+was the ``prior probability'' that the person was a pinterest user. When we
+learned our subject was female, we revised that to the ``\textbf{posterior}''
+of .26.
+
+\index{NBA}
+\index{tall}
+
+Finally, note that P(A$|$B) is \textbf{\textit{not}} the same thing as
+P(B$|$A). I gave you a heads-up about this above. In general, P(A$|$B) and
+P(B$|$A) are very different numbers. Ask yourself this: if you chose a random
+American, and they turned out to be pretty tall (say, taller than average),
+what's the probability that they're also an NBA player? I think you'll agree
+that the number here would be very small indeed: perhaps P(NBA$|$tall) would be
+.00001. There just aren't that many NBA players out there, so the chances of
+you randomly choosing one -- tall or not -- is miniscule. But consider the
+reverse question: if your random choice just happened to be an NBA player,
+what's the probability that they'd also be tall? This, by contrast, would be
+far greater: I'll bet P(tall$|$NBA) is close to .95, since nearly all
+professional basketball players are pretty tall.
+
+Or continue the pinterest example. P(pinterest $|$ female) might be .26
+(\textit{i.e.}, 26\% of all females are pinterest users), but P(female $|$
+pinterest) might be .87 (87\% of all pinterest users are females). We'll
+quantify all this in the next section.
+
+%\section{The relationship between joint and conditional}
+%
+%\index{joint probability}
+%\index{conditional probability}
+%
+%Mathematically, here's how these two concepts (joint probability and
+%conditional probability) are related. If A and B are two events, then:
+%
+%\vspace{-.2in}
+%\begin{align*}
+%\boxed{P(A|B) = \frac{P(A,B)}{P(B)}}
+%\end{align*}
+%
+%Suppose I knew that the probability of a random U.S. citizen being a
+%\textit{male pinterest user} was .04. And now suppose I knew that about half
+%of U.S. citizens are male. Then, I could compute:
+%
+%\vspace{-.2in}
+%\begin{align*}
+%P(\textrm{male,pinterest}) = .04 \\
+%P(\textrm{male}) = .5 \\
+%P(\textrm{pinterest} | \textrm{male}) &= \frac{P(\textrm{male},
+%\textrm{pinterest})}{P(\textrm{pinterest})} \\
+%                    &= \frac{P(\textrm{pinterest},
+%\textrm{male})}{P(\textrm{pinterest})} \\
+%                    &= \frac{.04}{.15} = .267 \\
+%\end{align*}
+%
+%\section{Bayes' Rule}
+%\label{sec:bayes}
+%
+%Knowing how joint and conditional probabilities are related, and knowing that
+%P(A,B) = P(B,A), we can derive the following law:
+%
+%\vspace{-.2in}
+%\begin{align*}
+%P(A|B) = \frac{P(B|A) \cdot P(A)}{P(B)}
+%\end{align*}
+%
+%This is called \textbf{Bayes' Rule} (sometimes \textbf{Bayes' Law} or
+%\textbf{Bayes' Theorem}) after the 18th-century Presbyterian minister Thomas
+%Bayes. It is one of the most influential (and controversial, actually)
+%statements in statistics and even all of mathematics.
+%
+%\section{Independence}
+%
+%We need one more background concept before we attack Na\"{i}ve Bayes Classifiers,
+%and that is the \textbf{independence} of events.
+%
+%Simply put, two events are ``independent'' if \textit{whether one of them
+%occurs has no bearing on whether the other one occurs}. It does \textit{not}
+%mean the events are mutually exclusive. It means that the probability of each
+%one of them occurring has nothing to do with the other.
+%
+%It's best seen through an example. Suppose I chose a random U.S. citizen, and
+%I observe two things: whether or not they're white, and whether or not they're
+%female. If I asked you for your estimate of the ``prior'' for the race
+%question, you'd probably come up with something like P(white) = .6. Now I ask
+%you: suppose, before observing their race, that you learned your subject was
+%female. Does this cause you to update your ``prior'' estimate to a more
+%accurate ``posterior''?
+%
+%The answer is no. Whether or not someone is white is \textit{independent} of
+%whether they're female. You thought P(white) was .6, and you still think
+%P(white$|$female) is .6. The opposite was true in the pinterest example: your
+%estimate of their pinterest status \textit{did} change when you learned about
+%their gender. Therefore, those two events are \textit{not} independent.
+%
+%Both of the following mathematical identities are true \textit{\textbf{only
+%\underline{if}}} the events $A$ and $B$ are independent:
+%\vspace{-.2in}
+%\begin{align*}
+%P(A,B) &= P(A) \cdot P(B) \\
+%P(A|B) &= P(A)
+%\end{align*}
+%
