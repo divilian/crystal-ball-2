@@ -1,4 +1,4 @@
-\chapter{About probability}
+\chapter{Probabilistic reasoning}
 \label{ch:prob}
 
 \index{probability}
@@ -82,7 +82,7 @@ didn't buy anything,'' an outcome to which we'll assign a probability.
 \index{redheads}
 \index{joint probability}
 \index{,@, (comma) (joint probability)}
-%\index{pipe@\|\ (pipe) (conditional probability)}
+\index{$\vert$@$\vert$ (pipe) (conditional probability)}
 
 Very commonly, we'll be considering the likelihood that two different events
 \textit{both} occur. For instance, perhaps we're interested in the probability
@@ -104,21 +104,96 @@ Finally, note that P(A,B) is the same thing as P(B,A), guaranteed. Switching
 the order of terms in a \textit{joint} probability doesn't change the answer.
 (This will \textit{not} be true in the next section, so watch out!)
 
+\index{joint distribution (probability)}
+
+Sometimes we'll talk about ``the full \textbf{joint distribution}'' of a set of
+discrete random variables. This can be visualized as a normalized contingency
+table with the probability for all the combinations. The joint distro of our
+airline passenger variables might look like this:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+                     bald  blonde  brunette    red
+            female  0.000   0.154     0.192  0.064
+            male    0.141   0.128     0.256  0.026
+            other   0.013   0.000     0.026  0.000
+\end{Verbatim}
+
+\index{mutually exclusive}
+\index{collectively exhaustive}
+
+This means that, for instance, 14.1\% of our passengers are bald males, 6.4\%
+of our passengers are red-headed females, there were no blonde ``others,''
+\textit{etc.} Obviously, the sum of all the cells in this table will equal
+exactly 1, since they are both mutually exclusive and collectively exhaustive.
+
+\section{``Marginal'' probability}
+
+\index{marginal probability}
+\index{margins (of a contingency table)}
+
+As we've seen, when we have two different variables (like hair color and
+gender) we can talk about the probability of various combinations of these,
+like P(blonde, $\overline{\textrm{male}}$) and
+P($\overline{\textrm{brunette}}$, male). But sometimes we also need to talk
+just one of those variables at a time, like P(female): ``what's the probability
+that an airline passenger is female, and I don't care what her hair color is?''
+
+This is sometimes called the \textbf{marginal probability}. It gets its name
+because its answer is really in the \textit{margins} of the corresponding
+contingency table. If we add margins to the above table, we get:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+                 bald  blonde  brunette    red    All
+        female  0.000   0.154     0.192  0.064  0.410
+        male    0.141   0.128     0.256  0.026  0.551
+        other   0.013   0.000     0.026  0.000  0.038
+        All     0.154   0.282     0.474  0.090  1.000
+\end{Verbatim}
+
+We can now look at the right margin and discover that the marginal probability
+P(male) is .551, and we can look at the bottom margin and see at a glance that
+P(blonde) is .282. This sort of analysis illustrates that, for example:
+
+\begin{center}
+\small
+P(female) = P(bald,female) + P(blonde,female) + P(brunette,female) + P(red,female)
+\end{center}
+
+and
+
+\begin{center}
+\small
+P(brunette) = P(brunette,female) + P(brunette,male) + P(brunette,other)
+\end{center}
+
+To compute a marginal from the joint, we're really just adding up all the
+different cases. There are three different ways to be a brunette: you can be a
+female brunette, a male brunette, or some other kind of brunette. That's all a
+marginal probability really is.
+
 \section{``Conditional'' probability}
 
 \index{conditional probability}
 \index{college degree}
 \index{unemployed}
+\index{conditioning@``conditioning on'' (probability)}
+\index{given@``given'' ($\ \vert\ $) (conditional probability)}
 
 Another notion we'll use a great deal is \textbf{conditional probability},
-written with a ``pipe'' (vertical bar) like P(unemployed $|$\ college degree),
-or P(red $|\ \overline{\textrm{female}}$). The second of these means ``if I
-know for a fact that the passenger is not female, what's the probability that
-they're red-headed?'' Notice this is very different than the joint probability.
-With conditional probability, we're assuming that the second event
-\textit{does} occur, and then asking how that revises our original prediction.
-Unlike with joint probability, adding a vertical bar \textit{can} make the
-answer increase.
+written with a ``pipe'' (vertical bar) like P(unemployed $|$\ college degree).
+The pipe is normally pronounced ``given.'' So this expression is read ``the
+probability that someone is unemployed \textit{given} that they have a college
+degree.'' We call this ``\textbf{conditioning on}'' college degree.
+
+Or to return to our previous example, consider P(red $|\
+\overline{\textrm{female}}$). This quantity is the answer to the question: ``if
+I know for a fact that the passenger is not female, what's the probability that
+they're red-headed?''
+
+Notice this is very different than the joint probability. With conditional
+probability, we're assuming that the second event \textit{does} occur, and then
+asking how that revises our original prediction. Unlike with joint probability,
+adding a vertical bar \textit{can} make the answer increase.
 
 \index{pinterest}
 
@@ -155,92 +230,215 @@ P(B$|$A). I gave you a heads-up about this above. In general, P(A$|$B) and
 P(B$|$A) are very different numbers. Ask yourself this: if you chose a random
 American, and they turned out to be pretty tall (say, taller than average),
 what's the probability that they're also an NBA player? I think you'll agree
-that the number here would be very small indeed: perhaps P(NBA$|$tall) would be
-.00001. There just aren't that many NBA players out there, so the chances of
-you randomly choosing one -- tall or not -- is miniscule. But consider the
-reverse question: if your random choice just happened to be an NBA player,
-what's the probability that they'd also be tall? This, by contrast, would be
-far greater: I'll bet P(tall$|$NBA) is close to .95, since nearly all
-professional basketball players are pretty tall.
+that the number here would be very small indeed: perhaps P(NBA\ $|$\ tall)
+would be .00001. There just aren't that many NBA players out there, so the
+chances of you randomly choosing one -- tall or not -- is miniscule. But
+consider the reverse question: if your random choice just happened to be an NBA
+player, what's the probability that they'd also be tall? This, by contrast,
+would be far greater: I'll bet P(tall\ $|$\ NBA) is close to .95, since nearly
+all professional basketball players are pretty tall.
 
 Or continue the pinterest example. P(pinterest $|$ female) might be .26
 (\textit{i.e.}, 26\% of all females are pinterest users), but P(female $|$
-pinterest) might be .87 (87\% of all pinterest users are females). We'll
-quantify all this in the next section.
+pinterest) might be .87 (87\% of all pinterest users are females). These are
+easy to confuse but critical to distinguish. We'll quantify all this in the
+next section.
 
-%\section{The relationship between joint and conditional}
-%
-%\index{joint probability}
-%\index{conditional probability}
-%
-%Mathematically, here's how these two concepts (joint probability and
-%conditional probability) are related. If A and B are two events, then:
-%
-%\vspace{-.2in}
-%\begin{align*}
-%\boxed{P(A|B) = \frac{P(A,B)}{P(B)}}
-%\end{align*}
-%
-%Suppose I knew that the probability of a random U.S. citizen being a
-%\textit{male pinterest user} was .04. And now suppose I knew that about half
-%of U.S. citizens are male. Then, I could compute:
-%
-%\vspace{-.2in}
-%\begin{align*}
-%P(\textrm{male,pinterest}) = .04 \\
-%P(\textrm{male}) = .5 \\
-%P(\textrm{pinterest} | \textrm{male}) &= \frac{P(\textrm{male},
-%\textrm{pinterest})}{P(\textrm{pinterest})} \\
-%                    &= \frac{P(\textrm{pinterest},
-%\textrm{male})}{P(\textrm{pinterest})} \\
-%                    &= \frac{.04}{.15} = .267 \\
-%\end{align*}
-%
-%\section{Bayes' Rule}
-%\label{sec:bayes}
-%
-%Knowing how joint and conditional probabilities are related, and knowing that
-%P(A,B) = P(B,A), we can derive the following law:
-%
-%\vspace{-.2in}
-%\begin{align*}
-%P(A|B) = \frac{P(B|A) \cdot P(A)}{P(B)}
-%\end{align*}
-%
-%This is called \textbf{Bayes' Rule} (sometimes \textbf{Bayes' Law} or
-%\textbf{Bayes' Theorem}) after the 18th-century Presbyterian minister Thomas
-%Bayes. It is one of the most influential (and controversial, actually)
-%statements in statistics and even all of mathematics.
-%
-%\section{Independence}
-%
-%We need one more background concept before we attack Na\"{i}ve Bayes Classifiers,
-%and that is the \textbf{independence} of events.
-%
-%Simply put, two events are ``independent'' if \textit{whether one of them
-%occurs has no bearing on whether the other one occurs}. It does \textit{not}
-%mean the events are mutually exclusive. It means that the probability of each
-%one of them occurring has nothing to do with the other.
-%
-%It's best seen through an example. Suppose I chose a random U.S. citizen, and
-%I observe two things: whether or not they're white, and whether or not they're
-%female. If I asked you for your estimate of the ``prior'' for the race
-%question, you'd probably come up with something like P(white) = .6. Now I ask
-%you: suppose, before observing their race, that you learned your subject was
-%female. Does this cause you to update your ``prior'' estimate to a more
-%accurate ``posterior''?
-%
-%The answer is no. Whether or not someone is white is \textit{independent} of
-%whether they're female. You thought P(white) was .6, and you still think
-%P(white$|$female) is .6. The opposite was true in the pinterest example: your
-%estimate of their pinterest status \textit{did} change when you learned about
-%their gender. Therefore, those two events are \textit{not} independent.
-%
-%Both of the following mathematical identities are true \textit{\textbf{only
-%\underline{if}}} the events $A$ and $B$ are independent:
-%\vspace{-.2in}
-%\begin{align*}
-%P(A,B) &= P(A) \cdot P(B) \\
-%P(A|B) &= P(A)
-%\end{align*}
-%
+
+\section{The relationship between joint and conditional}
+
+\index{joint probability}
+\index{conditional probability}
+
+Mathematically, here's how these two concepts (joint probability and
+conditional probability) are related. If A and B are two events, then:
+
+\vspace{-.2in}
+\begin{align*}
+\boxed{P(A|B) = \frac{P(A,B)}{P(B)}}
+\end{align*}
+
+In words: the conditional is the joint divided by the marginal of the thing
+being conditioned on.
+
+\begin{samepage}
+Let's quantify this with our pinterest example. Here's the four values in our
+joint distribution:
+
+\index{joint probability}
+
+\begin{center}
+\begin{tabular}{l|c|c}
+         & pinterest & $\overline{\textrm{pinterest}}$ \\
+\hline
+male     &   .02     &   .48  \\
+\hline
+female   &   .13     &   .37  \\
+\end{tabular}
+\end{center}
+\end{samepage}
+
+\index{marginal probability}
+\label{calculateMarginalConditional}
+
+We can compute the four marginals by summing rows / columns:
+
+\begin{align*}
+P(\textrm{male}) = .5 \\
+P(\textrm{female}) = .5 \\
+P(\textrm{pinterest}) = .15 \\
+P(\overline{\textrm{pinterest}} ) = .85 \\
+\end{align*}
+
+\index{conditional probability}
+And then, using our definition above, we can calculate all the conditionals:
+
+\begin{align*}
+P(\textrm{male}\ |\ \textrm{pinterest}) &= \frac{.02}{.15} = .003 \\
+P(\textrm{male}\ |\ \overline{\textrm{pinterest}}) &= \frac{.48}{.85} = .565 \\
+P(\textrm{female}\ |\ \textrm{pinterest}) &= \frac{.13}{.15} = .867 \\
+P(\textrm{female}\ |\ \overline{\textrm{pinterest}}) &= \frac{.37}{.85} = .435 \\
+P(\textrm{pinterest}\ |\ \textrm{male}) &= \frac{.02}{.5} = .04 \\
+P(\textrm{pinterest}\ |\ \textrm{female}) &= \frac{.13}{.5} = .26 \\
+P(\overline{\textrm{pinterest}}\ |\ \textrm{male}) &= \frac{.48}{.5} = .96 \\
+P(\overline{\textrm{pinterest}}\ |\ \textrm{female}) &= \frac{.37}{.5} = .74 \\
+\end{align*}
+
+It would be worth your while to double-check all the above calculations to
+reinforce your understanding of how joint, conditional, and marginal
+probabilities all work together.
+
+By the way, it's frequently much easier to estimate the conditional
+probabilities than it is to estimate joint probabilities. So we often run the
+equation at the start of this section ``backwards'' and get joints from
+conditionals. Either way, it works, though.
+
+\section{Bayes' Rule}
+\label{sec:bayes}
+
+Knowing how joint and conditional probabilities are related, and knowing that
+P(A,B) = P(B,A), it's easy to derive the following law:
+
+\vspace{-.2in}
+\begin{align*}
+\boxed{P(A|B) = \frac{P(B|A) \cdot P(A)}{P(B)}}
+\end{align*}
+
+\index{Bayes' Rule (probability)}
+\index{Bayes, Thomas}
+
+This is called \textbf{Bayes' Rule} (sometimes \textbf{Bayes' Law} or
+\textbf{Bayes' Theorem}) after the 18th-century Presbyterian minister Thomas
+Bayes. It is one of the most influential (and controversial, actually)
+statements in statistics and even all of mathematics. It will come up
+prominently in Chapter~\ref{naiveBayes}.
+
+
+\section{Independence}
+
+\index{independence (probability)}
+
+We need one more background concept before we're ready to apply some of this
+stuff, and that is the \textbf{independence} of events. There are two flavors
+of independence: absolute, and conditional.
+
+\subsection{Absolute independence}
+
+\index{absolute independence (probability)}
+\index{mutually exclusive}
+
+Simply put, two events are \textbf{absolutely independent} if \textit{the value
+of one has no bearing either way on the value of the other}. It does
+\textit{not} mean the events are mutually exclusive. It means that the
+probability of each one of them occurring has nothing to do with the other.
+
+\index{prior probability}
+\index{posterior probability}
+
+It's best seen through an example. Suppose I chose a random U.S. citizen, and I
+observe two things: whether or not they're white, and whether or not they're
+female. If I asked you for your estimate of the ``prior'' for the race
+question, you'd probably come up with something like P(white) = .6. Now I ask
+you: suppose, before observing their race, you learned your subject was female.
+Does this cause you to update your ``prior'' estimate to a more accurate
+``posterior''?
+
+The answer is no. Whether or not someone is white is \textit{independent} of
+whether they're female. If you thought the probability of this random person
+being white was .6 before, then you still think it's .6 after learning she's
+female. In symbols, you thought P(white) was .6, and you think P(white\ $|$\
+female) is also .6. The opposite was true in the pinterest example: your
+estimate of their pinterest status \textit{did} change when you learned about
+their gender. Therefore, those two events are \textit{not} independent.
+
+\index{association}
+
+I'm sure you realize that ``independent'' is pretty much the same concept as
+``not associated.'' The way to test a data set for two of its variables being
+independent is essentially to run the appropriate test ($\chi^2$, t-test, or
+Pearson's) and see whether there's a significant association or not. If there's
+not, then we have no compelling evidence that they're \textit{not} independent,
+so we cautiously conclude they are. 
+
+Both of the following mathematical identities are true \textit{\textbf{only
+\underline{if}}} the events $A$ and $B$ are independent:
+\begin{align*}
+P(A|B) &= P(A) \\
+P(A,B) &= P(A) \cdot P(B) 
+\end{align*}
+
+The first of these is basically the definition of independence: if P(white\
+$|$\ female) = P(white), we say they're independent. (And conversely, if
+P(male\ $|$\ pinterest) $\neq$ P(male), we say they're associated and therefore
+\textit{not} independent.)
+
+The second one is a useful multiplicative shortcut, again only valid if the
+variables in question are independent. It's okay to compute P(white,female) as
+P(white) $\cdot$ P(female) = .6 $\cdot$ .5 = .3 -- yielding a 30\% chance of
+randomly choosing a white female -- \textit{because} we know that race and
+gender are independent. (Conversely, it's \textit{not} okay to compute
+P(pinterest,male) as P(pinterest) $\cdot$ P(male) = .15 $\cdot$ .5 = .075,
+because these two variables are not independent; as we saw on
+p.\pageref{calculateMarginalConditional}, the true answer for P(pinterest,male)
+is only .02.)
+
+\subsection{Conditional independence}
+
+\index{conditional independence (probability)}
+
+And lastly, two variables can be \textbf{conditionally independent given a
+third variable} in addition to (or instead of) being absolutely independent.
+
+\index{confounding factor}
+
+What does this mean? Perhaps the best way to think of it is those
+\textbf{confounding factors} we learned about in the first volume of this text.
+You may remember that I had a different pinterest example in that one
+(Section~10.4.1) which featured three variables: a person's \texttt{hair}
+length, their \texttt{pinterest} activity, and their \texttt{gender}. After
+noticing that \texttt{hair} was associated with \texttt{pinterest}, and
+jokingly speculating as to whether long-hair caused pinterest-ness or vice
+versa, we hypothesized that perhaps gender was a confounding variable that was
+actually influencing them both. This theory would explain why long hair and
+pinterest usage tended to go together, without either of them being the cause
+of the other.
+
+In this case, we would say that although \texttt{hair} and \texttt{pinterest}
+were not \textit{absolutely} independent, they nevertheless were
+\textit{conditionally} independent given gender. In symbols:
+
+\small
+\begin{align*}
+P(\textrm{long hair}\ |\ \textrm{pinterest}) &\neq P(\textrm{long hair}) \quad
+&\leftarrow \textrm{no absolute independence}\\
+P(\textrm{long hair}\ |\ \textrm{pinterest,female}) &= P(\textrm{long hair}\ |\
+\textrm{female})
+\quad &\leftarrow \textrm{conditional independence}\\
+\end{align*}
+\normalsize
+
+In other words, once we know the subject is female, whether she's on pinterest
+tells us nothing further about whether or not she will have long hair. The
+information in the pinterest variable that signals ``strong possibility of long
+hair!'' is completely subsumed in the gender variable, and once that's
+controlled for, the pinterest and hair variables are again independent.
