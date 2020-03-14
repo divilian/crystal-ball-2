@@ -11,6 +11,9 @@ areas = the_tables[0]
 areas.columns = ['pic','role','description','adjectives','allocation']
 areas = areas[['role','adjectives','allocation']]
 
+
+#%%
+
 roles = np.array([], dtype=object)
 adjs = np.array([], dtype=object)
 
@@ -23,6 +26,9 @@ adjectives_df = pd.DataFrame({'role':roles, 'adjective':adjs})
 print(adjectives_df)
 
 areas = areas[['role','allocation']]
+print(areas)
+
+#%%
 
 percentages = np.array([], dtype=int)
 
