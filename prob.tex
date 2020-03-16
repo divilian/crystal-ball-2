@@ -313,6 +313,152 @@ probabilities than it is to estimate joint probabilities. So we often run the
 equation at the start of this section ``backwards'' and get joints from
 conditionals. Either way, it works, though.
 
+\section{The Law of ``Total Probability''}
+
+Now if there are only two sexes of newborn babies possible, then it should be
+pretty obvious that:
+
+\vspace{-.2in}
+\begin{align*}
+P(\textrm{male}) + P(\textrm{female}) = 1
+\end{align*}
+\vspace{-.2in}
+
+\index{Carl's ice cream}
+\index{ice cream}
+\index{Fredericksburg}
+\index{chocolate}
+\index{vanilla}
+\index{strawberry}
+\index{sprinkles}
+
+And if there are only three possible ice cream flavors to order at Carl's, then
+the probabilities for each customer's order must add up to 1 as well:
+
+\vspace{-.2in}
+\begin{align*}
+P(\textrm{vanilla}) + P(\textrm{chocolate}) + P(\textrm{strawberry}) = 1
+\end{align*}
+\vspace{-.2in}
+
+We don't even need to know how likely vanilla is to know that the sum of the
+three must equal 1. This is the simplest application of the \textbf{Law of
+Total Probability}.
+
+Now the following is also obvious if you think it through, but maybe not so
+obvious at first glance. Suppose that each Carl's customer orders a small,
+medium, or large ice cream cone, in one of the three flavors. The nine
+possibilities for a customer's order are thus:
+
+\vspace{-.1in}
+\begin{center}
+\begin{multicols}{3}
+\small
+A small vanilla cone \\
+A medium vanilla cone \\
+A large vanilla cone \\
+\columnbreak
+A small chocolate cone \\
+A medium chocolate cone \\
+A large chocolate cone \\
+\columnbreak
+A small strawberry cone \\
+A medium strawberry cone \\
+A large strawberry cone \\
+\end{multicols}
+\end{center}
+\vspace{-.1in}
+
+\index{mutually exclusive}
+\index{collectively exhaustive}
+Let's say we knew all nine probabilities (which must add up to 1, of course).
+Now, how could we figure out the probability of a \textit{chocolate} cone
+order, regardless of size? The answer is: you sum up all the mutually exclusive
+and collectively exhaustive cases which include chocolate as the flavor. In
+symbols:
+
+\vspace{-.2in}
+\begin{align*}
+P(\textrm{chocolate}) = P(\textrm{chocolate, small}) + P(\textrm{chocolate,
+medium)} + P(\textrm{chocolate, large})
+\end{align*}
+\vspace{-.2in}
+
+In plain English: the probability of the next customer ordering a chocolate
+cone is the probability they'll order a small chocolate cone plus the
+probability they'll order a medium chocolate cone plus the probability they'll
+order a large chocolate cone.
+
+And what's the probability that the customer will order a \textit{medium} cone,
+regardless of flavor? Clearly, it's:
+
+\vspace{-.2in}
+\begin{align*}
+P(\textrm{medium}) = P(\textrm{vanilla, medium}) + P(\textrm{chocolate,
+medium)} + P(\textrm{strawberry, medium})
+\end{align*}
+\vspace{-.2in}
+
+It's not rocket science -- you just have to think about all the different
+cases. But it is pretty useful, since oftentimes we have joint probabilities
+and need the marginal. And if you think about it, in the one-variable case the
+Law of Total Probability really just \textit{is} computing the marginal.
+
+Sometimes we have more than one variable we're interested in computing the
+probability of. Let's say that Carl's has an additional option: sprinkles on
+top. So now, there are these eighteen possible orders:
+
+\vspace{-.1in}
+\begin{center}
+\begin{multicols}{2}
+\scriptsize
+A plain small vanilla cone \\
+A plain medium vanilla cone \\
+A plain large vanilla cone \\
+A plain small chocolate cone \\
+A plain medium chocolate cone \\
+A plain large chocolate cone \\
+A plain small strawberry cone \\
+A plain medium strawberry cone \\
+A plain large strawberry cone \\
+\columnbreak
+A small vanilla cone with sprinkles\\
+A medium vanilla cone with sprinkles\\
+A large vanilla cone with sprinkles\\
+A small chocolate cone with sprinkles\\
+A medium chocolate cone with sprinkles\\
+A large chocolate cone with sprinkles\\
+A small strawberry cone with sprinkles\\
+A medium strawberry cone with sprinkles\\
+A large strawberry cone with sprinkles\\
+\end{multicols}
+\end{center}
+\vspace{-.1in}
+
+If we wanted to know (say) the probability of a small strawberry cone, we'd
+calculate:
+
+\vspace{-.2in}
+\begin{align*}
+P(\textrm{strawberry, small}) = P(\textrm{strawberry, small, plain}) + 
+P(\textrm{strawberry, small, sprinkles})
+\end{align*}
+\vspace{-.2in}
+
+And if we wanted to know (say) the probability of the next customer wanting a
+large cone with sprinkles, we'd compute:
+
+\vspace{-.2in}
+\begin{align*}
+P(\textrm{large, sprinkles}) = & P(\textrm{vanilla, large, sprinkles}) + \\
+& P(\textrm{chocolate, large, sprinkles}) + \\
+& P(\textrm{strawberry, large, sprinkles})
+\end{align*}
+\vspace{-.2in}
+
+You get the idea.
+
+
 \section{Bayes' Rule}
 \label{sec:bayes}
 
