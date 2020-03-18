@@ -141,9 +141,10 @@ the database. You can run this command:
 \index{sqlite\_master@\texttt{sqlite\_master}}
 \label{sqlite_master}
 \index{SELECT statement@\texttt{SELECT} statement (SQL)}
+\index{FROM clause@``\texttt{FROM}'' clause (SQL)}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-print(pd.read_sql("SELECT name FROM sqlite_master WHERE type='table'"))
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+print(pd.read_sql("SELECT name FROM sqlite_master WHERE type='table'", conn))
 \end{Verbatim}
 
 to find out. If this were the output:
@@ -188,6 +189,7 @@ know much SQL at all. You can simply use this one-liner:
 
 \index{SELECT statement@\texttt{SELECT} statement (SQL)}
 \index{*@\texttt{*} (splat) (SQL)}
+\index{FROM clause@``\texttt{FROM}'' clause (SQL)}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 df = pd.read_sql("SELECT * FROM table_name", conn)
@@ -227,6 +229,7 @@ returning the entire result, use \texttt{COUNT(*)}, \texttt{MAX()},
 \index{COUNT@\texttt{COUNT()} (SQL)}
 \index{MAX@\texttt{MAX()} (SQL)}
 \index{MIN@\texttt{MIN()} (SQL)}
+\index{FROM clause@``\texttt{FROM}'' clause (SQL)}
 \begin{BVerbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm,bgcolor=AliceBlue]
 SELECT COUNT(*) FROM table_name
 SELECT MAX(col1) FROM table_name
