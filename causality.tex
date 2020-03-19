@@ -1,0 +1,53 @@
+
+\chapter{Causality}
+
+\index{causal relationship}
+\index{observational study}
+\index{controlled experiment}
+
+I must now ask you to reach in your memory banks alllll the way back to
+Chapter~10 of the \textit{previous} volume of this book series. That chapter,
+entitled ``Interpreting Data,'' dealt with association vs.~causality,
+confounding factors, controlled experiments vs.~observational studies, and
+related topics. The key question we addressed was how to interpret a
+statistical association between variables. If two variables are correlated,
+then they're correlated...but how confident can we be that there's a
+\textbf{causal} relationship between them -- which is what we usually care
+about?
+
+\index{causal diagram}
+\index{barbecue}
+\index{cancer}
+
+\begin{figure}[ht]
+\begin{minipage}{6in}
+\raisebox{-.5\height}{\includegraphics[width=0.5\textwidth]{causalDiagram.png}}
+\raisebox{-.5\height}{\includegraphics[width=0.4\textwidth]{causalDiagram2.png}}
+\caption{Causal diagrams, each expressing a hypotheses about the causality
+among variables.}
+\label{fig:causalDiagrams}
+\end{minipage}
+\end{figure}
+
+The tool we used for this analysis was the \textbf{causal diagram}, examples of
+which appear in Figure~\ref{fig:causalDiagrams}. Each bubble represents one
+variable, with ``i.v.'' and ``d.v.'' annotations marking the independent and
+dependent variable of our analysis. Arrows pointing from one bubble to another
+asserts a causal relationship between the two: that the value of one is not
+merely \textit{associated with}, but is partially \textit{responsible for}, the
+value of the other. 
+
+If you remember that particular example, there was an observational study
+suggesting that eating barbecue can increase one's risk of various types
+cancer. Assuming that an association between the two variables was in fact
+discovered, the two sides of Figure~\ref{fig:causalDiagrams} represent
+competing theories as to the reasons for that association.
+
+The question we'll ask in this chapter is as follows: given a data set, is
+there any way to actually \textit{tell} which of several competing causal
+theories is true? In other words, if we have more than one hypothesis giving
+alternate explanations for how the patterns in the data set arrived, can the
+data itself be used to judge between them?
+
+And the answer is: sometimes. Let's learn when it can, and when it cannot.
+
