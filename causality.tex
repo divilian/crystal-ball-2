@@ -60,6 +60,8 @@ times when the data fails us in our quest to nail this down. This happens when
 the \textbf{skeleton}s of the two causal models are identical.
 
 \index{skeleton (of a causal diagram)}
+\index{smoking}
+\index{depression}
 
 The skeleton of a causal diagram is simply the diagram you get if you
 \textit{remove the arrowheads}. Consider the two competing models in
@@ -111,3 +113,98 @@ nicotine on the human brain, and determine whether there is a mechanism by
 which serotonin is reduced. Social psychologists could conduct surveys and
 focus groups and learn how often cigarettes are sought by victims of depression
 and why. But the data itself will not give a verdict.
+
+
+\section{The good news: different ``skeletons''}
+
+Often, though, the situation isn't that dire. Consider the controversy raised
+in one of my recent freshman seminars. The class was discussing the invention
+of chopsticks, and the impact that may have had on eastern culture as well as
+culinary techniques. One student made a different kind of claim. He said,
+``this is why so many of the great video game players in the world are from
+Asian countries! When kids from those regions grow up using chopsticks, it
+demands more attention to fine motor skills than using a fork would. And when
+they develop this terrific finger-eye coordination at a young age, it leads to
+greater expertise with a controller or keyboard. Thus they are better equipped
+to compete in high-level gaming.''
+
+Perhaps. But as I listened to this student, I couldn't help remembering what my
+own boys told me: that many of the Asian countries place a higher cultural
+value on video games than we do in the western world. Apparently,
+high-achieving video game players are afforded the same fame and fortune in
+South Korea or Japan that our NFL and NBA players are in the U.S. They are
+awarded lucrative contracts, perform paid testimonial advertising, give
+autographs to cheering throngs, and so forth. It stands to reason, then, that a
+culture which rewards excellent video game play would produce excellent video
+gamers \textit{regardless} of whether those players used forks or chopsticks.
+
+\vspace{-.15in}
+\begin{figure}[ht]
+\begin{center}
+\raisebox{-.5\height}{\includegraphics[width=0.4\textwidth]{chopsticksVG.png}}
+\quad
+\raisebox{-.5\height}{\includegraphics[width=0.4\textwidth]{regionVG.png}}
+\vspace{-.05in}
+\caption{Two competing causal models about why many great video game
+players are from Asian countries.}
+\label{chopsticksVG}
+\end{center}
+\end{figure}
+\vspace{-.05in}
+
+These two competing hypotheses are illustrated in Figure~\ref{chopsticksVG}.
+On the left is my student's model: the region of the world you're in (Asian or
+non-Asian) influences whether or not you primarily use chopsticks at your
+meals. With this much, I agree. But he then further claims that the use of
+chopsticks \textit{causally influences} how good a video game player you are.
+
+The right side of the diagram shows my own mental model: the region of the
+world you're in causally influences both chopstick usage \textit{and} video
+game prowess. In my model, \textsf{chopsticks} and \textsf{VG skill} are
+\textit{associated}, but not \textit{causally} associated.
+
+Now before we go on, consider the following exercise. Without even knowing the
+technical detail that comes next, can you figure out how to confirm or refute
+my student's (left-hand) causal model? What could you do with the data?
+
+The solution is intuitive to many, but not to all. Simply put, you split the
+data into two groups: those from Asian countries and those from non-Asians
+countries. Consider: if, \textit{considering only Asians}, we discover that
+chopstick users are better video gamers than non-chopstick users, then that
+lends credence to the hypothesis that one causes the other. (And the same goes
+for considering only non-Asians.) But if we look only at Asians (or only at
+non-Asians) and find that chopsticks and video game skill are uncorrelated,
+then that pretty much refutes the hypothesis. Everything in the coming sections
+is an elaboration of that principle.
+
+\subsection{Comparing the skeletons}
+
+The reason this example turns out to be one of the ``good news`` cases is that
+the skeletons of the causal diagrams are different. Check out
+Figure~\ref{chopsticksVGskeleton}. At first glance, you might assume that they
+are the same, just as in the smoking/depression example. After all, they're
+both chains-of-three nodes. But they're \textit{not} the same. In one,
+\textsf{chopsticks} is the bubble with connections to the other two, and in the
+other it's \textsf{region of the world}. Just because they're the same shape
+doesn't mean they're the same skeleton: the same bubbles have to be connected
+to the same bubbles.
+
+\vspace{-.15in}
+\begin{figure}[ht]
+\begin{center}
+\raisebox{-.5\height}{\includegraphics[width=0.45\textwidth]{chopsticksVGskeleton.png}}
+\quad
+\raisebox{-.5\height}{\includegraphics[width=0.45\textwidth]{regionVGskeleton.png}}
+\vspace{-.05in}
+\caption{The skeletons of the two causal diagrams.}
+\label{chopsticksVGskeleton}
+\end{center}
+\end{figure}
+\vspace{-.05in}
+
+And since the skeletons are different, the data can distinguish between the
+two, and tell us which causal model (or neither) is likely to be correct.
+
+\subsection{Reasoning about independence}
+
+
