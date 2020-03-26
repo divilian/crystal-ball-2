@@ -167,18 +167,25 @@ Now before we go on, consider the following exercise. Without even knowing the
 technical detail that comes next, can you figure out how to confirm or refute
 my student's (left-hand) causal model? What could you do with the data?
 
-The solution is intuitive to many, but not to all. Simply put, you split the
-data into two groups: those from Asian countries and those from non-Asians
-countries. Consider: if, \textit{considering only Asians}, we discover that
-chopstick users are better video gamers than non-chopstick users, then that
-lends credence to the hypothesis that one causes the other. (And the same goes
-for considering only non-Asians.) But if we look only at Asians (or only at
-non-Asians) and find that chopsticks and video game skill are uncorrelated,
-then that pretty much refutes the hypothesis. Everything in the coming sections
-is an elaboration of that principle.
+\index{conditional probability}
+\index{conditioning@``conditioning on'' (probability)}
+\index{confounding factor}
+
+The solution is intuitive to many, but not to all. Simply put, you
+\textbf{condition on} the \text{region of the world} variable. This means you
+split the data into two groups: those from Asian countries and those from
+non-Asians countries. Think about it: if you \textit{considered only Asians},
+and discovered that chopstick-using Asians are better video gamers than
+non-chopstick-using Asians, then that would lend credence to the hypothesis
+that one causes the other. (And the same goes for considering only non-Asians.)
+But if you looked only at Asians (or only at non-Asians) and found that
+chopsticks and video game skill are \textit{un}correlated, then that pretty
+much refutes the hypothesis. Everything in the coming sections is an
+elaboration of that principle.
 
 \subsection{Comparing the skeletons}
 
+\index{skeleton (of a causal diagram)}
 The reason this example turns out to be one of the ``good news`` cases is that
 the skeletons of the causal diagrams are different. Check out
 Figure~\ref{chopsticksVGskeleton}. At first glance, you might assume that they
@@ -196,7 +203,8 @@ to the same bubbles.
 \quad
 \raisebox{-.5\height}{\includegraphics[width=0.45\textwidth]{regionVGskeleton.png}}
 \vspace{-.05in}
-\caption{The skeletons of the two causal diagrams.}
+\caption{The good case: the causal diagrams have \textit{different}
+skeletons.}
 \label{chopsticksVGskeleton}
 \end{center}
 \end{figure}
@@ -207,4 +215,114 @@ two, and tell us which causal model (or neither) is likely to be correct.
 
 \subsection{Reasoning about independence}
 
+\index{independence (probability)}
+
+The reason we can use the data to render a verdict on our competing causal
+diagrams is that they embody different \textit{independence assumptions}.
+
+Look carefully at the left side of Figure~\ref{chopsticksVG} on
+p.~\pageref{chopsticksVG}. If that causal model were true, then
+\textsf{chopsticks} and \textsf{VG skill} would not be absolutely independent.
+Nor would \textsf{region of the world} and \textsf{VG skill}: after all, if
+you're from an Asian country, you're more likely to use chopsticks, and if you
+use chopsticks, you're more likely to be good at video games, so of course
+the \textsf{region of the world} and \textsf{VG skill} variables are
+correlated.
+
+\index{conditional independence}
+\index{conditional probability}
+
+However, in that left-hand diagram, \textsf{region of the world} and \textsf{VG
+skill} will be \textit{\underline{conditionally} independent given
+\textsf{chopsticks}}. In symbols:
+
+\vspace{-.1in}
+\begin{samepage}
+\begin{align*}
+P(\textrm{VG}\ |\ \textrm{region}) \neq P(\textrm{VG})
+\end{align*}
+\begin{center}
+\textit{but}
+\end{center}
+\vspace{-.1in}
+\begin{align*}
+P(\textrm{VG}\ |\ \textrm{region},\ \textrm{chopsticks}) =
+P(\textrm{VG}\ |\ \textrm{chopsticks})
+\end{align*}
+\end{samepage}
+
+Why is this? Because in the left-hand diagram, the only reason that knowing
+a person's \textsf{region} was of any use to predicting their \textsf{VG skill}
+was because it influenced how likely it was that they used \textsf{chopsticks}.
+If you actually \textit{have} the information about \textsf{chopsticks}
+directly, well then you can toss \textsf{region} out the window. It's
+irrelevant at that point.
+
+The right-hand side of Figure~\ref{chopsticksVG} is much different. Its
+independence assumptions are that \textsf{VG skill} and
+\textit{\textsf{chopsticks}} are conditionally independent given
+\textit{\textsf{region}}. Namely:
+
+\vspace{-.1in}
+\begin{samepage}
+\begin{align*}
+P(\textrm{VG}\ |\ \textrm{region}) \neq P(\textrm{VG}) \quad \textrm{(again)}
+\end{align*}
+\begin{center}
+\textit{but}
+\end{center}
+\vspace{-.1in}
+\begin{align*}
+P(\textrm{VG}\ |\ \textrm{chopsticks},\ \textrm{region}) =
+P(\textrm{VG}\ |\ \textrm{region})
+\end{align*}
+\end{samepage}
+\vspace{-.1in}
+
+This is the flip side of the former case: now, although \textsf{chopsticks} can
+tell you something useful about \textsf{VG skill} in a pinch, the primary
+influencer of gaming skill is not \textsf{chopsticks}, but
+\textit{\textsf{region}}. Once you tell me what region of the world somebody is
+from, I have much better information about their possible video game use, and
+knowing whether they use chopsticks is no longer of interest to me.
+
+\bigskip
+
+To sum up: both models agree that
+
+\vspace{-.1in}
+\begin{align*}
+P(\textrm{VG}\ |\ \textrm{region}) \neq P(\textrm{VG}).
+\end{align*}
+\vspace{-.1in}
+
+But the left one (my student's hypothesis) asserts:
+
+\vspace{-.1in}
+\begin{align*}
+P(\textrm{VG}\ |\ \textrm{region},\ \textrm{chopsticks}) &=
+P(\textrm{VG}\ |\ \textrm{chopsticks})\\
+P(\textrm{VG}\ |\ \textrm{chopsticks},\ \textrm{region}) &\neq
+P(\textrm{VG}\ |\ \textrm{region}),
+\end{align*}
+\vspace{-.1in}
+
+while the right one (my own hypothesis) asserts:
+
+\vspace{-.1in}
+\begin{align*}
+P(\textrm{VG}\ |\ \textrm{region},\ \textrm{chopsticks}) &\neq
+P(\textrm{VG}\ |\ \textrm{chopsticks})\\
+P(\textrm{VG}\ |\ \textrm{chopsticks},\ \textrm{region}) &=
+P(\textrm{VG}\ |\ \textrm{region}).
+\end{align*}
+
+(Note carefully the ``='' vs.~``$\neq$'' signs in those equations, because
+they're the only difference!)
+
+Armed with this insight, we realize that judging between our alternate causal
+models boils down to analyzing the data to see which conditional independence
+assumptions actually hold. Let's see how to do that.
+
+\section{Testing the data for conditional independence}
 
