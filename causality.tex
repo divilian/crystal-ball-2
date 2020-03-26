@@ -19,23 +19,25 @@ about?
 \index{barbecue}
 \index{cancer}
 
+\vspace{-.1in}
 \begin{figure}[ht]
 \begin{minipage}{6in}
-\raisebox{-.5\height}{\includegraphics[width=0.5\textwidth]{causalDiagram.png}}
-\raisebox{-.5\height}{\includegraphics[width=0.4\textwidth]{causalDiagram2.png}}
+\raisebox{-.5\height}{\includegraphics[width=0.45\textwidth]{causalDiagram.png}}
+\raisebox{-.5\height}{\includegraphics[width=0.45\textwidth]{causalDiagram2.png}}
+\vspace{-.15in}
 \caption{Causal diagrams, each expressing a hypotheses about the causality
 among variables.}
 \label{fig:causalDiagrams}
 \end{minipage}
 \end{figure}
+\vspace{-.05in}
 
 The tool we used for this analysis was the \textbf{causal diagram}, examples of
 which appear in Figure~\ref{fig:causalDiagrams}. Each bubble represents one
-variable, with ``i.v.'' and ``d.v.'' annotations marking the independent and
-dependent variable of our analysis. Arrows pointing from one bubble to another
-asserts a causal relationship between the two: that the value of one is not
-merely \textit{associated with}, but is partially \textit{responsible for}, the
-value of the other. 
+variable. Arrows pointing from one bubble to another asserts a causal
+relationship between the two: that the value of one is not merely
+\textit{associated with}, but is partially \textit{responsible for}, the value
+of the one pointed at. 
 
 If you remember that particular example, there was an observational study
 suggesting that eating barbecue can increase one's risk of various types
@@ -47,7 +49,65 @@ The question we'll ask in this chapter is as follows: given a data set, is
 there any way to actually \textit{tell} which of several competing causal
 theories is true? In other words, if we have more than one hypothesis giving
 alternate explanations for how the patterns in the data set arrived, can the
-data itself be used to judge between them?
+\textit{data itself} be used to judge between them?
 
 And the answer is: sometimes. Let's learn when it can, and when it cannot.
 
+\section{The bad news: identical ``skeletons''}
+
+Before I get you too excited, let me say right at the outset that there are
+times when the data fails us in our quest to nail this down. This happens when
+the \textbf{skeleton}s of the two causal models are identical.
+
+\index{skeleton (of a causal diagram)}
+
+The skeleton of a causal diagram is simply the diagram you get if you
+\textit{remove the arrowheads}. Consider the two competing models in
+Figure~\ref{smokingDepression}. An observational study some years ago found an
+association between smoking cigarettes and experiencing clinical depression,
+and made the claim that therefore one of the many detriments to smoking
+(besides heart disease, lung cancer, and other things) was an emotional one.
+That represents the causal model on the left side of the diagram. But some
+objected and said, ``wait a minute...couldn't it instead be the case that
+people who are going through depression are seeking ways to cope with it, and
+that substances like nicotine could be one of those ways?'' This
+depression-causes-smoking hypothesis is on the right side. 
+
+\vspace{-.15in}
+\begin{figure}[ht]
+\begin{minipage}{6in}
+\raisebox{-.5\height}{\includegraphics[width=0.45\textwidth]{smokingDepression.png}}
+\raisebox{-.5\height}{\includegraphics[width=0.45\textwidth]{depressionSmoking.png}}
+\vspace{-.15in}
+\caption{Does smoking cause depression...or does depression lead to smoking?}
+\label{smokingDepression}
+\end{minipage}
+\end{figure}
+\vspace{-.05in}
+
+Unfortunately there is no way to resolve this by looking at the data alone.
+This is because if you remove the (one) arrowhead, you get the same skeleton
+(Figure~\ref{smokingDepressionSkeleton}). Note that ``the same skeleton'' means
+merely \textit{the same bubbles are connected to the same bubbles.} It does
+\textit{not} have anything to do with where those bubbles are positioned on the
+page.
+
+\vspace{-.1in}
+\begin{figure}[ht]
+\begin{center}
+\includegraphics[width=0.8\textwidth]{smokingDepressionSkeleton.png}
+\vspace{-.15in}
+\caption{The bad case: both causal diagrams have the \textit{same} skeleton.}
+\label{smokingDepressionSkeleton}
+\end{center}
+\end{figure}
+\vspace{-.05in}
+
+In this case, the only way to resolve which of the causal models is the true
+one is to investigate the phenomenon on the ground. We have to study the
+mechanisms -- physical and societal -- by means of which each of them might
+plausibly cause the other. Medical researchers could explore the effects of
+nicotine on the human brain, and determine whether there is a mechanism by
+which serotonin is reduced. Social psychologists could conduct surveys and
+focus groups and learn how often cigarettes are sought by victims of depression
+and why. But the data itself will not give a verdict.
