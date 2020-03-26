@@ -32,15 +32,20 @@ consists of a combination of content and formatting/structural commands (or
 (``Rendering'' a page means ``interpreting all that HTML formatting stuff and
 actually presenting a pretty page formatted the way it specifies.)
 
+The first thing to be aware of is that HTML is \textit{not} a programming
+language. (That is, you can't write a program in it.) It's strictly a
+formatting syntax for specifying how text and graphical elements should be laid
+out. If you ever ask someone whether they've done computer programming, and
+they say, ``yeah, I've done programming in HTML,'' you know they're lying.
+
 \index{JSON}
 \index{hierarchical data}
 
-The first important thing to know about HTML is that it is
-\textit{hierarchical}, not flat. This makes it more like JSON than CSV. Even
-though every HTML file is a single sequence of characters, it encodes a
-tree-like structure in which elements can exist inside other elements, which
-can exist inside other elements, \textit{etc.}, with no limit to the amount of
-nesting.
+The second thing to know about HTML is that it is \textit{hierarchical}, not
+flat. This makes it more like JSON than CSV. Even though every HTML file is a
+single sequence of characters, it encodes a tree-like structure in which
+elements can exist inside other elements, which can exist inside other
+elements, \textit{etc.}, with no limit to the amount of nesting.
 
 \index{element (HTML)}
 \index{tag (HTML)}
@@ -49,13 +54,12 @@ nesting.
 
 \index{title@\texttt{<title>} (HTML tag)}
 
-The basic building block of HTML is the \textbf{element}, which is delimited
-by starting and ending \textbf{tags}. Tags are key words, most of which
-indicate something structural or stylistic, enclosed in wakkas (``\texttt{<
-... >}''). The ending tag has a slash (``\texttt{/}'') immediately before the
-keyword, showing that it matches the corresponding opening tag. So, for
-instance, one pair of starting and ending tags might be ``\texttt{<title>}''
-and ``\texttt{</title>}''.
+The basic building block of HTML is the \textbf{element}, which is delimited by
+starting and ending \textbf{tags}. Tags are key words, most of which indicate
+something structural or stylistic, enclosed in wakkas (``\texttt{< ... >}'').
+The ending tag has a slash (``\texttt{/}'') immediately before the keyword,
+showing that it matches the corresponding opening tag. So one pair of starting
+and ending tags might be ``\texttt{<title>}'' and ``\texttt{</title>}''.
 
 Note that the entire contents of the \textit{element} is (1) the starting tag,
 (2) the ending tag, and (3) \textit{everything in between}, which could be
