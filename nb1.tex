@@ -1,0 +1,290 @@
+
+\chapter[ML classifiers: Na\"{i}ve Bayes (1 of 3)]
+{\huge ML classifiers: Na\"{i}ve Bayes (1 of 3)}
+\label{ch:naiveBayes}
+
+\index{machine learning (ML)}
+
+For some folks, the coolest and most exciting parts of Data Science are the
+\textbf{machine learning (ML)} algorithms. These are the under-the-hood
+techniques for doing prediction and analytics. We'll look at a few of them
+briefly in this class, and you'll delve into them more fully in later courses.
+
+\index{classifier}
+\index{label}
+\index{class (ML classifiers)}
+
+Recall that a \textbf{classifier} is an algorithm/program to predict which of
+several \textbf{labels} (or \textbf{classes}) to assign to a data point.
+Perhaps we're trying to predict what political party someone is affiliated
+with, and our labels are ``Democrat,'' ``Republican,'' and ``Green.'' Perhaps
+we're trying to predict whether someone will default on a loan we're
+considering giving them, and the labels are ``safe'' and ``high-risk.''
+
+\index{labeled example}
+\index{unlabeled example}
+\index{example, labeled vs.~unlabeled}
+\index{training data}
+
+There are many different algorithms for classification, but they all use a set
+of \textbf{labeled examples} as ``\textbf{training data}.'' The idea is that by
+scrutinizing a bunch of examples for which we \textit{know} the label, we can
+intelligently figure out what label to assign to new, \textbf{unlabeled
+examples}.
+
+\index{feature}
+\index{target}
+
+The attributes of our training data (and new data) that we'll use for
+prediction are sometimes called \textbf{features}. If our training data is in
+a DataFrame, the features are essentially all the relevant columns except for
+one, which is the \textbf{target}. Our goal, given a new data point that has
+values for all the features, is to label its target with the label it's most
+likely to have, assuming the training data are representative examples. 
+
+\index{performance (of a classifier)}
+\index{test data}
+
+A classifier's \textbf{performance} can be measured in several ways, but the
+most straightforward is to score how many unlabeled examples it gives the
+correct label to. This of course begs the question: if the example is
+\textit{un}labeled, how can we know whether or not the classifier's label was
+correct? What we have to do in practice is set aside some of our (precious)
+labeled data as a set of \textbf{test data}. We sort of pretend we don't know
+the answers for the test data, feed them to the algorithm which has been
+trained on the \textit{training} points, and then score how well it did.
+
+\index{Na\"{i}ve Bayes classifier}
+\index{baseline}
+
+One of the simplest (and quickest) classifiers around is called the
+\textbf{Na\"{i}ve Bayes classifier}, for reasons which will become apparent. In
+some ways, it's the rock-bottom, no-frills default algorithm for
+classification. One reason it's important is that it's simple and actually
+works surprisingly (even embarrassingly) well in many cases. Another reason is
+that even when it doesn't turn out to have the best performance, it's still a
+\textbf{baseline} which other algorithms' performance can be compared to. A
+researcher might report: ``our whiz-bang algorithm X got 89.4\% of examples
+correct on this test set, compared with 83.7\% for straightforward Na\"{i}ve
+Bayes.''
+
+\section{The Na\"{i}ve Bayes algorithm}
+
+Suppose we're designing a security system for a Galactic Cruiser. One thing we
+need to do is identify possible evildoers on our security cameras. Given what
+we can observe about them, can we tell good guys from bad guys?
+
+\index{training data}
+\label{jediTraining}
+
+Here's some training data:
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+             face  height  demeanor lightsaber  type
+            clean   short  menacing      green  Sith
+            beard  medium      calm      green  Jedi
+            clean    tall  menacing        red  Sith
+            beard  medium      calm       blue  Jedi
+            beard  medium      calm       blue  Jedi
+            clean  medium      calm       blue  Sith
+            clean    tall  menacing        red  Jedi
+            clean  medium  menacing        red  Sith
+            clean   short      calm       blue  Jedi
+            beard  medium  menacing      green  Sith
+            beard  medium  menacing       blue  Jedi
+                            . . .
+\end{Verbatim}
+
+\index{feature}
+\index{label}
+\index{target}
+\index{Jedi}
+\index{Sith}
+
+Our features are the first four columns: whether the \texttt{face} of the
+person in question has a \texttt{beard} or is \texttt{clean}-shaven, what their
+\texttt{height} is (clustered in three broad ranges), whether their
+\texttt{demeanor} is \texttt{menacing} or \texttt{calm}, and what color
+\texttt{lightsaber} they wield. The final column is our label: this person is
+known to be a \texttt{Jedi} (good guy) or a \texttt{Sith} (bad guy).
+
+A test point that we might want to evaluate looks like this:
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+                 face  height  demeanor lightsaber  type
+                beard   short  menacing        red   ?? 
+\end{Verbatim}
+
+Operationally, a short, menacing, bearded person with a red lightsaber has just
+showed up on security camera \#305. Should we sound the alarm? That, of course,
+depends upon their (as yet unknown) \texttt{type}. We want to predict this
+based on our past examples.
+
+\index{conditional probability}
+
+The \textbf{Na\"{i}ve Bayes} classification algorithm applies conditional
+probability to this question. Really, what we're asking is: ``which of the
+following two quantities is greater:
+
+\begin{compactenum}
+\item P(Jedi\ $|$\ beard,\ short,\ menacing,\ red),  or
+\item P(Sith\ $|$\ beard,\ short,\ menacing,\ red)?''
+\end{compactenum}
+ 
+Note that we're combining joint and conditional probabilities here. Given that
+we have the \textit{joint} event ``bearded, short, menacing, and red,'' what's
+the \textit{conditional} probability of them being a Jedi (or Sith)? If we
+estimate the first as .8 and the second as .2, for instance, we won't sound the
+alarm.
+
+\section{Using Bayes' rule}
+
+\index{Bayes' Rule (probability)}
+
+With Bayes' rule, we can rewrite these as:
+
+\small
+\begin{center}
+(1) Estimated Jedi probability:
+
+\boxed{\textrm{P(Jedi \ | \ beard, short, menacing, red)} =
+\frac{\textrm{P(beard, short, menacing, red \ | \ Jedi)} \cdot \textrm{P(Jedi)}}{\textrm{P(beard, short, menacing, red)}}}
+\end{center}
+\normalsize
+
+and
+\small
+\begin{center}
+(2) Estimated Sith probability:
+
+\boxed{\textrm{P(Sith \ | \ beard, short, menacing, red)} =
+\frac{\textrm{P(beard, short, menacing, red \ | \ Sith)} \cdot \textrm{P(Sith)}}{\textrm{P(beard, short, menacing, red)}}}
+\end{center}
+\normalsize
+
+Note that the two equations are identical except for the words ``Jedi'' and
+``Sith,'' which are interchanged. We'll first focus on equation (1).
+
+Bayes' Rule has allowed us to turn things on their head. In essence, instead of
+asking ``if they have these physical features, would they likely be a Jedi?''
+we're asking ``if they're a Jedi, would they be likely to have these physical
+features?'' 
+
+\index{prior (probability)}
+
+\index{numerator}
+
+The right-hand side of equation (1) has three parts: two in the numerator, and
+one in the denominator. Ignore the denominator for a moment. The second part of
+the numerator, P(Jedi), is our \textbf{prior} probability. That's easy to
+estimate from the training data: we just count up what percentage of our
+samples are Jedi overall.
+
+The first half of the numerator needs more work. It reads:
+
+\vspace{-.2in}
+\begin{align*}
+P(\textrm{beard},\ \textrm{short},\ \textrm{menacing},\ \textrm{red} \ | \ \textrm{Jedi}) 
+\end{align*}
+
+\index{independence (probability)}
+
+Now \textbf{\textit{\underline{if}}} \ it just so happened that those four
+features were \textit{independent} of one another, this would actually be
+super easy to compute. We could just do this:
+
+\vspace{-.2in}
+\begin{align*}
+P(\textrm{beard} \ |\ \textrm{Jedi}) \cdot
+P(\textrm{short} \ |\ \textrm{Jedi}) \cdot
+P(\textrm{menacing} \ |\ \textrm{Jedi}) \cdot
+P(\textrm{red} \ |\ \textrm{Jedi})
+\end{align*}
+
+Under this outrageous assumption, we've split the expression into \textit{each
+feature individually.} This is called \textbf{the Na\"{i}ve Bayes assumption}.
+Of course it's probably \textit{not} true that beardedness, height, demeanor,
+and lightsaber color are all independent of each other; for one thing, if some
+or all of these features are indicative of Jedi-ness (which we hope), then they
+certainly \textit{will} vary together! But the Na\"{i}ve Bayes classifier says
+``aw heck, let's just throw caution to the wind and see how things work out.''
+
+All these components are now trivially obtainable from the training data. For
+example, what's a good estimate of P(beard $|$ Jedi)? Simple: look at
+\textit{only the Jedi} in the training data, and count up how many
+``\texttt{beard}s'' and ``\texttt{clean}s'' there are. The fraction that are
+\texttt{beard}s is our estimate of P(beard $|$ Jedi).\footnote{If you have
+trouble seeing this, go back to the definition of conditional probability on
+p.~\pageref{condProbDef}. We're really calculating
+$\dfrac{P(\textrm{beard},\textrm{Jedi})}{P(\textrm{Jedi})}$ here, which is
+``the number of bearded Jedi divided by the number of total Jedi.''}
+
+To make it concrete, in our training data on p.~\pageref{jediTraining}, there
+are a total of six Jedi (count them!), of whom four have beards (count them!).
+Therefore, our estimate for P(beard $|$ Jedi) is $\frac{4}{6} = \frac{2}{3}$.
+In other words, based on this training data, we guesstimate that if you're a
+Jedi, it's about 67\% likely that you're bearded.
+
+
+\pagebreak
+\section{A numerical example}
+
+\index{numerator}
+
+Let's work out the numerical answer (numerator only) for the training data
+listed earlier. First, considering \textit{only} the five \texttt{Jedi} rows
+gives us our Jedi numerator:
+
+\smallskip
+% Whew! See array package documentation.
+\begin{tabular}{>{$}c<{$}@{$\ \cdot\ $}>{$}c<{$}@{$\ \cdot\ $}>{$}c<{$}@{$\
+\cdot\ $}>{$}c<{$}@{$\ \cdot\ $}>{$}c<{$}>{$}l<{$}}
+P(\textrm{beard}|\textrm{Jedi}) &
+P(\textrm{short}|\textrm{Jedi}) &
+P(\textrm{menacing}|\textrm{Jedi}) &
+P(\textrm{red}|\textrm{Jedi}) & P(\textrm{Jedi}) &= \\
+\frac{4}{6} & \frac{1}{6} & \frac{2}{6} & \frac{1}{6} &
+\frac{6}{11} &= .0034
+\end{tabular}
+
+\bigskip
+Now let's do the same thing for the five \texttt{Sith} rows to get the Sith
+numerator:
+
+\smallskip
+\begin{tabular}{>{$}c<{$}@{$\ \cdot\ $}>{$}c<{$}@{$\ \cdot\ $}>{$}c<{$}@{$\
+\cdot\ $}>{$}c<{$}@{$\ \cdot\ $}>{$}c<{$}>{$}l<{$}}
+P(\textrm{beard}|\textrm{Sith}) &
+P(\textrm{short}|\textrm{Sith}) &
+P(\textrm{menacing}|\textrm{Sith}) &
+P(\textrm{red}|\textrm{Sith}) & P(\textrm{Sith}) &= \\
+\frac{1}{5} & \frac{1}{5} & \frac{4}{5} & \frac{2}{5} &
+\frac{5}{11} &= .0058\\
+\end{tabular}
+
+\bigskip
+Look very very carefully at the training data on p.~\pageref{jediTraining} and
+confirm that you agree with the above numbers. Using a pencil to write marks
+on the training data often helps you to keep everything straight.
+
+\subsection{Throw away the denominator}
+
+\index{denominator}
+\index{throwing away the denominator}
+
+Okay, those are the two numerators. To get true probabilities, we have to
+divide by the denominators, of course. But the nice thing is: \textit{the
+denominators are the \underline{same} in the two cases!} For both expressions,
+we would need to divide by P(\textrm{beard}, \textrm{short}, \textrm{menacing},
+\textrm{red}) (in words, ``what's the probability that any random person would
+be a bearded, short, menacing person with a red lightsaber?'') This of course
+has the same value even if we compute it twice. For this reason, we
+\textit{throw away the denominator} since in the end all we really care about
+is ``which is higher, P(Jedi $|$ \textsl{stuff}) or P(Sith $|$
+\textsl{stuff})?''
+
+In this case, P(Sith $|$ \textsl{stuff}) is the higher of the two quantities
+(.0058 vs.~.0034) and so we boldly predict: ``this person looks like a Sith!
+Sound the alarm.''
+
+\bigskip
+All that counting and dividing, of course, is a pain. So we'll get Python to
+automate it for us. That's the subject of the next chapter.
