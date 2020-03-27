@@ -117,6 +117,10 @@ and why. But the data itself will not give a verdict.
 
 \section{The good news: different ``skeletons''}
 
+\index{chopsticks}
+\index{video games}
+\index{Asian countries}
+
 Often, though, the situation isn't that dire. Consider the controversy raised
 in one of my recent freshman seminars. The class was discussing the invention
 of chopsticks, and the impact that may have had on eastern culture as well as
@@ -168,7 +172,7 @@ technical detail that comes next, can you figure out how to confirm or refute
 my student's (left-hand) causal model? What could you do with the data?
 
 \index{conditional probability}
-\index{conditioning@``conditioning on'' (probability)}
+\index{conditioning@``conditioning on''}
 \index{confounding factor}
 
 The solution is intuitive to many, but not to all. Simply put, you
@@ -324,5 +328,264 @@ Armed with this insight, we realize that judging between our alternate causal
 models boils down to analyzing the data to see which conditional independence
 assumptions actually hold. Let's see how to do that.
 
-\section{Testing the data for conditional independence}
+\section{Confirming or denying causal hypotheses}
+
+\subsection{Testing the data for absolute independence}
+
+\index{$\chi ^2$ test}
+\index{t-test@$t$-test}
+\index{F-test@$F$-test}
+
+We already know how to test for \textit{absolute} independence: just see
+whether an association exists between the two variables. For two categorical
+variables, it's $\chi ^2$; for two numeric variables, it's a Pearson's
+correlation; and for one of each, it's a $t$-test (or, if you have more than
+two values for the categorical variable, an $F$-test.
+
+\index{synthetic data set}
+
+Let's synthesize some data. For this example, we'll make it easy and say that
+our three variables of interest -- \textsf{region}, \textsf{chopsticks}, and
+\textsf{VG} -- are all categorical, and furthermore are all ``binary'' (only
+two values each). Suppose for a moment that both of the above hypotheses were
+wrong, and actually there was \textit{no} association between \textit{any} of
+the variables. To make a data set reflecting this (certainly wrong) reality, we
+could write code like this:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+region = np.random.choice(['Asian','non-Asian'],p=[.4,.6],size=10000)
+chopsticks = np.random.choice(['yes','no'],p=[.3,.7],size=10000)
+VG = np.random.choice(['good','bad'],p=[.2,.8],size=10000)
+
+data = pd.DataFrame({'region':region,'chopsticks':chopsticks,'VG':VG})
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+                 region chopsticks    VG
+        0         Asian         no   bad
+        1     non-Asian        yes  good
+        2     non-Asian        yes   bad
+        3         Asian         no  good
+        4     non-Asian        yes   bad
+                      .  .  .
+\end{Verbatim}
+
+If this were the case, we'd run our $\chi ^2$ test and get our expected
+negative result:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+scipy.stats.chi2_contingency(pd.crosstab(data.chopsticks, data.VG))[1]
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+0.5055960853810801
+\end{Verbatim}
+
+Here, the right thing to do is throw out both my student's hypothesis and my
+own. Both of them predict that \textsf{chopsticks} and \textsf{VG} would be
+associated, and since they're not, both causal models are probably bogus.
+
+\subsection{Testing the data for conditional independence}
+
+Okay. That's old stuff. Now let's talk about testing for \textit{conditional}
+independence. This involves \textit{three} variables: the two you're checking
+for independence, and the one you're conditioning on. 
+
+Now it turns out this is a hard problem when the variable you're conditioning
+on is numeric, but not so hard when it's categorical. In our case, of course,
+it's categorical, since that's the only kind of data we have.
+
+\subsubsection{Generating, and testing, ``\underline{chopsticks}-cause-videogame-prowess''}
+
+Suppose for the moment that my student was correct. How could we generate a
+synthetic data set reflecting his view of the world? How about:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+region = np.random.choice(['Asian','non-Asian'],p=[.4,.6],size=10000)
+chopsticks = np.where(region=='Asian',
+    np.random.choice(['yes','no'],p=[.8,.2],size=10000),
+    np.random.choice(['yes','no'],p=[.1,.9],size=10000))
+VG = np.where(chopsticks=='yes',
+    np.random.choice(['good','bad'],p=[.5,.5],size=10000),
+    np.random.choice(['good','bad'],p=[.1,.9],size=10000))
+\end{Verbatim}
+
+\pagebreak
+I'm guessing at the numbers, of course. But compare this code with the
+left-side causal model in Figure~\ref{chopsticksVG} (p.~\pageref{chopsticksVG})
+and see if you agree that they coincide. First, we generate \texttt{region}
+independently. Then, we give \texttt{Asian}s a much higher likelihood of being
+chopstick users (80\% as opposed to a mere 10\% of non-Asians). Then, we make
+many more of the chopstick users good video game players (50\% of them) than we
+do non-chopstick users (only 10\%).
+
+\index{conditioning@``conditioning on''}
+
+Testing for conditional independence is just a matter of conditioning;
+\textit{i.e.} treating the two conditioned groups separately.
+
+My student predicted these two things, remember:
+
+\begin{align*}
+P(\textrm{VG}\ |\ \textrm{region},\ \textrm{chopsticks}) &=
+P(\textrm{VG}\ |\ \textrm{chopsticks}) & \textit{student prediction \#1} \\
+P(\textrm{VG}\ |\ \textrm{chopsticks},\ \textrm{region}) &\neq
+P(\textrm{VG}\ |\ \textrm{region}) & \textit{student prediction \#2} \\
+\end{align*}
+\vspace{-.1in}
+
+Let's see if they're true (with the synthetic data set that we know should have
+made them true). The first one claims that \textsf{VG} and \textsf{region} are
+conditionally independent given \textsf{chopsticks}. If this is true, then
+$\chi ^2$ tests on \textsf{VG} and \textsf{region} -- if taken among only the
+chopstick users, or among only the non-chopstick users -- should give us
+\textit{negative} results. Do they?
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+choppers = data[data.chopsticks == "yes"]
+nonChoppers = data[data.chopsticks != "yes"]
+
+scipy.stats.chi2_contingency(pd.crosstab(choppers.region, choppers.VG))[1]
+scipy.stats.chi2_contingency(pd.crosstab(nonChoppers.region, nonChoppers.VG))[1]
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+0.41149872565464615
+0.3220502005397185
+\end{Verbatim}
+
+\index{p-value@$p$-value}
+
+As expected, \textbf{yes}. The $p$-values are well above .05, which tells us
+that \textsf{region} and \textsf{VG} are \textit{not} correlated -- at least
+when we only look at chopstick users, and when we only look at non-chopstick
+users.
+
+Look at that code carefully. We first made two different data frames --
+\texttt{choppers} and \texttt{nonChoppers} -- by taking a subset of the
+original data frame. Then, we subjected each one to a $\chi ^2$ test of the
+relevant variables. Both $p$-values came back greater than $\alpha$, confirming
+that these conditional independencies exist.
+
+To test prediction \#2, we split into groups a different way: Asians and
+non-Asians. Then, we check whether \texttt{chopsticks} and \texttt{VG} are
+independent. To wit:
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+asians = data[data.region == "Asian"]
+nonAsians = data[data.region != "Asian"]
+
+scipy.stats.chi2_contingency(pd.crosstab(asians.chopsticks, asians.VG))[1]
+scipy.stats.chi2_contingency(pd.crosstab(nonAsians.chopsticks, nonAsians.VG))[1]
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+1.4977381776979758e-33
+3.1074726542441227e-71
+\end{Verbatim}
+
+As expected, they are correlated, and therefore \textit{not} independent. There
+is clearly an association between chopstick usage and video game skill, even
+when controlling for region of the world.
+
+\subsubsection{Generating, and testing, ``\underline{culture}-causes-videogame-prowess''}
+
+Okay, now let's suppose the \textit{I} was correct in saying that chopstick
+usage itself has negligible impact on video game skill: the real effect is that
+certain parts of the world have cultures conducive to video games. To generate
+a synthetic data set reflecting \textit{this} view of the world, we'd do
+something like this:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+region = np.random.choice(['Asian','non-Asian'],p=[.4,.6],size=10000)
+chopsticks = np.where(region=='Asian',
+    np.random.choice(['yes','no'],p=[.8,.2],size=10000),
+    np.random.choice(['yes','no'],p=[.1,.9],size=10000))
+VG = np.where(region=='Asian',
+    np.random.choice(['good','bad'],p=[.4,.6],size=10000),
+    np.random.choice(['good','bad'],p=[.15,.85],size=10000))
+\end{Verbatim}
+
+It looks similar at a glance to what we had before, but notice carefully that
+both \texttt{chopsticks} \textit{and \texttt{VG}} are now being influenced by
+\texttt{region}. Good video game players will still be more likely to use
+chopsticks, but not \textit{because} they use chopsticks. Instead, it's because
+they're often from Asian countries. Compare this code with the right-side
+causal model in Figure~\ref{chopsticksVG} (p.~\pageref{chopsticksVG}) and see
+if you agree.
+
+\index{conditioning@``conditioning on''}
+
+What did my causal model predict? These two things:
+
+\begin{align*}
+P(\textrm{VG}\ |\ \textrm{region},\ \textrm{chopsticks}) &\neq
+P(\textrm{VG}\ |\ \textrm{chopsticks}) & \textit{my prediction \#1} \\
+P(\textrm{VG}\ |\ \textrm{chopsticks},\ \textrm{region}) &=
+P(\textrm{VG}\ |\ \textrm{region}) & \textit{my prediction \#2} \\
+\end{align*}
+\vspace{-.1in}
+
+We test these just as before, though looking for the opposite results. If we
+condition on chopsticks, we should see that \textsf{region} and \textsf{VG} are
+\textit{still correlated}:
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+choppers = data[data.chopsticks == "yes"]
+nonChoppers = data[data.chopsticks != "yes"]
+
+scipy.stats.chi2_contingency(pd.crosstab(choppers.region, choppers.VG))[1]
+scipy.stats.chi2_contingency(pd.crosstab(nonChoppers.region, nonChoppers.VG))[1]
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+2.888410498627128e-34
+9.646356783989529e-68
+\end{Verbatim}
+
+These low $p$-values confirm just what we thought: using chopsticks has nothing
+to do with it, man: even factoring that out, video game skill still goes with
+region of the world.
+
+And for prediction \#2:
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+asians = data[data.region == "Asian"]
+nonAsians = data[data.region != "Asian"]
+
+scipy.stats.chi2_contingency(pd.crosstab(asians.chopsticks, asians.VG))[1]
+scipy.stats.chi2_contingency(pd.crosstab(nonAsians.chopsticks, nonAsians.VG))[1]
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+0.9962429463855988
+0.4256313356217548
+\end{Verbatim}
+
+we find that as expected, once you control for country, chopstick usage and
+video game skill have nothing much to do with each other.
+
+\section{Taking a breath}
+
+Whew. That was a lot of number crunching, and subtle reasoning. It's easy to
+get lost in the numbers and say, ``wait...did I just confirm that? Or deny it?
+Which hypothesis was I testing? Was my $p$-value too low? too high? Aggh!''
+
+When you step back and take a breath, you'll see the pattern. In both of these
+cases, we stacked the deck, of course. We deliberately generated an artificial
+data set to confirm the student's hypothesis, and then generated one to confirm
+mine. Who knows what the real answer is? I don't actually have any data on
+video game competitions nor chopstick usage.
+
+The important thing to see is that if the skeletons of two different causal
+theories are different, then you don't have to throw up your hands and say
+``correlation doesn't equal causation! So I guess I know nothing!'' The data
+often has a lot to say, and even in observational studies, a careful analysis
+can reveal deep truths.
 
