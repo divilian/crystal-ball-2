@@ -1,7 +1,7 @@
 
 \chapter[ML classifiers: Na\"{i}ve Bayes (1 of 3)]
 {\huge ML classifiers: Na\"{i}ve Bayes (1 of 3)}
-\label{ch:naiveBayes}
+\label{ch:naiveBayes1}
 
 \index{machine learning (ML)}
 
@@ -70,6 +70,9 @@ Bayes.''
 
 \section{The Na\"{i}ve Bayes algorithm}
 
+\index{spycam}
+\index{security camera}
+
 Suppose we're designing a security system for a Galactic Cruiser. One thing we
 need to do is identify possible evildoers on our security cameras. Given what
 we can observe about them, can we tell good guys from bad guys?
@@ -77,7 +80,8 @@ we can observe about them, can we tell good guys from bad guys?
 \index{training data}
 \label{jediTraining}
 
-Here's some training data:
+Here's some training data, in a \texttt{DataFrame} called ``\texttt{t}'' (for
+``training''):
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
              face  height  demeanor lightsaber  type
             clean   short  menacing      green  Sith
@@ -112,6 +116,9 @@ A test point that we might want to evaluate looks like this:
                  face  height  demeanor lightsaber  type
                 beard   short  menacing        red   ?? 
 \end{Verbatim}
+
+\index{spycam}
+\index{security camera}
 
 Operationally, a short, menacing, bearded person with a red lightsaber has just
 showed up on security camera \#305. Should we sound the alarm? That, of course,
@@ -227,6 +234,7 @@ Jedi, it's about 67\% likely that you're bearded.
 \pagebreak
 \section{A numerical example}
 
+\label{jediNumerical}
 \index{numerator}
 
 Let's work out the numerical answer (numerator only) for the training data
