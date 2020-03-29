@@ -150,33 +150,41 @@ print(predict("clean","tall","menacing","red"))
 
 \section{Estimating confidence}
 
-Our \texttt{predict()} function, as written, just gives a binary answer:
-either \texttt{Sith} or \texttt{Jedi}. It may be useful to know \textit{how
-confident} it is in its prediction for any given input. All we need to do is
-compute the correct ratio. Remember that \texttt{jediness} and
-\texttt{sithness} are just the \textit{numerators} of probabilities, and that
-those probabilities have the same denominator. Therefore, in order to compute
-the true $P(\textrm{Jedi}|e)$, where $e$ is all our evidence (calm, no beard,
-and so forth), we just need to compute:
+\index{evidence}
 
+Our \texttt{predict()} function, as written, just gives a binary answer: either
+\texttt{Sith} or \texttt{Jedi}. It may be useful to know \textit{how confident}
+it is in its prediction for any given input. All we need to do is compute the
+correct ratio. Remember that \texttt{jediness} and \texttt{sithness} are just
+the \textit{numerators} of probabilities, and that those probabilities have the
+same denominator. Therefore, in order to compute the true $P(\textrm{Jedi}\ |\
+e)$, where $e$ is all our evidence (calm, beard, and so forth), we just need to
+compute:
+
+\vspace{-.2in}
 \begin{align*}
-P(\textrm{Jedi}|e) = \frac{\textrm{jediness}}{\textrm{jediness} + \textrm{sithness}}
+P(\textrm{Jedi}\ |\ e) = \frac{\textrm{jediness}}{\textrm{jediness} + \textrm{sithness}}
 \end{align*}
+\vspace{-.2in}
 
 and similarly, 
 
+\vspace{-.2in}
 \begin{align*}
-P(\textrm{Sith}|e) = \frac{\textrm{sithness}}{\textrm{jediness} + \textrm{sithness}}
+P(\textrm{Sith}\ |\ e) = \frac{\textrm{sithness}}{\textrm{jediness} + \textrm{sithness}}
 \end{align*}
+\vspace{-.2in}
 
 The denominator drops out when we divide the quantities anyway.
+
+\medskip
 
 So let's enhance our \texttt{predict()} function to return a list of
 \textit{two} values: the prediction, and the confidence level (on a scale of
 .5 to 1, meaning ``only 50\% confident in our prediction'' all the way to
 ``absolutely 100\% confident in our prediction.'' To wit:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 def predict(face, height, demeanor, lightsaber):
     ...
     if jediness > sithness:
@@ -185,18 +193,25 @@ def predict(face, height, demeanor, lightsaber):
         return ["Sith", sithness/(jediness+sithness)]
 \end{Verbatim}
 
-Taking it for a spin:
+\index{list}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
->>> predict("clean","tall","menacing","red")
-    ['Sith', 0.9760957241941071]
->>> predict("beard","tall","menacing","blue")
-    ['Jedi', 0.7298292697172792]
+(Note that we're returning a list here, of the two values.) Taking it for a
+spin:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+predict("clean","tall","menacing","red")
+predict("beard","tall","menacing","blue")
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+['Sith', 0.9760957241941071]
+['Jedi', 0.7298292697172792]
 \end{Verbatim}
 
-We're incredibly confident that our beardless, tall, menacing, red-wielder is
-a Sith, but not nearly so confident that our bearded, tall, menacing
-blue-wielder is a Jedi.
+So we're incredibly confident that our clean-shaven, tall, menacing,
+red-wielder is a Sith, but not nearly so confident that our bearded, tall,
+menacing blue-wielder is a Jedi.
 
 \vspace{.2in}
 \section{Coding it more generally}
