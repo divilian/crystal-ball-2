@@ -78,13 +78,14 @@ create a dictionary, called something like ``\texttt{probs},'' to store all the
 probabilities. To compute the priors, all we have to do is figure out what
 fraction of the rows go with each label:
 
+\label{calcPriors}
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 probs = {}
 probs['Jedi'] = len(t[t.type=='Jedi'])/len(t)
 probs['Sith'] = len(t[t.type=='Sith'])/len(t)
 \end{Verbatim}
 
-For the conditionals like ``$P(\textrm{calm}|\textrm{Sith})$'', we ask:
+For the conditionals like ``$P(\textrm{calm}\ |\ \textrm{Sith})$'', we ask:
 \textit{considering only the rows that have \texttt{Sith} labels}, what
 fraction also have \texttt{calm} labels? That boils down to this:
 
@@ -95,7 +96,7 @@ probs['calm|Sith'] = (len(t[(t.type=='Sith') & (t.demeanor=='calm')]) /
 \end{Verbatim}
 \normalsize
 
-The other nine conditionals follow exactly the same pattern. (It may strike you
+The other 19 conditionals follow exactly the same pattern. (It may strike you
 that we're repeating a lot of very similar code here, and making slight edits
 to each one, and that there's a better, more general way. You're right. Stay
 tuned for Section~\ref{codingNbGenerally}.)
@@ -195,8 +196,7 @@ def predict(face, height, demeanor, lightsaber):
 
 \index{list}
 
-(Note that we're returning a list here, of the two values.) Taking it for a
-spin:
+(We're returning a list here, of the two values.) Taking it for a spin:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 predict("clean","tall","menacing","red")
@@ -220,19 +220,24 @@ menacing blue-wielder is a Jedi.
 The above calculation of the probabilities left something to be desired, since
 it was hardcoded and repetitive. We can improve on this by writing our code in
 a more general way, rather than explicitly referring to problem-specific names
-like \texttt{'Jedi'} and \texttt{'demeanor'} and \texttt{'blue'}. Here's one
-way to do all the calculations:
+like ``\texttt{Jedi}'' and ``\texttt{demeanor}'' and ``\texttt{blue}.'' Here's
+one way to do all the training calculations:
 
+\index{drop\_duplicates@\texttt{.drop\_duplicates()} (Pandas)}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 df = pd.read_csv("...")
 
 probs = {}
-features = df.columns[:-1]
-target = df.columns[-1]
+features = df.columns[0:len(df.columns)-1]
+target = df.columns[len(df.columns)-1]
 
 for label in df[target].drop_duplicates():
+
+    # Calculate priors.
     probs[label] = len(df[df[target] == label])/len(df)
+
+    # Calculate conditionals.
     for feature in features:
         for value in df[feature].drop_duplicates():
             probs[value+"|"+label] = (
@@ -240,42 +245,70 @@ for label in df[target].drop_duplicates():
                     len(df[df[target] == label]))
 \end{Verbatim}
 
-Here's we're assuming (1) the last column of the DataFrame is the target, and
-(2) all the values in the columns are unique (\textit{e.g.}, that we won't
-have an ``\texttt{out-of-state}'' column with some ``\texttt{beard}'' values and
-also have a ``\texttt{married}'' column with ``\texttt{beard}'' values. But those
-are pretty much our only assumptions.
+Lots going on here. First, after reading the data, we set \texttt{features} to
+be the names of all the columns except the last one, and \texttt{target} to be
+the name of the last one.
 
+Then we loop through all the different target labels (\textit{e.g.},
+``\texttt{Jedi}'' and ``\texttt{Sith}''), calculating both priors and
+conditionals. The priors are straightforward: they're just the fraction of rows
+that match the label, like we did in the top box on p.~\pageref{calcPriors}.
+
+We're making an assumption when calculating conditionals: that all the values
+in the columns are unique (\textit{i.e.}, that we won't have, for example, an
+``\texttt{out-of-state}'' column with some ``\texttt{beard}'' values and also
+have a ``\texttt{married}'' column with ``\texttt{beard}'' values.) As long as
+this is true, we know we have a unique string to use as a key (like
+``\texttt{medium|Sith}'') and it won't have a name collision with any other
+conditional.
+
+\pagebreak
 The \texttt{predict()} method itself will be generalized as follows: instead
 of taking exactly four parameters named ``\texttt{face}'',
 ``\texttt{demeanor}'', \textit{etc.}, it will take a \textit{list} of
 parameter values, so that it can be called like this:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
->>> predict(['beard','tall','menacing','blue'])
-\end{Verbatim}
+\vspace{-.1in}
+\begin{verbatim}
+    predict(['beard','tall','menacing','blue'])
+\end{verbatim}
+\vspace{-.1in}
 
-Here's one implementation of the function:
+Here's one way to implement the function:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 def predict(values):
-    scores = []
-    top_prob = 0
-    top_answer = ""
-    for label in df[target].drop_duplicates():
-        prob = probs[label]                     # Start with the prior
-        for value in values:
-            prob *= probs[value+"|"+label]
-        scores.append(prob)
-        if prob > top_prob:
-            top_prob = prob
-            top_answer = label
-    return [ top_answer, top_prob / sum(scores) ]
+
+   # Compute one score for each target label.
+   scores = []
+
+   # Keep track of the highest score, and its label, as we go.
+   top_score = 0
+   top_label = ""
+
+   for label in df[target].drop_duplicates():
+       score = probs[label]                   # Start with the prior
+       for value in values:
+           score *= probs[value+"|"+label]    # Multiply in conditionals
+       scores.append(score)
+
+       # If the score we just computed is the highest so far, we have a
+       # new most-likely label.
+       if score > top_score:
+           top_score = score
+           top_label = label
+
+   return [ top_label, top_score / sum(scores) ]
 \end{Verbatim}
 
 We use the variable \texttt{scores} to keep a list of the numerators for each
 target label: this is only necessary to compute the confidence level in the
-result.
+result. We go through all the possible target labels, computing our score for
+each, and adding it to \texttt{scores}. Along the way, each time we encounter a
+label who has a higher score than any previous label, we remember it (and its
+score) in the variables \texttt{top\_label} and \texttt{top\_score}. That way,
+at the end of the loop, we can return our list of two elements: the predicted
+label, and our confidence in it.
 
 \section{Measuring performance}
 
