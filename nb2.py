@@ -6,19 +6,19 @@ import scipy.stats
 import seaborn as sns
 
 
-df = pd.read_csv("security_cam.csv")
+t = pd.read_csv("security_cam.csv")
 
 probs = {}
-features = df.columns[0:len(df.columns)-1]
-target = df.columns[len(df.columns)-1]
+features = t.columns[0:len(t.columns)-1]
+target = t.columns[len(t.columns)-1]
 
-for label in df[target].drop_duplicates():
-    probs[label] = len(df[df[target] == label])/len(df)
+for label in t[target].drop_duplicates():
+    probs[label] = len(t[t[target] == label])/len(t)
     for feature in features:
-        for value in df[feature].drop_duplicates():
+        for value in t[feature].drop_duplicates():
             probs[value+"|"+label] = (
-                len(df[(df[target] == label) & (df[feature] == value)]) / 
-                    len(df[df[target] == label]))
+                len(t[(t[target] == label) & (t[feature] == value)]) / 
+                    len(t[t[target] == label]))
 
 def predict(values):
 
@@ -29,7 +29,7 @@ def predict(values):
     top_score = 0
     top_label = ""
 
-    for label in df[target].drop_duplicates():
+    for label in t[target].drop_duplicates():
         score = probs[label]                   # Start with the prior
         for value in values:
             score *= probs[value+"|"+label]    # Multiply in conditionals

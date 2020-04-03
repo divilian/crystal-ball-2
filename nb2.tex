@@ -1,6 +1,3 @@
-% ADD SKLEARN STUFF (SEE JEDISCIKIT.PY)
-% INCLUDING ONE-HOT ENCODING
-
 
 \chapter[ML classifiers: Na\"{i}ve Bayes (2 of 3)]
 {\huge ML classifiers: Na\"{i}ve Bayes (2 of 3)}
@@ -226,23 +223,23 @@ one way to do all the training calculations:
 \index{drop\_duplicates@\texttt{.drop\_duplicates()} (Pandas)}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-df = pd.read_csv("...")
+t = pd.read_csv("...")
 
 probs = {}
-features = df.columns[0:len(df.columns)-1]
-target = df.columns[len(df.columns)-1]
+features = t.columns[0:len(t.columns)-1]
+target = t.columns[len(t.columns)-1]
 
-for label in df[target].drop_duplicates():
+for label in t[target].drop_duplicates():
 
     # Calculate priors.
-    probs[label] = len(df[df[target] == label])/len(df)
+    probs[label] = len(t[t[target] == label])/len(t)
 
     # Calculate conditionals.
     for feature in features:
-        for value in df[feature].drop_duplicates():
+        for value in t[feature].drop_duplicates():
             probs[value+"|"+label] = (
-                len(df[(df[target] == label) & (df[feature] == value)]) / 
-                    len(df[df[target] == label]))
+                len(t[(t[target] == label) & (t[feature] == value)]) / 
+                    len(t[t[target] == label]))
 \end{Verbatim}
 
 Lots going on here. First, after reading the data, we set \texttt{features} to
@@ -286,7 +283,7 @@ def predict(values):
    top_score = 0
    top_label = ""
 
-   for label in df[target].drop_duplicates():
+   for label in t[target].drop_duplicates():
        score = probs[label]                   # Start with the prior
        for value in values:
            score *= probs[value+"|"+label]    # Multiply in conditionals
@@ -312,25 +309,52 @@ label, and our confidence in it.
 
 \section{Measuring performance}
 
-So how well does this classifier work? This depends on how we measure its
-``goodness.'' Commonly, we'll simply ask, ``what percentage of the time is it
-right?'' and count errors the same in either direction (calling ``Sith'' for an
-actual Jedi, or calling ``Jedi'' for an actual Sith).
+\index{performance (of a classifier)}
 
-As we know, we can't test a classifier's performance on the data it's trained
-on and expect to get anything accurate. So we'll need to split our data into a
-training set and a test set. This can be done easily in Pandas with:
+Okay, so how well does this classifier work? This depends on how we measure its
+``goodness.'' You may remember from Chapter~29 of the first volume of this
+series that this is sometimes a nuanced decision. For the spaceship case,
+perhaps it's more important to nail every potential Sith, even at the risk of
+unnecessarily investigating and detaining some Jedi. If we wanted to do this,
+we would need our measure of \texttt{performance} to penalize false negatives
+more than it does false positives.
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-complete_data_set = pd.read_csv("warriors.csv")
+Most commonly, we'll simply ask, ``what percentage of the time is it right?''
+In other words, we'll count errors the same in either direction (predicting
+\texttt{Sith} for someone who is actually a Jedi is just as ``bad'' as
+predicting \texttt{Jedi} for an actual Sith). That's what we'll do first.
+
+\index{test data}
+
+Now as we know, we can't test a classifier's performance on the data it's
+trained on and expect to get anything accurate. So we'll need to split our data
+into a training set and a test set. This can be done easily in Pandas with:
+
+\index{security\_cam@\texttt{security\_cam.csv}}
+\index{sample@\texttt{.sample()} (Pandas)}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+complete_data_set = pd.read_csv("security_cam.csv")
 train = complete_data_set.sample(frac=.7)
 test = complete_data_set.drop(train.index)
 t = train
 \end{Verbatim}
 
-This call to \texttt{.sample()} chooses 70\% of the original, complete
-DataFrame's rows and copies them to a DataFrame called ``\texttt{train}''. Then
-the next line makes ``\texttt{test}'' a DataFrame of all the others (the
+\index{spycam}
+
+This call to \texttt{.sample()} randomly\footnote{You might ask, ``why not just
+take the \textit{first} 70\% of the rows as the training data, and the last
+30\% as the test data? Why choose randomly?'' The answer is that it's probably
+okay to do that, but sometimes there is meaning to the order of the rows in the
+data set and we want to avoid biasing the training vs.~test rows one way or
+another. For example, if our \texttt{security\_cam.csv} was arranged
+chronologically, then the first 70\% of the spycam measurements would all have
+been taken \textit{earlier} than the ones we'd test our performance on. A big
+deal? Possibly not...but on the other hand, perhaps the makeup of our spaceship
+clientele has changed over time, and thus not shuffling the rows would lead to
+inaccuracies.} chooses 70\% of the original \texttt{DataFrame}'s rows and
+copies them to a new \texttt{DataFrame} called ``\texttt{train}''. Then the
+next line makes ``\texttt{test}'' a \texttt{DataFrame} of all the others (the
 remaining 30\%). For convenience, we then copy \texttt{train} into the
 \texttt{t} variable so that none of our previous code has to change.
 
@@ -340,277 +364,51 @@ to compute our accuracy. All we need to do is iterate through the
 \texttt{test} set, passing each row to \texttt{predict()} and seeing whether
 we get the correct answer:
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 num_correct = 0
 for i in range(len(test)):
     row = test.iloc[i]
-    p = predict(row['face'],row['height'],row['demeanor'],row['lightsaber'])
+    p = predict([row['face'],row['height'],row['demeanor'],row['lightsaber']])
     if p[0] == row['type']:
         num_correct += 1
 
-print("We got " + str(num_correct/len(test)*100) +  
-    "% correct on the test data.")
+print("We got {}% correct on the test data.".format(num_correct/len(test)*100))
 \end{Verbatim}
+\vspace{-.2in}
 
 We get a different answer every time we run our program, since it will choose
 a different training/test split in each case.
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
 We got 82.63% correct on the test data.
 \end{Verbatim}
 
-\section{Numerical/continuous variables}
+If we did want to err on the side of caution, and penalize false-Jedi
+predictions more than false-Sith predictions, we could do that as follows: 
 
-In all the examples above, we had categorical features. Computing something
-like ``$P(\textrm{calm}|\textrm{Jedi})$'' is thus just a matter of counting the
-\texttt{Jedi} rows which (exactly) match the value \texttt{calm}. But what if
-we have a numeric feature, like a person's age or salary?
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+num_missed_jedi = 0
+num_missed_siths = 0
+for i in range(len(test)):
+    row = test.iloc[i]
+    p = predict([row['face'],row['height'],row['demeanor'],row['lightsaber']])
+    if p[0] != row['type']:
+        if p[0] == 'Jedi':
+            num_missed_siths += 1
+        if p[0] == 'Sith':
+            num_missed_jedi += 1
 
-One quick-and-dirty way to deal with numeric features is to ``bin'' them, kind
-of like a histogram. Note that this is actually what we already did with the
-``\texttt{height}'' column in the Jedi example: instead of heights like 4'9"
-and 6'6", we had values like \texttt{short} and \texttt{tall}.
+penalty = num_missed_jedi + num_missed_siths * 2
+our_score = (1 - penalty/len(test)) * 100
+\end{Verbatim}
+\vspace{-.2in}
 
-This has obvious drawbacks. For one, we're throwing away all the detail
-present in the measurement and treating different values exactly alike. For
-another, it's up to us to somewhat arbitrarily choose how many bins to use and
-where the demarcation lines are. This has an \textit{ad hoc} feel to it.
-
-Better is to treat the continuous variable as what it really is: a number.
-\textbf{Gaussian Na\"{i}ve Bayes} is probably the most common way to deal with
-this in a principled fashion: we make the assumption that the numeric feature
-is distributed \textbf{normally} (``normal''==``Gaussian''), and estimate its
-mean and standard deviation from the training data. Then, to estimate
-$P(value|target\_label)$ for any particular test data point's value, we choose
-the estimated value of its \textbf{probability density} and use that.
-
-Suppose we had a numeric \texttt{height} feature (measured in inches) instead
-of a categorical one. Our data might look like this:
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-        face  height  demeanor lightsaber  type
-       clean    62.5  menacing      green  Sith
-       beard    68.3      calm      green  Jedi
-       clean    78.1  menacing        red  Sith
-       beard    63.9      calm       blue  Jedi
-       beard    61.9      calm       blue  Jedi
-       clean    68.2      calm       blue  Sith
-       clean    80.1  menacing        red  Jedi
-       clean    33.5      calm      green  Jedi
-                    . . .
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+Our score on the test data was 66.33.
 \end{Verbatim}
 
-Our Gaussian Na\"{i}ve Bayes assumption will be that \textit{for each class, the
-\texttt{height} feature is distributed normally}. If we take all the
-\texttt{Jedi} rows, and calculate their \texttt{height}s' mean and standard
-deviation, we get:
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
->>> warriors[warriors.type=='Jedi'].height.mean()
-    64.0571428571429
->>> warriors[warriors.type=='Jedi'].height.std()
-    9.661931704216865
-\end{Verbatim}
-
-Performing the same calculation for the \texttt{Sith} rows gives us:
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
->>> warriors[warriors.type=='Sith'].height.mean()
-    68.3902173913043
->>> warriors[warriors.type=='Sith'].height.std()
-    9.319673312968604
-\end{Verbatim}
-
-Looks like Sith Lords are a bit taller than Jedi in general, and slightly less
-variable.
-
-\vspace{.1in}
-Let's say we're doing a prediction for a data point with a height of 69
-inches. We'll need to know the value of the density at $x$=69 for both our
-estimated Jedi and estimated Sith distributions. Using the SciPy library, we
-can get ``frozen'' density functions for each distribution:
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-import scipy.stats
-jedi_height = scipy.stats.norm(64.0571428571429, 9.661931704216865)
-sith_height = scipy.stats.norm(68.3902173913043, 9.319673312968604)
-\end{Verbatim}
-
-and then, to calculate the densities, we just call \texttt{.pdf()} on those
-objects:
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
->>> jedi_height.pdf(69)
-    0.036230663486274517
->>> sith_height.pdf(69)
-    0.042717943988373371
-\end{Verbatim}
-
-Not surprisingly, the Sith number comes out a fair bit higher, since according
-to our estimated density, the average Sith's height is taller than the average
-Jedi's.
-
-Keep in mind that the ``.0362'' and ``.0427'' numbers here are a bit hard to
-interpret. They are \textit{not} ``the probability that a Jedi/Sith is exactly
-69 inches tall'' -- that probability, as with all continuous random variables,
-is \textit{zero}. Instead, it's ``the value of the density at $x$=69'' which
-isn't really in any units that make sense. It's okay, though, since we are
-throwing away out denominator and doing relative comparisons anyway.
-
-By the way, there are also other useful things you can call on a frozen SciPy
-distribution, including \texttt{.cdf()} to get the value of the cumulative
-density function at any point, \texttt{.ppf()} to get quantile,
-\texttt{.rvs()} to generate random variates, ordinary statistical things like
-\texttt{.median()}, \texttt{.mean()}, \texttt{.std()}, and other more exotic
-statistical things like moments, confidence intervals, differential entropy,
-survival functions, \textit{etc.} See the documentation for details.
-
-\subsection{Incorporating into the classifier}
-
-Let's add this feature to our classifier. First, the not-so-generally-coded
-version, which had lines like this:
-
-\footnotesize
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-probs['tall|Sith'] = (len(t[(t.type=='Sith') & (t.demeanor=='tall')]) /
-    len(t[(t.type=='Sith')]))
-\end{Verbatim}
-\normalsize
-
-Since \texttt{height} is now numeric, we need to replace all those
-height-related lines with code like this:
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-sith_heights = t[t.type == 'Sith'].height
-sith_height = scipy.stats.norm(sith_heights.mean(),sith_heights.std())
-jedi_heights = t[t.type == 'Jedi'].height
-jedi_height = scipy.stats.norm(jedi_heights.mean(),jedi_heights.std())
-\end{Verbatim}
-
-``\texttt{sith\_height}'' is now our frozen distribution function. In 
-\texttt{predict()}, then, we simply use it as another multiplier:
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-def predict(face, height, demeanor, lightsaber):
-    jediness = (probs[face+"|Jedi"] *
-                probs[demeanor+"|Jedi"] *
-                probs[lightsaber+"|Jedi"] *
-                probs["Jedi"])
-    sithness = (probs[face+"|Sith"] *
-                probs[demeanor+"|Sith"] *
-                probs[lightsaber+"|Sith"] *
-                probs["Sith"])
-
-    jediness *= jedi_height.pdf(height)
-    sithness *= sith_height.pdf(height)
-
-    if jediness > sithness:
-        return "Jedi"
-    else:
-        return "Sith"
-\end{Verbatim}
-
-Notice we've removed the ``\texttt{probs[height+"|Jedi"]}'' lines,
-since they're no longer applicable: \texttt{height} is numeric now. Instead,
-we multiply our \texttt{jediness}/\texttt{sithness} by the value of the
-corresponding class's estimated density at that point.
-
-To incorporate this numeric variable into the more general version of the
-code, we need to intelligently distinguish between numeric and categorical
-columns. This can be done via the \texttt{.dtype} accessor on a DataFrame
-column:
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
->>> print(t.lightsaber.dtype)
-    dtype('O')
->>> print(t.height.dtype)
-    dtype('float64')
-\end{Verbatim}
-
-(The ``\texttt{O}'' stands for ``object,'' which is Pandas' non-intuitive way of
-telling you that the column is something non-numeric, like a string.) You can
-directly compare the result to a value like ``\texttt{np.dtype("float64")}'',
-but the safer and preferred way is to use NumPy's \texttt{.issubdtype()}
-function which more intelligently detects any numeric type (ints, floats,
-\textit{etc.}, no matter the precision).
-
-Our generic implementation begins with:
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-probs = {}
-densities = {}
-target = df.columns[-1]
-numeric_features = [ c for c in df.columns[:-1] 
-    if np.issubdtype(df[c].dtype, np.number) ]
-categorical_features = [ c for c in df.columns[:-1]
-    if not np.issubdtype(df[c].dtype, np.number) ]
-\end{Verbatim}
-
-We're creating a \texttt{densities} dictionary, somewhat similar to our
-\texttt{probs} dictionary, to store feature-specific information for our
-numeric variables (\texttt{probs} will continue to store information for
-categorical variables.) Instead of simple numeric values, \texttt{densities}
-will store frozen density functions.
-
-We now populate \texttt{densities} (and \texttt{probs}):
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-for label in df[target].drop_duplicates():
-    rows_with_this_label = df[df[target] == label]
-    probs[label] = len(rows_with_this_label)/len(df)
-    for feature in numeric_features:
-        density = scipy.stats.norm(rows_with_this_label[feature].mean(),
-            rows_with_this_label[feature].std())
-        densities[feature+"|"+label] = density
-    for feature in categorical_features:
-        for value in df[feature].drop_duplicates():
-            probs[value+"|"+label] = (
-                len(df[(df[target] == label) & (df[feature] == value)]) / 
-                    len(df[df[target] == label]))
-\end{Verbatim}
-
-Our generic \texttt{predict()} function needs to be adjusted somewhat, since
-if we just pass a list of values, we can't tell \textit{which} feature a
-numeric value is supposed to go with. There are various ways to solve this,
-but we'll choose to pass a key/value pair string here (like
-\texttt{"height=69.3"}):
-
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
-def predict(values):
-    scores = []
-    top_prob = 0
-    top_answer = ""
-    for label in df[target].drop_duplicates():
-        prob = probs[label]    # Start with the prior
-        for value in values:
-            if "=" in value:
-                # Numeric feature.
-                numeric_feature, numeric_value = value.split("=")
-                numeric_value = float(numeric_value)
-                prob *= densities[numeric_feature+"|"+label].pdf(numeric_value)
-            else:
-                # Categorical feature.
-                prob *= probs[value+"|"+label]
-        scores.append(prob)
-        if prob > top_prob:
-            top_prob = prob
-            top_answer = label
-    return [ top_answer, top_prob / sum(scores) ]
-\end{Verbatim}
-
-And we call it like this:
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
->>> predict(['beard','height=65','menacing','blue'])
-    ['Jedi', 0.85863336769968801]
->>> predict(['beard','height=85','menacing','blue'])
-    ['Jedi', 0.72742228657164021]
-\end{Verbatim}
-
-How's this thing do?
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-We got 82.33% correct on the test data.
-\end{Verbatim}
-
-Not too shabby.
-
+Here we're penalizing actual-Siths-that-we-predicted-were-Jedi \textit{twice}
+as much as actual-Jedi-that-we-predicted-were-Sith. Our score is no longer a
+``percentage,'' really; it's just a number -- kinda sorta between 0 and 100
+(although it could be lower if we misidentified enough Siths) -- which we can
+use to compare with other classifiers.
