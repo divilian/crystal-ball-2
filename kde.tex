@@ -178,15 +178,28 @@ majority of points.
 One solution to these unfortunate histogram problems is a more advanced
 technique called a \textbf{Kernel Density Estimate}, or a \textbf{KDE}.
 
-\index{kernel}
-\index{Gaussian (kernel)}
+\index{density}
+\index{probability density}
+\index{distribution}
+\label{probDensity}
+
+A ``\textbf{density}'' (or ``\textbf{probability density}'') is defined as a
+single, strongly-peaked function that has an area under its curve of exactly 1.
+It indicates how likely certain values of a numeric variable are to occur:
+values for which the density is high are more probable. Probability densities
+play a starring role in understanding the tendencies of both real and
+randomly-generated data.
+
+When we talk about a ``\textbf{kernel},'' we just mean a density shape that
+we're going to make lots of copies of and add up together. Normally (no pun
+intended!) we will use a \textit{Gaussian kernel}, which means ``a bell curve a
+la the normal distribution'':
+
 \index{normal distribution}
 \label{Gaussian}
-
-A ``kernel'' is defined as a single, strongly-peaked function that has an area
-under its curve of exactly 1. Normally (no pun intended!) we will use a
-\textit{Gaussian kernel}, which means ``a bell curve a la the normal
-distribution'':
+\index{``bell-curvy''}
+\index{kernel}
+\index{Gaussian (kernel)}
 
 \begin{center}
 \includegraphics[width=0.4\textwidth]{lilGaussian.png}

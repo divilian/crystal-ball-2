@@ -86,6 +86,7 @@ For the conditionals like ``$P(\textrm{calm}\ |\ \textrm{Sith})$'', we ask:
 \textit{considering only the rows that have \texttt{Sith} labels}, what
 fraction also have \texttt{calm} labels? That boils down to this:
 
+\label{calcConditionals}
 \footnotesize
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 probs['calm|Sith'] = (len(t[(t.type=='Sith') & (t.demeanor=='calm')]) /
@@ -272,6 +273,7 @@ parameter values, so that it can be called like this:
 \vspace{-.1in}
 
 Here's one way to implement the function:
+\label{codingNbGenerallyPredict}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 def predict(values):

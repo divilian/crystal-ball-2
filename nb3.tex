@@ -1,0 +1,364 @@
+% ADD SKLEARN STUFF (SEE JEDISCIKIT.PY)
+% INCLUDING ONE-HOT ENCODING
+
+\chapter[ML classifiers: Na\"{i}ve Bayes (3 of 3)]
+{\huge ML classifiers: Na\"{i}ve Bayes (3 of 3)}
+\label{ch:naiveBayes3}
+
+\section{Numeric variables}
+
+\index{Jedi}
+\index{Sith}
+
+In all the examples above, we had categorical features. Computing something
+like ``$P(\textrm{calm}\ |\ \textrm{Jedi})$'' is thus just a matter of counting
+the \texttt{Jedi} rows which (exactly) match the value \texttt{calm}. But what
+if we have a numeric feature, like a person's age or salary?
+
+One quick-and-dirty way to deal with numeric features is to ``bin'' them, kind
+of like a histogram. Note that this is actually what we already did with the
+``\texttt{height}'' column in the Jedi example: instead of heights like 4'9"
+and 6'6", we had values like \texttt{short} and \texttt{tall}.
+
+This has obvious drawbacks. For one, we're throwing away all the detail
+present in the measurement and treating different values exactly alike. For
+another, it's up to us to somewhat arbitrarily choose how many bins to use and
+where the demarcation lines are. This has an \textit{ad hoc} feel to it.
+
+\subsection{Gaussian Na\"{i}ve Bayes}
+\index{Gaussian Na\"{i}ve Bayes}
+\index{normal distribution}
+\index{Gaussian (normal) distribution}
+\index{bell-curvy}
+\index{probability density}
+
+Better is to treat the continuous variable as what it really is: a number.
+\textbf{Gaussian Na\"{i}ve Bayes} is probably the most common way to deal with
+this in a principled fashion: we make the assumption that the numeric feature
+is distributed \textbf{normally} (``normal''==``Gaussian''), and estimate its
+mean and standard deviation from the training data. Then, to estimate
+$P(\textrm{value}\ |\ \textrm{target\_label})$ for any particular test data
+point's value, we choose the estimated value of its \textbf{probability
+density} (p.~\pageref{probDensity}) and use that.
+
+Remember from Section~\ref{GaussianDistro} (p.~\pageref{GaussianDistro}) that
+if a variable is ``distributed normally'' it means that its values are
+``bell-curvy.'' There's some average value which occurs a lot, and values
+farther and farther from that average are less and less likely to occur.
+
+Now suppose we had a numeric \texttt{height} feature (measured in inches)
+instead of a categorical one. Our data might look like this:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+                    face  height  demeanor lightsaber  type
+                   clean    62.5  menacing      green  Sith
+                   beard    68.3      calm      green  Jedi
+                   clean    78.1  menacing        red  Sith
+                   beard    63.9      calm       blue  Jedi
+                   beard    61.9      calm       blue  Jedi
+                   clean    68.2      calm       blue  Sith
+                   clean    80.1  menacing        red  Jedi
+                   clean    33.5      calm      green  Jedi
+                                . . .
+\end{Verbatim}
+
+\index{normal distribution}
+\index{Gaussian (normal) distribution}
+
+Our Gaussian Na\"{i}ve Bayes assumption will be that \textit{for each class,
+the \texttt{height} feature is distributed normally}. Given this assumption, we
+can characterize its normal distribution with just two parameters: its
+estimated mean and standard deviation. So we take all the \texttt{Jedi} rows,
+and calculate their \texttt{height}s' mean and standard deviation:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+warriors[warriors.type=='Jedi'].height.mean()
+warriors[warriors.type=='Jedi'].height.std()
+\end{Verbatim}
+\vspace{-.3in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+64.0571428571429
+9.661931704216865
+\end{Verbatim}
+
+\vspace{.1in}
+Performing the same calculation for the \texttt{Sith} rows gives us:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+warriors[warriors.type=='Sith'].height.mean()
+warriors[warriors.type=='Sith'].height.std()
+\end{Verbatim}
+\vspace{-.3in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+68.3902173913043
+9.319673312968604
+\end{Verbatim}
+
+Interesting. Looks like Sith Lords are a bit taller than Jedi in general, and
+slightly less variable.
+
+\vspace{.1in}
+
+\index{frozen distribution@``frozen'' distribution (SciPy)}
+\index{spycam}
+\index{security camera}
+
+Now let's say we're doing a Jedi-vs.-Sith prediction for a person whose height
+(according to our security camera) is 69 inches. We'll need to know the value
+of the density at $x$=69 for both our estimated Jedi and estimated Sith
+distributions. Using the SciPy library, we can get ``frozen'' distributions for
+each:
+
+\index{import@\texttt{import}}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+import scipy.stats
+jedi_height = scipy.stats.norm(64.0571428571429, 9.661931704216865)
+sith_height = scipy.stats.norm(68.3902173913043, 9.319673312968604)
+\end{Verbatim}
+
+\index{pdf@\texttt{.pdf()} method}
+
+Think of a frozen distribution as just a variable on which we can call a
+\texttt{.pdf()} method to find the height of its distribution at a particular
+value. Let's see how high the estimated Jedi and Sith densities are for a
+height of 69 inches:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+jedi_height.pdf(69)
+sith_height.pdf(69)
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+0.036230663486274517
+0.042717943988373371
+\end{Verbatim}
+
+Not surprisingly, the Sith number comes out a fair bit higher, since according
+to our estimated density, the average Sith's height is taller than the average
+Jedi's.
+
+Keep in mind that the ``.0362'' and ``.0427'' numbers here are a bit hard to
+interpret. They are \textit{not} ``the probability that a Jedi/Sith is exactly
+69 inches tall'' -- that probability, as with all continuous random variables,
+is \textit{zero}. Instead, it's ``the value of the density at $x$=69'' which
+isn't really in any units that make sense. It's okay, though, since we are
+throwing away out denominator and doing relative comparisons anyway.
+
+\index{normal random value}
+\index{random value}
+\index{quantiles}
+\index{mean}
+\index{standard deviation}
+
+By the way, there are also other useful things you can call on a frozen SciPy
+distribution, including \texttt{.cdf()} to get the value of the cumulative
+density function at any point, \texttt{.ppf()} to get a quantile,
+\texttt{.rvs()} to generate random values from it, ordinary statistical
+things like \texttt{.median()}, \texttt{.mean()}, \texttt{.std()}, and other
+more exotic statistical things like moments, confidence intervals, differential
+entropy, survival functions, \textit{etc.} See the documentation for details.
+
+\subsection{Incorporating into the classifier}
+
+Let's add this feature to our classifier. First, the training code for the
+not-so-generally-coded version (p.~\pageref{calcConditionals}), which had lines
+like this:
+
+\footnotesize
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+probs['tall|Sith'] = (len(t[(t.type=='Sith') & (t.demeanor=='tall')]) /
+    len(t[(t.type=='Sith')]))
+\end{Verbatim}
+\normalsize
+
+Since \texttt{height} is now numeric, we need to replace all those
+height-related lines with code like this:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+sith_heights = t[t.type == 'Sith'].height
+sith_height = scipy.stats.norm(sith_heights.mean(),sith_heights.std())
+jedi_heights = t[t.type == 'Jedi'].height
+jedi_height = scipy.stats.norm(jedi_heights.mean(),jedi_heights.std())
+\end{Verbatim}
+
+\index{frozen distribution@``frozen'' distribution (SciPy)}
+\index{predict@\texttt{predict()} (Jedi/Sith)}
+
+``\texttt{sith\_height}'' and ``\texttt{jedi\_height}'' are now our frozen
+distribution functions. In \texttt{predict()}, then, we simply use it as
+another multiplier:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+def predict(face, height, demeanor, lightsaber):
+    jediness = (probs[face+"|Jedi"] *
+                jedi_height.pdf(height) *               <-- CHANGED
+                probs[demeanor+"|Jedi"] *
+                probs[lightsaber+"|Jedi"] *
+                probs["Jedi"])
+    sithness = (probs[face+"|Sith"] *
+                sith_height.pdf(height) *               <-- CHANGED
+                probs[demeanor+"|Sith"] *
+                probs[lightsaber+"|Sith"] *
+                probs["Sith"])
+    if jediness > sithness:
+        return "Jedi"
+    else:
+        return "Sith"
+\end{Verbatim}
+
+Squint at that code and notice the changed lines from
+Figure~\ref{fig:predictFunc} (on p.~\pageref{fig:predictFunc}). We've removed
+the ``\texttt{probs[height+"|Jedi"]}'' lines, since they're no longer
+applicable: \texttt{height} is numeric now. Instead, we multiply our
+\texttt{jediness}/\texttt{sithness} by the value of the corresponding class's
+estimated density at that point.
+
+\index{dtype@\texttt{dtype}}
+
+To incorporate this numeric variable into the more general version of the code
+(p.\pageref{codingNbGenerally}), we need to intelligently distinguish between
+numeric and categorical columns. This can be done via the \texttt{.dtype}
+accessor on a \texttt{DataFrame} column:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(t.lightsaber.dtype)
+print(t.height.dtype)
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+dtype('O')
+dtype('float64')
+\end{Verbatim}
+
+\index{object@``\texttt{object}'' (a.k.a. \texttt{str}) \texttt{dtype}}
+\index{issubdtype@\texttt{issubdtype()}}
+
+(The ``\texttt{O}'' stands for ``object,'' which is Pandas' non-intuitive way
+of telling you that the column is something non-numeric, like a string.) You
+can directly compare the result to a value like
+``\texttt{np.dtype("float64")}'', but the safer and preferred way is to use
+NumPy's \texttt{issubdtype()} function which more intelligently detects any
+numeric type (\texttt{int}s, \texttt{float}s, \textit{etc.}, no matter the
+precision).
+
+Our new generic implementation begins with:
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+probs = {}
+densities = {}
+target = t.columns[len(t.columns)-1]
+num_fs= [ c for c in t.columns[:-1] if np.issubdtype(t[c].dtype,np.number) ]
+cat_fs = [ c for c in t.columns[:-1] if not np.issubdtype(t[c].dtype,np.number) ]
+\end{Verbatim}
+
+We're creating a \texttt{densities} dictionary, somewhat similar to our
+\texttt{probs} dictionary, to store feature-specific information for our
+numeric variables (\texttt{probs} will continue to store information for
+categorical variables). Instead of simple numeric values, \texttt{densities}
+will store frozen distribution functions. Additionally, instead of a single
+\texttt{features} list like we had on p.~\pageref{codingNbGenerally}, we now
+have two lists -- \texttt{num\_fs} and \texttt{cat\_fs} -- for the names of the
+numeric and categorical features, respectively.
+
+\index{list!list comprehension}
+\index{boxies (square brackets)}
+\index{[]@\texttt{[]} (boxies)}
+
+Something else in that code might be new to you: we're using something called a
+\textbf{list comprehension}, which is just a sleek way of creating a list
+without the need for a \texttt{for} loop. Notice the boxies after the equals
+signs for \texttt{num\_fs} and \texttt{cat\_fs}, and the \texttt{if} clauses.
+This code says ``if column \texttt{c} is a numeric variable, put it in
+\texttt{num\_fs}, otherwise put it in \texttt{cat\_fs}.''
+
+\medskip
+
+All right, now we can populate \texttt{densities} (and \texttt{probs}):
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+for label in df[target].drop_duplicates():
+    rows_with_this_label = df[df[target] == label]
+    probs[label] = len(rows_with_this_label)/len(df)
+    for feature in numeric_features:
+        density = scipy.stats.norm(rows_with_this_label[feature].mean(),
+            rows_with_this_label[feature].std())
+        densities[feature+"|"+label] = density
+    for feature in categorical_features:
+        for value in df[feature].drop_duplicates():
+            probs[value+"|"+label] = (
+                len(df[(df[target] == label) & (df[feature] == value)]) / 
+                    len(df[df[target] == label]))
+\end{Verbatim}
+
+\index{predict@\texttt{predict()} (Jedi/Sith)}
+\index{key-value pair}
+
+Our generic \texttt{predict()} function from
+(p.\pageref{codingNbGenerallyPredict}) needs to be adjusted somewhat, since if
+we just pass a list of values, we can't tell \textit{which} feature a numeric
+value is supposed to go with. There are various ways to solve this, but we'll
+choose to pass a key/value pair string in this case (like
+\texttt{"height=69.3"}). The complete code is in Figure~\ref{generalNbWithNum},
+and we call the function like this:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+predict(['beard','height=65','menacing','blue'])
+predict(['beard','height=85','menacing','blue'])
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+['Jedi', 0.85863336769968801]
+['Jedi', 0.72742228657164021]
+\end{Verbatim}
+
+\begin{figure}[ht]
+\centering
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+def predict(values):
+
+    scores = []
+    top_prob = 0
+    top_answer = ""
+
+    for label in df[target].drop_duplicates():
+
+        prob = probs[label]    # Start with the prior
+
+        for value in values:
+            if "=" in value:
+                # Numeric feature.
+                numeric_feature, numeric_value = value.split("=")
+                numeric_value = float(numeric_value)
+                prob *= densities[numeric_feature+"|"+label].pdf(numeric_value)
+            else:
+                # Categorical feature.
+                prob *= probs[value+"|"+label]
+
+        scores.append(prob)
+
+        if prob > top_prob:
+            top_prob = prob
+            top_answer = label
+
+    return [ top_answer, top_prob / sum(scores) ]
+\end{Verbatim}
+\caption{A general Na\"{i}ve Bayes \texttt{predict()} function, enhanced to
+allow numeric features (which are passed as key/value strings like
+\texttt{"height=51.5"}).}
+\label{generalNbWithNum}
+\end{figure}
+
+And how does this thing do?
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+We got 82.33% correct on the test data.
+\end{Verbatim}
+
+Not too shabby.
+
