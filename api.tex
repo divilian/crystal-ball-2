@@ -272,6 +272,10 @@ Python program with the API so you can access the data.
 
 \subsection{Authentication}
 
+\index{authentication}
+\index{rate limit}
+\index{OAuth}
+
 Many APIs require some form of \textbf{authentication}, which essentially
 means you need to provide some personal information to identify you to the
 site. Since we'll be dealing only with open APIs, this isn't a security thing
@@ -291,10 +295,9 @@ without realizing it if you've ever enabled some third-party app which then
 caused a confirmation dialog box to pop up saying, ``application so-and-so is
 requesting access to the following information of yours...do you approve?'')
 
-For Twitter, here's the procedure I used:
+For Twitter, here's the procedure that works as of this writing:
 
-\begin{enumerate}
-\itemsep.1em
+\begin{compactenum}
 \item If you're not actually a Twitter user, create a Twitter account.
 \item Sign on to \url{dev.twitter.com}.
 \item Go to \url{apps.twitter.com} and create an ``application.'' For our
@@ -302,7 +305,7 @@ purposes, an application is sort of like a project, of which you can have
 several. It's mainly an organizational thing.
 \item Navigate to your application and choose ``Keys and Access Tokens.''
 Create an Access Token.
-\end{enumerate}
+\end{compactenum}
 
 You will now see, on the ``Keys and Access Tokens'' page, \textit{four} strings
 of gobbledygook, all four of which you'll need:
@@ -310,13 +313,13 @@ of gobbledygook, all four of which you'll need:
 \vspace{.1in}
 \small
 \begin{compactitem}
-\item A ``consumer key.'' Mine is \texttt{9dFucBtR1P58pJICXGV2gaKhj}.
+\item A ``consumer key.'' Mine is \texttt{\footnotesize 9dFucBtR1P58pJICXGV2gaKhj}.
 \item A ``consumer secret.'' Mine is
-\texttt{uKufTBegOrw5hrjNQmXFwcVtWjSb2bUHsMEoBwjN5gHzTbpJ0U}.
+\texttt{\footnotesize uKufTBegOrw5hrjNQmXFwcVtWjSb2bUHsMEoBwjN5gHzTbpJ0U}.
 \item An ``access token.'' Mine is
-\texttt{1019144197-5dhD0p1VbE80kPnzZrhjq43G08iMbguggkn67q1}.
+\texttt{\footnotesize 1019144197-5dhD0p1VbE80kPnzZrhjq43G08iMbguggkn67q1}.
 \item An ``access token secret.'' Mine is
-\texttt{JOtRHxgzhj6KQhuOuwljB214UImybVANFX6pbSYsDJhTd}.
+\texttt{\footnotesize JOtRHxgzhj6KQhuOuwljB214UImybVANFX6pbSYsDJhTd}.
 \end{compactitem}
 \normalsize
 \vspace{.1in}
@@ -333,12 +336,15 @@ this is super important.)
 
 \subsection{Authenticating with the \texttt{requests\_oauthlib} package}
 
+\index{requests\_oauthlib@\texttt{requests\_oauthlib} package}
+\index{conda install@``\texttt{conda install}'' command}
+
 To authenticate with OAuth, we'll use Python's \texttt{requests\_oauthlib}
-package as follows:
+package. You may have to install it first, by typing ``\texttt{conda install
+requests-oauthlib}'' at your operating system's command line. Then, this code
+should work:
 
-conda install requests-oauthlib
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 from requests_oauthlib import OAuth1
 cons_key = "MlUmay5kA1vGWKokmmFofgRLX"
 cons_secret = "2FFYCyI2rhUIEltkepeNhVcZvYufXJukCJMqE1s3ALKoLYm7LD"
@@ -347,10 +353,12 @@ access_secret = "fmW3KSw0kSYH43QPqSxUscnZD8XF8M8oEJnKm2sRAcq70"
 oauth = OAuth1(cons_key, cons_secret, access_token, access_secret)
 \end{Verbatim}
 
-We now have an object called \texttt{oauth} which can be passed to functions
+We now have a variable called \texttt{oauth} which can be passed to functions
 in the \texttt{requests} package to get data.
 
 \subsection{HTTP GET parameters}
+\index{HTTP}
+\index{\texttt{GET} parameter (HTTP)}
 
 The Twitter API is documented at \url{https://dev.twitter.com/docs}, a page
 well worth perusing in detail. You'll see numerous endpoints documented there,
@@ -361,91 +369,131 @@ triggering some operation, passing parameters, and getting a return value. The
 syntax is a bit different though. In Python, you're used to making a function
 call like this:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
-get_user_timeline('katyperry',4)
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+get_user_timeline('katyperry',4)     <-- (not real; I'm making this up)
 \end{Verbatim}
 
 to indicate something like ``get the latest four tweets from user
-\texttt{@katyperry}.'' The corresponding syntax in URL Land is like this:
+\texttt{@katyperry}.'' Now in order to ``call'' a ``function'' from the
+\textit{API} and ``pass'' these ``parameters,'' you code up a URL with syntax
+like this:
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=lines]
+\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=lines,framesep=3mm]
 https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=katyperry&count=4
 \end{Verbatim}
 
-Note that parameters are ``passed'' as key/value pairs, with no spaces, after a
-``\texttt{?}'', and separated by ``\texttt{\&}'' signs. The following code:
+Stare at all that nonsense. Note that our ``parameters'' are expressed as
+key/value pairs, with no spaces, at the end of the URL: after a ``\texttt{?}'',
+and each separated by ``\texttt{\&}'' signs. The following code, then:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 four_from_katy = json.loads(requests.get(
     "https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=
             katyperry&count=4",
             auth=oauth).content.decode('utf-8'))
+
 for tweet in four_from_katy:
     print(tweet.text)
 \end{Verbatim}
 \normalsize
 
-produces this result (today):
+produces this result (as of today):
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-You're not going to miss this dance @effiepassero. #americanidol
-@CadeFoehner Keep that feather, keep catching those dreams. #americanidol
-HONEY!  #americanidol
-@MaraJustine1 There’s not just glitter on your nails It's in every pore,
-and it comes out every time you sing  #americanidol
+\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=single,framesep=3mm]
+Sending <3 out to all of you on this #ShoesdayTuesday! I will be donating 10% from the
+sale of every shoe and handb... https://t.co/TsyHuFquc6
+
+this is how you wash with styyylesss https://t.co/C7rlCUGv9Y
+
+OMGEE We're leaving it to you, America! We couldn't choose between @GraceLeermusic &
+@LaurenMascitti so we're leavi... https://t.co/OH2X3o9XAV
+
+It's the end of the #AmericanIdol journey for #DemiRae - but the beginning of a new
+journey for her. Keep being the... https://t.co/P5Fqx2Q7l5
 \end{Verbatim}
 
-By the way, if a value you want to pass contains a space, you'll need to
-convert that space to a plus sign (``\texttt{+}''). For instance, the standard
-search endpoint is \texttt{https://api.twitter.com/1.1/search/tweets.json},
-and requires a ``\texttt{q}'' parameter with your query string. I could search
-for Star Wars toys with:
+\section{URL encoding}
 
-\small
+Sometimes the parameters you want to put into a URL contain spaces or
+punctuation characters. You'll need to encode those properly in order for the
+URL to be valid and for the API to not get confused.
+
+If a value you want to pass contains a space, you'll need to convert that space
+to a plus sign (``\texttt{+}''). For instance, the standard search endpoint for
+Twitter is \texttt{https://api.twitter.com/1.1/search/tweets.json}, and
+requires a ``\texttt{q}'' parameter with your query string. I could search for
+Star Wars toys with:
+
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
 toys = json.loads(requests.get(
     "https://api.twitter.com/1.1/search/tweets.json?q=
             star+wars+toys&count=5", auth=oauth).content.decode('utf-8'))
 \end{Verbatim}
-\normalsize
 
-This endpoint returns a dictionary of information:
+Note how instead of putting ``\texttt{star wars toys}'' in the URL, I put
+``\texttt{star+wars+toys}''. In case you're in a shopping mood, btw, this
+endpoint returns a dictionary of information:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
->>> print(list(toys.keys()))
-    ['statuses', 'search_metadata']
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(toys.keys())
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+['statuses', 'search_metadata']
 \end{Verbatim}
 
-Looks like the tweets themselves (``\texttt{statuses}'') are in the
-\texttt{statuses} key, so:
+It looks like the tweets themselves (``statuses'') are in the \texttt{statuses}
+key, so:
 
-\small
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
->>> for tweet in toys['statuses']:
-        print(tweet['text'])
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+for tweet in toys['statuses']:
+    print(tweet['text'])
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
 The #StarWars portfolio of #toys is about to get bigger. #Hasbro announced
-it’s going to make #JabbatheHutt’s sail… https://t.co/FYC1DLftXX
-RT @hottoysofficial: #HotToys 1/6th scale #ObiWanKenobi (Regular &amp; Deluxe
-Version) collectible figures from #StarWars EP3 are available for…
+it’s going to make #JabbatheHutt's sail... https://t.co/FYC1DLftXX
+
+RT @hottoysofficial: #HotToys 1/6th scale #ObiWanKenobi (Regular & Deluxe
+Version) collectible figures from #StarWars EP3 are available for...
+
 HotToys 1/6 Old Luke Skywalker Star Wars Movie Series 12'' Man Figure
 Collection https://t.co/NbHgtpnDwi #Toys https://t.co/ejrGXjVT3F
+
 Star Wars Black Series  6" Rey (JEDI TRAINING )Toys R Us Exclusive
 https://t.co/ArxT9kPjZt https://t.co/lcLbp7pwjG
 \end{Verbatim}
 \normalsize
 
+\bigskip
 
-If you have weird characters other than spaces, I suggest the \texttt{parse()}
-method from the \texttt{urllib} library to make things kosher:
+\index{percent syntax}
+\index{urllib@\texttt{urllib} package}
+\index{quote\_plus@\texttt{quote\_plus()} function (\texttt{urllib})}
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
+If you have weird characters other than spaces, you have to convert them to a
+``percent syntax'' in which you encode each weird character as a percent sign
+followed by the proper two hexadecimal digits. This is a pain to do by hand,
+but don't worry: the \texttt{quote\_plus()} function from the
+\texttt{urllib.parse} package makes things easy:
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 import urllib.parse
->>> print(urllib.parse.quote_plus("http://cs.umw.edu/star wars toys! 20% off"))
+print(urllib.parse.quote_plus("http://cs.umw.edu/star wars toys! 20% off"))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
 'http%3A%2F%2Fcs.umw.edu%2Fstar+wars+toys%21+20%25+off'
 \end{Verbatim}
 
+Now, instead of using the original URL that had the illegal characters (like
+``\texttt{!}'' and space and ``\texttt{\%}''), we can just use the
+\texttt{quote\_plus()}'d version in its place when we call the API.
 
-\subsection{Specialized packages}
+\section{Specialized packages}
 
 For many popular APIs, including Twitter, you may find Python packages written
 to streamline and hide some of the protocol idiosyncrasies. These may be
