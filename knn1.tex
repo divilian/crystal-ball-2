@@ -267,47 +267,141 @@ which is precisely the red X nearest to the question mark.
 \end{figure}
 
 
-PICK UP HEREvvv
+\section{Categorical features}
 
+Now what do we do if our features are categorical? We can just make them
+numerical, but in a principled way. If we have a binary feature, with only two
+possible values -- \texttt{public}/\texttt{private},
+\texttt{collegeGraduate}/\texttt{notACollegeGraduate} -- it's easy: we just
+assign one number (say, ``1'') to one value and another (``2'') to the other
+one. Now we've turned a categorical column of
+\texttt{employed}-or-\texttt{unemployed}'s into a numeric column of 1-or-2's,
+which lets us compute Z-scores and distance measures as we did above.
 
-\subsection{Categorical features}
+\index{baseball}
+\index{football}
+\index{lacrosse}
 
-Now what do we do if our features are categorical? Same thing we learned in the
-Na\"{i}ve Bayes chapters: make them numerical, in a principled way. Again, the
-most common approach by far is to ``one-hot'' encode each categorical feature
-as a set of binary features, one for each feature value. (Recall that for
-lightsabers, this would turn the single feature value ``\texttt{red}'' into a
-set of three features ``\texttt{0},'' ``\texttt{0},'' and ``\texttt{1},''
-meaning ``this data point has zero ``blueness,'' zero ``greenness,'' and one
-``redness.'')
+With more than two possible values, though, you have to be careful. Consider a
+feature whose three values are ``\texttt{baseball},'' ``\texttt{football},''
+and ``\texttt{lacrosse}.'' Many people might unsuspectingly assign the numbers
+1, 2, and 3 to these values and then treat the feature as a numeric one. But
+you can't do this. Here's why: assuming the original values were on a
+categorical/nominal scale (recall the ``Scales of Measure'' chapter from Volume
+I of this series), converting them to numbers in a simpleminded fashion like
+this \textit{imposes an interval scale where none exists.}
 
-You can use \texttt{np.where()} function to create one-hot vectors, or, use
-the scikit-learn package's helpful ``\texttt{LabelBinarizer.fit\_transform}
-function:
+Think about it. A person whose favorite sport is baseball isn't any
+\textit{more} like a football fan than she is like a lacrosse fan. Yet if we
+turn \texttt{baseball} into 1, \texttt{football} into 2, and \texttt{lacrosse}
+into 3, that's exactly what our kNN classifier is going to think. It will view
+baseball fans and lacrosse fans as ``further apart'' because after all, 3 minus
+1 is 2.
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+\index{one-hot encoding}
+
+In order to avoid biasing the classifier with this non-information, we use a
+technique called \textbf{one-hot encoding}. We turn each non-binary categorical
+feature into a whole \textit{set} of binary features, one for each value. So
+instead of a \texttt{sport} feature with values \texttt{baseball},
+\texttt{football}, and \texttt{lacrosse}, we use \textit{three} features --
+called \texttt{baseball}, \texttt{football}, and \texttt{lacrosse} -- each with
+values of 0 or 1. Example:
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+age & IQ & sport \\
+\hline
+37 & 101 & football \\
+41 & 121 & baseball \\
+19 & 87 & football \\
+22 & 117 & lacrosse \\
+\hline
+\end{tabular}
+\quad
+{\Huge $\Rightarrow$}
+\quad
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+age & IQ & football & baseball & lacrosse \\
+\hline
+37 & 101 & 1 & 0 & 0 \\
+41 & 121 & 0 & 1 & 0 \\
+19 & 87 & 1 & 0 & 0 \\
+22 & 117 & 0 & 0 & 1 \\
+\hline
+\end{tabular}
+\end{center}
+
+Perhaps you can see why it's called ``one-hot'' encoding: each row has exactly
+one ``hot'' entry for the new features (that is, only one ``1'' entry).
+
+\index{scikit-learn@\texttt{scikit-learn} (package)}
+\index{LabelBinarizer@\texttt{LabelBinarizer.fit\_transform()}}
+\index{fit\_transform@\texttt{fit\_transform()}}
+
+You can use \texttt{np.where()} function to create one-hot features, or you
+might find the \texttt{scikit-learn} package's
+``\texttt{LabelBinarizer.fit\_transform()} function helpful:
+
+\index{import@\texttt{import}}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 from sklearn.preprocessing import LabelBinarizer
+
 lb = LabelBinarizer()
-lightsaber = lb.fit_transform(df.lightsaber)
+sport_onehot = lb.fit_transform(df.sport)
 \end{Verbatim}
-\normalsize
 
-Careful: although this function takes a Series, it returns a NumPy array:
+Careful: although this function takes a \texttt{Series} as input, it returns a
+\texttt{NumPy} array as output:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
->>> print(df.lightsaber.head())
-    0      red
-    1     blue
-    2      red
-    3    green
->>> lb.fit_transform(df.lightsaber)[0:4]
-    array([[0, 0, 1],
-           [1, 0, 0],
-           [0, 0, 1],
-           [0, 1, 0]])
+\pagebreak
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(df.sport)
 \end{Verbatim}
-\normalsize
+\vspace{-.3in}
 
-You'll have to stick all your transformed variables back together with
-\texttt{np.concatenate()} before passing them to a classifier.
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+0    football
+1    baseball
+2    football
+3    lacrosse
+Name: sport, dtype: object
+\end{Verbatim}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(sport_onehot)
+\end{Verbatim}
+\vspace{-.3in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+[[0 1 0]
+ [1 0 0]
+ [0 1 0]
+ [0 0 1]]
+\end{Verbatim}
+
+\medskip
+You'll have to stick all your transformed variables back together into the
+\texttt{DataFrame} before passing them to a classifier.
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+df['baseball'] = sport_onehot[:,0]
+df['football'] = sport_onehot[:,1]
+df['lacrosse'] = sport_onehot[:,2]
+df = df.drop('sport',axis=1)
+
+print(df)
+\end{Verbatim}
+\vspace{-.3in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+   age   IQ  baseball  football  lacrosse
+0   37  101         0         1         0
+1   41  121         1         0         0
+2   19   87         0         1         0
+3   22  117         0         0         1
+\end{Verbatim}
 
