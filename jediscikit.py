@@ -59,18 +59,19 @@ print("\nNB got these wrong:")
 print(nb_guessed_wrong[~nb_guessed_wrong.isin(knn_guessed_wrong.index)])
 
 
-# nb_num_wrong = np.array(
-#     [ len(naive_bayes(*get_sample(s))) for _ in range(200) ])
-# knn_num_wrong = np.array(
-#     [ len(kNN(*get_sample(s),3)) for _ in range(200) ])
-# nb_accuracy = (len(s) - nb_num_wrong) / len(s) * 100
-# knn_accuracy = (len(s) - knn_num_wrong) / len(s) * 100
+nb_num_wrong = np.array(
+    [ len(naive_bayes(*get_sample(s))) for _ in range(200) ])
+knn_num_wrong = np.array(
+    [ len(kNN(*get_sample(s),3)) for _ in range(200) ])
+num_test_pts = len(get_sample(s)[1])
+nb_accuracy = (num_test_pts - nb_num_wrong) / (num_test_pts) * 100
+knn_accuracy = (num_test_pts - knn_num_wrong) / (num_test_pts) * 100
 
-# results = pd.DataFrame({'nb':nb_accuracy, 'knn':knn_accuracy})
-# results_l = pd.melt(results, [], var_name='classifier', value_name='accuracy')
-# facet = sns.FacetGrid(results_l, col='classifier')
-# facet.map(plt.hist, 'accuracy', bins=20)
-# plt.show()
+results = pd.DataFrame({'Naive Bayes':nb_accuracy, '3-NN':knn_accuracy})
+results_l = pd.melt(results, [], var_name='classifier', value_name='accuracy')
+facet = sns.FacetGrid(results_l, col='classifier')
+facet.map(plt.hist, 'accuracy', bins=20)
+plt.savefig("nb_knn_comparison.png")
 
 
 
