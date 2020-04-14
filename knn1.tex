@@ -301,107 +301,126 @@ baseball fans and lacrosse fans as ``further apart'' because after all, 3 minus
 \index{one-hot encoding}
 
 In order to avoid biasing the classifier with this non-information, we use a
-technique called \textbf{one-hot encoding}. We turn each non-binary categorical
-feature into a whole \textit{set} of binary features, one for each value. So
-instead of a \texttt{sport} feature with values \texttt{baseball},
-\texttt{football}, and \texttt{lacrosse}, we use \textit{three} features --
-called \texttt{baseball}, \texttt{football}, and \texttt{lacrosse} -- each with
-values of 0 or 1. Example:
+technique called \textbf{one-hot encoding}. We turn each categorical feature
+into a whole \textit{set} of binary features, one for each value. So instead of
+a \texttt{sport} feature with values \texttt{baseball}, \texttt{football}, and
+\texttt{lacrosse}, we use \textit{three} features -- called \texttt{baseball},
+\texttt{football}, and \texttt{lacrosse} -- each with values of 0 or 1.
+Example:
 
 \begin{center}
+\footnotesize
 \begin{tabular}{|c|c|c|}
 \hline
-age & IQ & sport \\
+age & edLevel & sport \\
 \hline
-37 & 101 & football \\
-41 & 121 & baseball \\
-19 & 87 & football \\
-22 & 117 & lacrosse \\
+37 & HS & football \\
+41 & college & baseball \\
+19 & college & football \\
+22 & college & lacrosse \\
 \hline
 \end{tabular}
 \quad
 {\Huge $\Rightarrow$}
 \quad
-\begin{tabular}{|c|c|c|c|c|}
+\begin{tabular}{|c|c|c|c|c|c|}
 \hline
-age & IQ & football & baseball & lacrosse \\
+age & HS & college & football & baseball & lacrosse \\
 \hline
-37 & 101 & 1 & 0 & 0 \\
-41 & 121 & 0 & 1 & 0 \\
-19 & 87 & 1 & 0 & 0 \\
-22 & 117 & 0 & 0 & 1 \\
+37 & 1 & 0 & 1 & 0 & 0 \\
+41 & 0 & 1 & 0 & 1 & 0 \\
+19 & 0 & 1 & 1 & 0 & 0 \\
+22 & 0 & 1 & 0 & 0 & 1 \\
 \hline
 \end{tabular}
 \end{center}
 
+\index{wide form}
+\index{long form}
+
 Perhaps you can see why it's called ``one-hot'' encoding: each row has exactly
-one ``hot'' entry for the new features (that is, only one ``1'' entry).
+one ``hot'' (\textit{i.e.}, 1) entry for each of the one-hotted features. Every
+row has either a 0 for \texttt{HS} and a 1 for \texttt{college}, or vice versa;
+and every row has a 1 for exactly \textit{one} of \texttt{football},
+\texttt{baseball}, and \texttt{lacrosse}, and 0 for the other two. This is sort
+of like going from \textbf{long form} to \textbf{wide form} data, if you think
+about it.
 
 \index{scikit-learn@\texttt{scikit-learn} (package)}
-\index{LabelBinarizer@\texttt{LabelBinarizer.fit\_transform()}}
+\index{OneHotEncoder@\texttt{OneHotEncoder.fit\_transform()}}
 \index{fit\_transform@\texttt{fit\_transform()}}
+\index{sparse@\texttt{sparse=False} (\texttt{OneHotEncoder})}
 
 You can use \texttt{np.where()} function to create one-hot features, or you
 might find the \texttt{scikit-learn} package's
-``\texttt{LabelBinarizer.fit\_transform()} function helpful:
+\texttt{OneHotEncoder.fit\_transform()} function helpful. It's a little weird;
+when you create your \texttt{OneHotEncoder}, you have to pass it an argument of
+``\texttt{sparse=False}'' if you want it to work the way you expect.
 
 \index{import@\texttt{import}}
+\index{double boxies@``double boxies''}
+\index{[]@\texttt{[]} (boxies)}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-from sklearn.preprocessing import LabelBinarizer
+from sklearn.preprocessing import OneHotEncoder
 
-lb = LabelBinarizer()
-sport_onehot = lb.fit_transform(df.sport)
+ohe = OneHotEncoder(sparse=False)
+onehot_features = ohe.fit_transform(df[['edLevel','sport']])
 \end{Verbatim}
 
-Careful: although this function takes a \texttt{Series} as input, it returns a
-\texttt{NumPy} array as output:
+Careful: although this function takes a \texttt{DataFrame} as input, it returns
+a \texttt{NumPy} array as output:
 
-\pagebreak
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-print(df.sport)
+print(df[['edLevel','sport']])
 \end{Verbatim}
 \vspace{-.3in}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-0    football
-1    baseball
-2    football
+   edLevel     sport
+0       HS  football
+1  college  baseball
+2  college  football
+3  college  lacrosse
 3    lacrosse
 Name: sport, dtype: object
 \end{Verbatim}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-print(sport_onehot)
+print(onehot_features)
 \end{Verbatim}
 \vspace{-.3in}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-[[0 1 0]
- [1 0 0]
- [0 1 0]
- [0 0 1]]
+[[1. 0. 0. 1. 0.]
+ [0. 1. 1. 0. 0.]
+ [0. 1. 0. 1. 0.]
+ [0. 1. 0. 0. 1.]]
 \end{Verbatim}
 
 \medskip
-You'll have to stick all your transformed variables back together into the
-\texttt{DataFrame} before passing them to a classifier.
+If you want these columns back in your \texttt{DataFrame}, you'll have to stick
+them back in there:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-df['baseball'] = sport_onehot[:,0]
-df['football'] = sport_onehot[:,1]
-df['lacrosse'] = sport_onehot[:,2]
-df = df.drop('sport',axis=1)
+df['HS'] = onehot_features[:,0]
+df['college'] = onehot_features[:,1]
+df['baseball'] = onehot_features[:,2]
+df['football'] = onehot_features[:,3]
+df['lacrosse'] = onehot_features[:,4]
+df = df.drop(['edLevel','sport'],axis=1)
 
 print(df)
 \end{Verbatim}
 \vspace{-.3in}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-   age   IQ  baseball  football  lacrosse
-0   37  101         0         1         0
-1   41  121         1         0         0
-2   19   87         0         1         0
-3   22  117         0         0         1
+   age   HS  college  baseball  football  lacrosse
+0   37  1.0      0.0       0.0       1.0       0.0
+1   41  0.0      1.0       1.0       0.0       0.0
+2   19  0.0      1.0       0.0       1.0       0.0
+3   22  0.0      1.0       0.0       0.0       1.0
 \end{Verbatim}
 
+But as we'll see in the next chapter, the array itself is ready-made for
+\texttt{scikit-learn}'s powerful classifier implementations. Stay tuned.
