@@ -18,97 +18,61 @@ num_yrs = np.where(default == 'yes',
 bank = pd.DataFrame({'cc_debt':cc_debt, 'num_yrs':num_yrs,
     'default':default})[['cc_debt','num_yrs','default']]
 
-sns.pairplot(data=bank, x_vars=['num_yrs'], y_vars=['cc_debt'],
-    hue='default',
-    markers=['X','+'], palette={'yes':'red','no':'green'}, aspect=1.5)
-plt.show()
-plt.savefig("synthesized_bank.png")
+defaulters = bank[bank.default=='yes']
+repayers = bank[bank.default=='no']
+notsures = bank[bank.default=='maybe']
+a = plt.scatter(defaulters.num_yrs, defaulters.cc_debt, color="red", marker="X",
+    s=40)
+b = plt.scatter(repayers.num_yrs, repayers.cc_debt, color="green", marker="P",
+    s=30)
+plt.xlabel('Number of years at present job')
+plt.ylabel('Credit card debt ($)')
+plt.legend([a,b],["defaulted","repaid"])
+#plt.show()
+#plt.savefig("synthesized_bank.png")
+
+def zscores(arr):
+    return (arr - arr.mean()) / arr.std()
+
+cc_debt_mean = bank.cc_debt.mean()
+cc_debt_std = bank.cc_debt.std()
+num_yrs_mean = bank.num_yrs.mean()
+num_yrs_std = bank.num_yrs.std()
+
+bank.cc_debt = zscores(bank.cc_debt)
+bank.num_yrs = zscores(bank.num_yrs)
+
+def dist(x,y):
+    return np.sqrt((x[0]-y[0])**2 + (x[1]-y[1])**2)
+
+def predict(cc_debt, num_yrs, k):
+    bank['dists'] = dist([bank.cc_debt, bank.num_yrs],
+        [(cc_debt - cc_debt_mean) / cc_debt_std,
+        (num_yrs - num_yrs_mean) / num_yrs_std])
+    k_closest_pts = bank.sort_values('dists').iloc[0:k]
+    return k_closest_pts.default.value_counts().index[0]
 
 
-#pts = pd.read_csv(io.StringIO('''
-#cc_debt,num_yrs,default
-#28000,1,yes
-#13000,.5,yes
-#1000,1.5,no
-#21000,2,yes
-#5000,2.5,no
-#4000,3.1,yes
-#25500,3.2,yes
-#24000,4.1,no
-#14000,4.5,no
-#2000,5.3,no
-#25500,5.9,no
-#20000,6.1,no
-#6000,7,no
-#7500,3.2,maybe
-#'''))
-#defaulters = pts[pts.default=='yes']
-#repayers = pts[pts.default=='no']
-#notsures = pts[pts.default=='maybe']
-#a = plt.scatter(defaulters.num_yrs, defaulters.cc_debt, color="red", marker="X",
-#    s=80)
-#b = plt.scatter(repayers.num_yrs, repayers.cc_debt, color="green", marker="P",
-#    s=80)
-#plt.scatter(notsures.num_yrs, notsures.cc_debt, color="blue", marker="$?$",
-#    s=115)
-#plt.xlabel('Number of years at present job')
-#plt.ylabel('Credit card debt ($)')
-#plt.legend([a,b],["defaulted","repaid"])
-#plt.show()
-#plt.savefig("bank_training.png")
-#
-#
-#def plot_line(x1, y1, x2, y2):
-#    slope = (y1 - y2) / (x1 - x2)
-#    yint = - (x2 * slope) + y2
-#    xpts = np.arange(x1,x2,.01)
-#    plt.plot(xpts,slope*xpts+yint,linestyle="--",color="grey")
-#
-#plt.figure()
-#a = plt.scatter(defaulters.num_yrs, defaulters.cc_debt, color="red", marker="X",
-#    s=80)
-#b = plt.scatter(repayers.num_yrs, repayers.cc_debt, color="green", marker="P",
-#    s=80)
-#plt.scatter(notsures.num_yrs, notsures.cc_debt, color="blue", marker="$?$",
-#    s=115)
-#
-#plot_line(3.1,4000,3.2,7000)
-#plt.xlabel('Number of years at present job')
-#plt.ylabel('Credit card debt ($)')
-#plt.title('1-NN')
-#plt.legend([a,b],["defaulted","repaid"])
-#plt.show()
-#plt.savefig("bank_training_1nn.png")
-#
-#plt.figure()
-#a = plt.scatter(defaulters.num_yrs, defaulters.cc_debt, color="red", marker="X",
-#    s=80)
-#b = plt.scatter(repayers.num_yrs, repayers.cc_debt, color="green", marker="P",
-#    s=80)
-#plt.scatter(notsures.num_yrs, notsures.cc_debt, color="blue", marker="$?$",
-#    s=115)
-#
-#plot_line(3.1,4000,3.2,7000)
-#plot_line(2.5,5000,3.2,7000)
-#plot_line(3.2,7000,4.5,14000)
-#plt.xlabel('Number of years at present job')
-#plt.ylabel('Credit card debt ($)')
-#plt.title('3-NN')
-#plt.legend([a,b],["defaulted","repaid"])
-#plt.show()
-#plt.savefig("bank_training_3nn.png")
-#
+train = bank.sample(frac=.7)
+test = bank.drop(train.index)
+
+num_correct = 0
+for i in range(len(test)):
+    row = test.iloc[i]
+    p = predict(row['cc_debt'], row['num_yrs'], 3)
+    if p == row['default']:
+        num_correct += 1
+print("We got {}% correct on the test data.".format(num_correct/len(test)*100))
+
+
+
 #pts_dist = np.empty(len(pts))
-#def dist(x,y):
-#    return np.sqrt((x[0]-y[0])**2 + (x[1]-y[1])**2)
+#
 #for i in range(len(pts_dist)):
 #    pts_dist[i] = dist((pts.iloc[i].cc_debt, pts.iloc[i].num_yrs),
 #        (pts.iloc[-1].cc_debt, pts.iloc[-1].num_yrs))
 #pts['dist'] = pts_dist
-#
-#def zscores(arr):
-#    return (arr - arr.mean()) / arr.std()
-#
+
 #plt.figure()
 #pts.cc_debt = zscores(pts.cc_debt)
 #pts.num_yrs = zscores(pts.num_yrs)

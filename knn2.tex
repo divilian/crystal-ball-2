@@ -4,20 +4,18 @@
 Last chapter gave the theory of kNN classifiers. Now how would we code one in
 Python?
 
-Conceptually it's pretty easy. For a new, unlabeled data point, compute the
+Conceptually it's pretty easy. We'll want to Z-score normalize everything
+first, of course. Then, for a new, unlabeled data point, we'll compute the
 ``distance'' (via whichever measure we choose) between it and every point in
-the training set. Then, sort these points by distance, choose the $k$ with the
-smallest distance, and take a majority vote.
+the training set. Then, we sort these points by distance, choose the $k$ with
+the smallest distance, and take a majority vote.
 
-\index{standardization}
-\index{normalized (variable)}
-\index{Z-score}
 \index{synthetic data set}
 
-Of course, we'll want to Z-score normalize everything first. We'll use our bank
-loan example, but with a lot more rows. Let's synthesize a data set real quick:
+We'll use our bank loan example, but with a lot more rows. Let's synthesize a
+data set real quick:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 NUM = 1000
 default = np.random.choice(['yes','no'], p=[.3,.7], size=NUM)
 cc_debt = np.where(default == 'yes',
@@ -35,7 +33,7 @@ people default on their loans, and that those who do tend to have a bit more
 credit card debt and somewhat fewer years at their current job. The resulting
 \texttt{DataFrame} looks like this:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
                      cc_debt  num_yrs default
                 0       7318      8.3     yes
                 1       2524      9.5      no
@@ -63,12 +61,147 @@ to get the grouped scatter plot in Figure~\ref{synthesized_bank}.
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.75\textwidth]{synthesized_bank.png}
+\includegraphics[width=0.85\textwidth]{synthesized_bank.png}
 \caption{Synthesized bank data.}
 \label{synthesized_bank}
 \end{figure}
 
+\section{Coding kNN by hand}
 
+\index{standardization}
+\index{normalized (variable)}
+\index{Z-score}
+
+To use this as training data, we'll Z-score normalize the features. We also
+need to Z-score the \textit{new} data points that come in to be classified,
+though, so we'd better remember the mean and standard deviation of each
+feature.
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+def zscores(arr):
+    return (arr - arr.mean()) / arr.std()
+
+cc_debt_mean = bank.cc_debt.mean()
+cc_debt_std = bank.cc_debt.std()
+num_yrs_mean = bank.num_yrs.mean()
+num_yrs_std = bank.num_yrs.std()
+
+bank.cc_debt = zscores(bank.cc_debt)
+bank.num_yrs = zscores(bank.num_yrs)
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+                  cc_debt   num_yrs default
+            0    1.321445  0.152280     yes
+            1    0.877662 -0.407452      no
+            2    0.150633 -1.000109     yes
+            3    2.152262 -1.790319     yes
+            4    0.927766  1.238819      no
+            ..        ...       ...     ...
+            995 -1.450414 -0.670855      no
+            996 -0.777325  0.415683      no
+            997 -0.172235  0.942490      no
+            998  0.385818  0.316907     yes
+            999 -0.669958  1.600998      no
+\end{Verbatim}
+
+\index{predict@\texttt{predict()}}
+\index{dist@\texttt{dist()}}
+
+Now let's write a function called \texttt{predict()} (to match the name we used
+in Chapters~\ref{ch:naiveBayes2} and ~\ref{ch:naiveBayes3}) which will make a
+loan-default prediction for a new applicant. We'll also write a \texttt{dist()}
+(for ``distance'') function to help it do its job.
+
+\index{Euclidean distance}
+\index{Pythagorean Theorem}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+def dist(x,y):
+    return np.sqrt((x[0]-y[0])**2 + (x[1]-y[1])**2)
+\end{Verbatim}
+
+We're using Euclidean distance here (Pythagorean Theorem), obviously. Our
+\texttt{predict()} will call this \texttt{dist()} function for every point to
+determine that point's Euclidean distance from our test point. Then, it will
+sort those by distance, pick the top $k$, and choose the majority:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+def predict(cc_debt, num_yrs, k):
+    bank['dists'] = dist([bank.cc_debt, bank.num_yrs],
+        [(cc_debt - cc_debt_mean) / cc_debt_std,
+        (num_yrs - num_yrs_mean) / num_yrs_std])
+    k_closest_pts = bank.sort_values('dists').iloc[0:k]
+    return k_closest_pts.default.value_counts().index[0]
+\end{Verbatim}
+
+Can you understand what this function is doing?
+
+First, notice that because of the magic of Pandas broadcasting operations, we
+don't even need a loop. The first line of the function calls \texttt{dist()} a
+grand total of once, giving it a list of the entire training data's x-values
+and y-values as the first argument, and then the new point's x-value and
+y-value (both Z-score normalized) as the second argument. Pretty slick!
+
+Then walk through how the majority rule is applied. The variable
+``\texttt{k\_closest\_pts},'' after the next line, will be a \texttt{DataFrame}
+that looks like so:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+              cc_debt   num_yrs default     dists
+        651 -0.058795 -0.720668     yes  0.101662
+        254 -0.010493 -0.720668     yes  0.105948
+        515  0.057728 -0.854746      no  0.106971
+        384  0.076899 -0.821226      no  0.120755
+        418 -0.147929 -0.754187     yes  0.123796
+        873  0.087356 -0.821226     yes  0.131212
+        672 -0.061782 -0.955304      no  0.135271
+\end{Verbatim}
+
+\index{value\_counts@\texttt{.value\_counts()} (Pandas)}
+
+(This assumes we passed a value of 7 for the \texttt{k} argument to
+\texttt{predict()} and are thus doing 7-NN.) Notice how the rows are ordered in
+decreasing distance from our new data point. In the final line of the function,
+we take the \texttt{.value\_counts()} of this \texttt{DataFrame}'s
+\texttt{default} column. This produces an intermediate value like:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+        yes    4
+        no     3
+        Name: default, dtype: int64
+\end{Verbatim}
+
+and when we take \texttt{.index[0]} of that, we get the label with the
+highest value count. In this case, it's ``\texttt{yes},'' so let's not give a
+loan to that guy.
+
+\subsection{Evaluating the hand-coded version}
+
+We can measure how well this classifier performs using essentially the same
+code we wrote back on p.~\pageref{evaluateNBcode}:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+num_correct = 0
+for i in range(len(test)):
+    row = test.iloc[i]
+    p = predict(row['cc_debt'], row['num_yrs'], 3)
+    if p == row['default']:
+        num_correct += 1
+print("We got {}% correct.".format(num_correct/len(test)*100))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+We got 73.667% correct.
+\end{Verbatim}
+
+Not that great, but looking again at Figure~\ref{synthesized_bank}
+(p.~\pageref{synthesized_bank}) you can see why! There's a huge region in that
+space where defaulters and non-defaulters have about the same prominence. For
+new points that fall in the midst of that morass, we're only guessing. In a
+region like that, no classifier is going to have much of a chance.
 
 %\index{scikit-learn@\texttt{scikit-learn} (package)}
 %\section{The \texttt{scikit-learn} library}

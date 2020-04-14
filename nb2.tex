@@ -8,7 +8,7 @@ assume that our data is in a Pandas \texttt{DataFrame} called ``\texttt{t}''
 (for ``training'') as it was in the last chapter (p.~\pageref{jediTraining}).
 Now imagine writing this function:
 
-\index{predict@\texttt{predict()} (Jedi/Sith)}
+\index{predict@\texttt{predict()}}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 def predict(face, height, demeanor, lightsaber):
@@ -113,7 +113,7 @@ the data itself ceases to matter. We run the function just by passing it the
 values derived from our spycam:
 
 \begin{figure}
-\index{predict@\texttt{predict()} (Jedi/Sith)}
+\index{predict@\texttt{predict()}}
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 def predict(face, height, demeanor, lightsaber):
     jediness = (probs[face+"|Jedi"] *
@@ -365,6 +365,8 @@ data (the random 70\% of the data set). We can then use the \texttt{test} set
 to compute our accuracy. All we need to do is iterate through the
 \texttt{test} set, passing each row to \texttt{predict()} and seeing whether
 we get the correct answer:
+
+\label{evaluateNBcode}
 
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 num_correct = 0
