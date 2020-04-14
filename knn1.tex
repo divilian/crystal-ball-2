@@ -339,12 +339,12 @@ age & HS & college & football & baseball & lacrosse \\
 \index{long form}
 
 Perhaps you can see why it's called ``one-hot'' encoding: each row has exactly
-one ``hot'' (\textit{i.e.}, 1) entry for each of the one-hotted features. Every
-row has either a 0 for \texttt{HS} and a 1 for \texttt{college}, or vice versa;
-and every row has a 1 for exactly \textit{one} of \texttt{football},
-\texttt{baseball}, and \texttt{lacrosse}, and 0 for the other two. This is sort
-of like going from \textbf{long form} to \textbf{wide form} data, if you think
-about it.
+one ``hot'' (\textit{i.e.}, 1) entry for each of the one-hotted features.
+Specifically, every row has either a 0 for \texttt{HS} and a 1 for
+\texttt{college}, or vice versa; and every row has a 1 for exactly \textit{one}
+of \texttt{football}, \texttt{baseball}, and \texttt{lacrosse}, and 0 for the
+other two. This is sort of like going from \textbf{long form} to \textbf{wide
+form} data, if you think about it.
 
 \index{scikit-learn@\texttt{scikit-learn} (package)}
 \index{OneHotEncoder@\texttt{OneHotEncoder.fit\_transform()}}
