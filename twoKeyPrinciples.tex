@@ -1,6 +1,8 @@
 
-\chapter{The bias-variance trade-off}
+\chapter{Two key ML principles}
 \index{bias-variance trade-off}
+
+\section{``The bias-variance trade-off''}
 
 Earlier in the book (p.~\pageref{bvTradeoffLowess}) I made a reference to
 something called ``the bias-variance trade-off.'' This turns out to be one of
@@ -54,6 +56,7 @@ see why this is the case, consider how different the training sets would have
 to be in order for me to make any \textit{different} decisions. Let's say the
 lightsaber colors for my original 714 training points were:
 
+\label{simpleClassifierTable}
 \Large
 \begin{center}
 \begin{tabular}{|l|rr|}
@@ -110,7 +113,7 @@ selectively labeling data points. However, this also means that a lot of its
 decisions are going to hinge on the particular data sample it was trained on,
 which means it will probably be picking up noise in addition to signal.
 
-\section{kNN vs.~Na\"{i}ve Bayes: bias vs.~variance}
+\subsection{kNN vs.~Na\"{i}ve Bayes}
 
 Let's compare how 3-NN and Na\"{i}ve Bayes perform on these two dimensions.
 Figure~\ref{comparisonCode} at the end of the chapter
@@ -208,62 +211,103 @@ make that mistake, since it's not as ambitious: it's settling for less precise,
 but more generally applicable trends.
 
 
-%\section{Varying $k$}
-%
-%One question that arises is: ``what's the
-%optimal value of $k$?'' It may or may not surprise you to learn that there's no
-%easy answer to this, and that it varies widely by data set and in fact even by
-%the training set chosen.
-%
-%Here's some code to try all (odd) values of $k$ between 1 and 301:
-%\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
-%corrects_train = []
-%corrects_test = []
-%for k in np.arange(1,301,2):
-%    knn = KNeighborsClassifier(n_neighbors=k)
-%    knn.fit(train_features, train.type.as_matrix())
-%    knn_predictions_train = knn.predict(train_features)
-%    knn_predictions_test = knn.predict(test_features)
-%    corrects_train.append(sum(knn_predictions_train == train.type)/len(train)*100)
-%    corrects_test.append(sum(knn_predictions_test == test.type)/len(test)*100)
-%\end{Verbatim}
-%\normalsize
-%
-%The resulting plot is in Figure~\ref{fig:varyingK}. The performance on the
-%training data is \textit{usually} better, as expected, although you'll see
-%some values of $k$ here in the 80-100 range where paradoxically that's not
-%true. More importantly, you'll notice that the line shows no simple pattern.
-%Very low numbers are good, and then performance tails off...but then it goes
-%back up again when $k$ is around 100 or so. Moreover, \textit{the apparent
-%optimal choice of k depends on the training set.}
-%
-%\begin{figure}
-%\centering
-%\includegraphics[width=0.9\textwidth]{k_vs_performance.pdf}
-%\caption{Correct classification rate as a function of $k$.}
-%\label{fig:varyingK}
-%\end{figure}
-%
-%Figure~\ref{fig:varyingTrainingSet} has some more results from the same code,
-%with different randomly-chosen training sets. We see some similarities here,
-%but by no means perfect uniformity. This is because a kNN classifier is a
-%high-variance classifier (especially for low $k$), as described in the next
-%section.
-%
-%\begin{figure}
-%\centering
-%\includegraphics[width=0.31\textwidth]{k_vs_performance1.pdf}
-%\includegraphics[width=0.31\textwidth]{k_vs_performance2.pdf}
-%\includegraphics[width=0.31\textwidth]{k_vs_performance3.pdf}
-%\caption{Correct classification rate vs.~$k$, for different training sets.}
-%\label{fig:varyingTrainingSet}
-%\end{figure}
-%
-%
-%\section{The ``Bias-Variance Tradeoff''}
-%
-%
-%
+\subsection{Varying $k$}
+
+Restricting our focus for the moment to just kNN classifiers, the question
+arises as to the optimal value of $k$. It may or may not surprise you to learn
+that there's no easy answer to this, and that it varies widely by data set and
+in fact even by the training set chosen.
+
+Here's some code to try all (odd) values of $k$ between 1 and 29. For each
+value, it runs ten different trials and averages their performance, so that we
+can smooth out the differences from particularly lucky or unlucky training sets:
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+ks = np.array([])
+performances = np.array([])
+
+for k in range(1,30,2):
+    for trial in range(10):
+        ks = np.append(ks, k)
+        performances = np.append(performances, kNN(s, k))
+
+results = pd.DataFrame({'k':ks, 'performance':performances})
+agg_results = results.groupby('k').performance.mean()
+agg_results.plot(kind='line', color='red',ylim=(70,100))
+\end{Verbatim}
+
+The resulting plot is in Figure~\ref{fig:varyingK}. This Sith/Jedi data set is
+simple enough that there aren't many really noticeable trends. Basically, as
+long as $k$ is above 5 or so, we max out the performance. Only when $k=1$ or
+$k=3$ do we see the too-high-variance problem come into play.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.9\textwidth]{varying_k.png}
+\caption{The accuracy of a kNN classifier on the Sith/Jedi data, as we fiddle
+with the number of nearest neighbors used.}
+\label{fig:varyingK}
+\end{figure}
+
+Real-life data sets normally have more variation than this. Often, there's an
+optimal range for $k$ that's quite a bit better than values outside that range,
+and there's no surefire way to predict what that range will be until you try
+it.
+
+In general, though, the big picture is that \textit{as $k$ increases, the
+classifier becomes lower-variance and higher-bias.} Can you see why? For low
+values of $k$, we're picking the one (or three, or five, or ...) training
+points that just happen to be nearest to our new data point. That's going to be
+a lot different depending on which points happen to be in the training set. But
+if $k$ is, say, 99, then no matter what training set we get, we're going to
+classify most points the same. Like the simple ``just go based on lightsaber
+color'' classifier described on p.~\pageref{simpleClassifierTable}, too many
+different things would have to simultaneously change between training sets in
+order for any different result.
+
+
+\begin{figure}[ht]
+\centering
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+# Run Naive Bayes, and return the accuracy as a percentage.
+def naive_bayes(s):
+    train = s.sample(frac=.7)
+    test = s.drop(train.index)
+
+    oe = OrdinalEncoder()
+    converted_features = oe.fit_transform(train.drop(['type'], axis=1))
+
+    naive_bayes = CategoricalNB()
+    naive_bayes.fit(converted_features, train.type)
+    nb_predictions = naive_bayes.predict(
+        oe.fit_transform(test.drop(['type'], axis=1)))
+    return (nb_predictions == test.type).sum() / len(test) * 100
+
+
+## Run kNN, and return the accuracy as a percentage.
+def kNN(s, k):
+    train = s.sample(frac=.7)
+    test = s.drop(train.index)
+
+    ohe = OneHotEncoder()
+    one_hotted_features = ohe.fit_transform(train.drop(['type'], axis=1))
+
+    knn = KNeighborsClassifier(n_neighbors=k)
+    knn.fit(one_hotted_features, train.type)
+    knn_predictions = knn.predict(
+        ohe.fit_transform(test.drop(['type'], axis=1)))
+    return (knn_predictions == test.type).sum() / len(test) * 100
+\end{Verbatim}
+
+\caption{Two functions, each of which chooses a random 70\% of a data set's
+rows for training, runs a classifier on the remaining rows, and returns its
+percent accuracy. Note that every time either of these functions is called, a
+different answer will be returned, since a new training set will be chosen at
+random.}
+\label{comparisonCode}
+\end{figure}
+
+
 %\section{The ``Curse of Dimensionality''}
 %\label{sec:curse}
 %
@@ -330,44 +374,3 @@ but more generally applicable trends.
 %\end{itemize}
 %
 %
-
-\begin{figure}[ht]
-\centering
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-# Run Naive Bayes, and return the accuracy as a percentage.
-def naive_bayes(s):
-    train = s.sample(frac=.7)
-    test = s.drop(train.index)
-
-    oe = OrdinalEncoder()
-    converted_features = oe.fit_transform(train.drop(['type'], axis=1))
-
-    naive_bayes = CategoricalNB()
-    naive_bayes.fit(converted_features, train.type)
-    nb_predictions = naive_bayes.predict(
-        oe.fit_transform(test.drop(['type'], axis=1)))
-    return (nb_predictions == test.type).sum() / len(test) * 100
-
-
-## Run kNN, and return the accuracy as a percentage.
-def kNN(s, k):
-    train = s.sample(frac=.7)
-    test = s.drop(train.index)
-
-    ohe = OneHotEncoder()
-    one_hotted_features = ohe.fit_transform(train.drop(['type'], axis=1))
-
-    knn = KNeighborsClassifier(n_neighbors=k)
-    knn.fit(one_hotted_features, train.type)
-    knn_predictions = knn.predict(
-        ohe.fit_transform(test.drop(['type'], axis=1)))
-    return (knn_predictions == test.type).sum() / len(test) * 100
-\end{Verbatim}
-
-\caption{Two functions, each of which chooses a random 70\% of a data set's
-rows for training, runs a classifier on the remaining rows, and returns its
-percent accuracy. Note that every time either of these functions is called, a
-different answer will be returned, since a new training set will be chosen at
-random.}
-\label{comparisonCode}
-\end{figure}
