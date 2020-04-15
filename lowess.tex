@@ -212,15 +212,16 @@ plt.plot(l[:,0],l[:,1],color="red")
 
 \vspace{.2in}
 
-\index{bias-variance tradeoff}
+\index{bias-variance trade-off}
+\label{bvTradeoffLowess}
 
 The ``\texttt{frac}'' parameter is our $\alpha$. The resulting curve for two
 different values of $\alpha$ is shown in Figure~\ref{fig:lowess}. Notice how
 $\alpha = \frac{1}{3}$ gives a much smoother line than $\alpha =
 \frac{1}{10}$, since it is using more points to do the smoothing. In fact, the
 former is quite close to the best-fit quadratic in this case. This is a
-manifestation of the classic ``bias-variance tradeoff'' we'll talk about later
-in the semester.
+manifestation of the classic ``bias-variance trade-off'' we'll look closely at
+in Chapter~\ref{ch:kNN2}.
 
 \begin{figure}[ht]
 \centering
