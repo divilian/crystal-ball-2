@@ -24,9 +24,8 @@ def get_sample(s):
 def naive_bayes(train, test):
     naive_bayes = CategoricalNB()
     oe = OrdinalEncoder()
-    naive_bayes.fit(
-        oe.fit_transform(train.drop(['type'], axis=1)),
-        train.type)
+    converted_features = oe.fit_transform(train.drop(['type'], axis=1))
+    naive_bayes.fit(converted_features, train.type)
     nb_predictions = naive_bayes.predict(
         oe.fit_transform(test.drop(['type'], axis=1)))
     return test[nb_predictions != test.type]

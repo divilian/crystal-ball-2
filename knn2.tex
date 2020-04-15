@@ -340,18 +340,83 @@ was classified correctly or incorrectly. Taking the \texttt{.sum()} of that
 array treats the \texttt{True}s as 1's and the \texttt{False}s as 0's, which is
 a nice and easy way to simply count the number of \texttt{True}s.)
 
+\subsection{\texttt{scikit-learn} for Na\"{i}ve Bayes}
 
+Let's use \texttt{scikit-learn} for Na\"{i}ve Bayes too, and then compare the
+two.
 
-%Let's use the scikit-learn library to compare 3-NN with Naive Bayes. First, we
-%load the data and split it randomly into training and test sets:
-%
-%\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
-%w = pd.read_csv("warriors.csv")
-%train = w.sample(frac=.7)
-%test = w.drop(train.index)
-%\end{Verbatim}
-%\normalsize
-%
+\index{OrdinalEncoder@\texttt{OrdinalEncoder}}
+
+Na\"{i}ve Bayes doesn't treat its features as numerical, so we don't need to
+one-hot encode them. Oddly, though, \texttt{scikit-learn} requires us to
+convert them to numbers anyway, and for this it provides the very misleadingly
+named \texttt{OrdinalEncoder}:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+from sklearn.preprocessing import OrdinalEncoder
+
+oe = OrdinalEncoder()
+converted_features = oe.fit_transform(train.drop(['type'], axis=1))
+\end{Verbatim}
+
+(Don't confuse this with the \texttt{OneHotEncoder} from the same package; they
+have a lot of letters in common!)
+
+I say the name is misleading because the word ``ordinal,'' as you remember from
+the ``Scales of Measure'' chapter in the first volume of this series, implies
+that there is a meaningful order to the possible values of a variable: ``cool''
+is closer to ``warm'' than it is to ``hot,'' for instance. But the Na\"{i}ve
+Bayes classifier, as we've seen, makes no such interpretation. So ``ordinally
+encoding'' our categorical features so we can pass them to a
+\texttt{CategoricalNB} variable which will (properly) \textit{not} interpret
+them on an ordinal scale seems like exactly the wrong verbiage. But they didn't
+ask me.
+
+The result of this is an array of numbers:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+                  face  height  demeanor lightsaber
+            879  beard    tall      calm      green
+            770  beard  medium      calm       blue
+            49   clean   short      calm       blue
+            892  clean   short      calm        red
+            774  clean  medium  menacing       blue
+            ..     ...     ...       ...        ...
+
+            [[0. 2. 0. 1.]
+             [0. 0. 0. 0.]
+             [1. 1. 0. 0.]
+             [1. 1. 0. 2.]
+             [1. 0. 1. 0.]
+                . . .
+\end{Verbatim}
+
+You can see that for the \texttt{lightsaber} feature, the
+\texttt{OrdinalEncoder} used 0 for \texttt{blue}, 1 for \texttt{green}, and 2
+for \texttt{red} (again in alphabetical order).
+
+\medskip
+Similarly to kNN, we create a \texttt{CategoricalNB} variable, \texttt{.fit()},
+it to the training data, and then call its \texttt{.predict()} method:
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+from sklearn.naive_bayes import CategoricalNB
+
+naive_bayes = CategoricalNB()
+naive_bayes.fit(converted_features, train.type)
+nb_predictions = naive_bayes.predict(
+    oe.fit_transform(test.drop(['type'], axis=1)))
+(test.type == nb_predictions).sum() / len(test) * 100
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+81.0
+\end{Verbatim}
+
+Na\"{i}ve Bayes was the loser with this data set: only 81\% accuracy as opposed
+to 5-NN's 85+\%.
+
 %\vspace{-.05in}
 %Next, we one-hot encode the features (all of which are categorical):
 %\vspace{-.1in}
