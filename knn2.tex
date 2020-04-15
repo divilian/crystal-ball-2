@@ -199,17 +199,149 @@ print("We got {}% correct.".format(num_correct/len(test)*100))
 We got 73.667% correct.
 \end{Verbatim}
 
-Not that great, but looking again at Figure~\ref{synthesized_bank}
+Not all that great, but looking again at Figure~\ref{synthesized_bank}
 (p.~\pageref{synthesized_bank}) you can see why! There's a huge region in that
 space where defaulters and non-defaulters have about the same prominence. For
 new points that fall in the midst of that morass, we're only guessing. In a
 region like that, no classifier is going to have much of a chance.
 
-%\index{scikit-learn@\texttt{scikit-learn} (package)}
-%\section{The \texttt{scikit-learn} library}
-%
-%
-%
+\index{scikit-learn@\texttt{scikit-learn} (package)}
+\section{The \texttt{scikit-learn} library}
+
+\index{security camera}
+\index{spycam}
+\index{Jedi}
+\index{Sith}
+\index{security\_cam@\texttt{security\_cam.csv}}
+
+As I alluded to in the last chapter, there's a great Python package called
+\texttt{scikit-learn} that implements many machine learning algorithms,
+including kNN (and Na\"{i}ve Bayes). Let's see how to make use of it, returning
+to the Jedi/Sith security camera example. Our original data set, which we'll
+randomly divide into training and test sets, looked like this:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+s = pd.read_csv("security_cam.csv")
+train = s.sample(frac=.7)
+test = s.drop(train.index)
+print(train)
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+                  face  height  demeanor lightsaber  type
+            879  beard    tall      calm      green  Jedi
+            770  beard  medium      calm       blue  Jedi
+            49   clean   short      calm       blue  Sith
+            892  clean   short      calm        red  Sith
+            774  clean  medium  menacing       blue  Jedi
+            ..     ...     ...       ...        ...   ...
+\end{Verbatim}
+
+\index{OneHotEncoder@\texttt{OneHotEncoder.fit\_transform()}}
+\index{fit\_transform@\texttt{fit\_transform()}}
+
+Recall that the \texttt{OneHotEncoder}'s \texttt{.fit\_transform()} method
+returns a NumPy array:
+
+\index{sparse@\texttt{sparse=False} (\texttt{OneHotEncoder})}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+from sklearn.preprocessing import OneHotEncoder
+
+ohe = OneHotEncoder(sparse=False)
+one_hotted_features = ohe.fit_transform(train.drop(['type'], axis=1))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+            [[1. 0. 0. 0. 1. 1. 0. 0. 1. 0.]
+             [1. 0. 1. 0. 0. 1. 0. 1. 0. 0.]
+             [0. 1. 0. 1. 0. 1. 0. 1. 0. 0.]
+             [0. 1. 0. 1. 0. 1. 0. 0. 0. 1.]
+             [0. 1. 1. 0. 0. 0. 1. 1. 0. 0.]
+                        . . .
+\end{Verbatim}
+
+It'd be good practice to run your eyeballs over those five rows and compare
+them with the categorical data, to verify that they line up. In particular, the
+first row, which says ``\texttt{1 0 0 0 1 1 0 0 1 0},'' means: ``yes, a
+\texttt{beard}; no, not \texttt{clean}; not \texttt{medium} or \texttt{short},
+but \texttt{tall}; yes \texttt{calm}, but no, not \texttt{menacing}; and a
+lightsaber that is \textit{not} \texttt{blue}, \textit{is} \texttt{green}, and
+is \textit{not} \texttt{red}.'' (Remember, the \texttt{OneHotEncoder} puts the
+feature values in alphabetical order.)
+
+\index{KNeighborsClassifier@\texttt{KNeighborsClassifier}}
+
+Now to actually perform kNN, we create a \texttt{KNeighborsClassifier}
+variable, telling it the value of \texttt{k} we want.
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+from sklearn.neighbors import KNeighborsClassifier
+
+knn = KNeighborsClassifier(n_neighbors=5)
+\end{Verbatim}
+
+\index{fit@\texttt{.fit()} method}
+
+Here, we're doing 5-NN. In \texttt{scikit-learn}, we ``\textbf{fit}'' a
+classifier to training data by calling the \texttt{.fit()} method. It takes two
+arguments: the feature columns, and the target column:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+knn.fit(one_hotted_features, train.type)
+\end{Verbatim}
+
+Finally, we call \texttt{.predict()} on the classifier -- passing it the
+features for our test points -- and it gives us back a column of its
+predictions for each one.
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+knn_predictions = knn.predict(
+    ohe.fit_transform(test.drop(['type'], axis=1)))
+\end{Verbatim}
+
+Comparing the true answers with the kNN predictions, side-by-side, lets us see
+how well we did:
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+results = pd.DataFrame({'true_answer':test.type, 'prediction':knn_predictions})
+print(results)
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+    true_answer prediction
+1          Sith       Sith
+4          Jedi       Sith
+8          Jedi       Jedi
+13         Jedi       Jedi
+21         Sith       Sith
+..          ...        ...
+\end{Verbatim}
+
+and we can sum up how many times they coincided to get a measure of accuracy:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+(test.type == knn_predictions).sum() / len(test) * 100
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+85.667
+\end{Verbatim}
+
+So our 5-NN classifier was correct more than 85\% of the time in its
+Jedi-vs-Sith calls. (That last line of code uses a convenient shortcut, by the
+way: when ``\texttt{test.type == knn\_predictions}'' is evaluated, it gives an
+array of \texttt{True}s and \texttt{False}s, specifying whether each test point
+was classified correctly or incorrectly. Taking the \texttt{.sum()} of that
+array treats the \texttt{True}s as 1's and the \texttt{False}s as 0's, which is
+a nice and easy way to simply count the number of \texttt{True}s.)
+
+
+
 %Let's use the scikit-learn library to compare 3-NN with Naive Bayes. First, we
 %load the data and split it randomly into training and test sets:
 %

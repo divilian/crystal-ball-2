@@ -36,9 +36,8 @@ def naive_bayes(train, test):
 def kNN(train, test, k):
     knn = KNeighborsClassifier(n_neighbors=k)
     ohe = OneHotEncoder()
-    knn.fit(
-        ohe.fit_transform(train.drop(['type'], axis=1)),
-        train.type)
+    one_hotted_features = ohe.fit_transform(train.drop(['type'], axis=1))
+    knn.fit(one_hotted_features, train.type)
     knn_predictions = knn.predict(
         ohe.fit_transform(test.drop(['type'], axis=1)))
     return test[knn_predictions != test.type]
