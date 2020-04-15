@@ -1,7 +1,7 @@
 
 \chapter{ML classifiers: kNN (2 of 2)}
 
-Last chapter gave the theory of kNN classifiers. Now how would we code one in
+Last chapter gave the theory of kNN classifiers. Now how to code one in
 Python?
 
 Conceptually it's pretty easy. We'll want to Z-score normalize everything
@@ -72,10 +72,10 @@ to get the grouped scatter plot in Figure~\ref{synthesized_bank}.
 \index{normalized (variable)}
 \index{Z-score}
 
-To use this as training data, we'll Z-score normalize the features. We also
-need to Z-score the \textit{new} data points that come in to be classified,
-though, so we'd better remember the mean and standard deviation of each
-feature.
+To use this as training data, we'll Z-score normalize the features. We'll also
+need to Z-score the \textit{new} data points that come in to be classified, so
+we'd better remember the mean and standard deviation of each feature for later
+use.
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 def zscores(arr):
@@ -122,7 +122,7 @@ def dist(x,y):
     return np.sqrt((x[0]-y[0])**2 + (x[1]-y[1])**2)
 \end{Verbatim}
 
-We're using Euclidean distance here (Pythagorean Theorem), obviously. Our
+As you can see, we're using Euclidean distance here (Pythagorean Theorem). Our
 \texttt{predict()} will call this \texttt{dist()} function for every point to
 determine that point's Euclidean distance from our test point. Then, it will
 sort those by distance, pick the top $k$, and choose the majority:
@@ -138,13 +138,16 @@ def predict(cc_debt, num_yrs, k):
 
 Can you understand what this function is doing?
 
-First, notice that because of the magic of Pandas broadcasting operations, we
+\index{vectorized@``vectorized'' operation}
+
+First, notice that because of the magic of Pandas vectorized operations, we
 don't even need a loop. The first line of the function calls \texttt{dist()} a
 grand total of once, giving it a list of the entire training data's x-values
 and y-values as the first argument, and then the new point's x-value and
 y-value (both Z-score normalized) as the second argument. Pretty slick!
 
-Then walk through how the majority rule is applied. The variable
+Then walk through how the majority rule is applied. Suppose \texttt{predict()}
+is passed a value of 7 for \texttt{k} (to do 7-NN). The variable
 ``\texttt{k\_closest\_pts},'' after the next line, will be a \texttt{DataFrame}
 that looks like so:
 
@@ -161,11 +164,10 @@ that looks like so:
 
 \index{value\_counts@\texttt{.value\_counts()} (Pandas)}
 
-(This assumes we passed a value of 7 for the \texttt{k} argument to
-\texttt{predict()} and are thus doing 7-NN.) Notice how the rows are ordered in
-decreasing distance from our new data point. In the final line of the function,
-we take the \texttt{.value\_counts()} of this \texttt{DataFrame}'s
-\texttt{default} column. This produces an intermediate value like:
+Notice how the rows are ordered in decreasing distance from our new data
+point. In the final line of the function, we take the \texttt{.value\_counts()}
+of this \texttt{DataFrame}'s \texttt{default} column. This produces an
+intermediate value like:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
         yes    4
@@ -173,9 +175,9 @@ we take the \texttt{.value\_counts()} of this \texttt{DataFrame}'s
         Name: default, dtype: int64
 \end{Verbatim}
 
-and when we take \texttt{.index[0]} of that, we get the label with the
-highest value count. In this case, it's ``\texttt{yes},'' so let's not give a
-loan to that guy.
+and when we take \texttt{.index[0]} of that, we get the label with the highest
+value count. In this case, it's ``\texttt{yes},'' soooo...let's not give a loan
+to that guy.
 
 \subsection{Evaluating the hand-coded version}
 
