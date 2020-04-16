@@ -307,70 +307,84 @@ random.}
 \label{comparisonCode}
 \end{figure}
 
+\section{``The curse of dimensionality''}
+\label{sec:curse}
 
-%\section{The ``Curse of Dimensionality''}
-%\label{sec:curse}
-%
-%Another key ML principle goes by the humorous name \textbf{the curse of
-%dimensionality}. It goes something like this. Suppose that in addition to
-%\texttt{height}, \texttt{demeanor}, \texttt{lightsaber}, and \texttt{beard},
-%we also have at our disposal many other features about Jedi \& Sith: their
-%ages, salaries, home planets, personality profiles, number of traffic tickets,
-%\textit{etc.} This is good news, right? It gives us more and more data to sift
-%through statistically and discover correlations, right? What's not to like?
-%
-%Yes, this is potentially good news, but with a catch. It turns out that as we
-%increase the number of features more and more (or, put another way, as we
-%increase the ``dimensionality'' of the problem from our original four
-%dimensions to 5, 6, 7, ..., and up into the hundreds) we have a data sparsity
-%problem. In terms of kNN classifiers, you can think of it this way:
-%effectively, \textit{all} the points effectively become far apart. We want to
-%find the 3 (or 15, or 77) ``nearest neighbors,'' but when we have so many
-%features (many of which will turn out to be irrelevant for the problem), we
-%find that \textit{any} two data points will differ on a large number of them.
-%Essentially, our noise swamps our signal.
-%
-%Another aspect of the problem concerns the amount of training data that we
-%need. When we have tons of features, we need an enormous number of training
-%samples in order to guarantee that we have several samples with each
-%combination of values (or their ranges). In our original problem, we didn't
-%need to much data to ensure that we'd have at least a few \texttt{tall},
-%\texttt{green}-lightsabered, \texttt{menacing} individuals with \texttt{no}
-%beard. But how many training points will we need before we have several
-%\texttt{tall}, \texttt{green}-lightsabered, \texttt{menacing}, 38-year-old,
-%extroverted, abstract-thinking individuals from Tatooine with 4 traffic
-%tickets and \texttt{no} beard who earn 6,000 Galactic credits annually?
-%Answer: a lot. And if we don't have that many, a kNN classifier trained on all
-%those features is going to suffer trying to find ``people like this one'' in
-%order to make a prediction.
-%
-%The moral to the story is that we will often need to trim our set of features,
-%sometimes aggressively, if we have too many. It feels wasteful -- all this
-%great data on all these people, and we're throwing it away! -- but it's the
-%right thing to do. This process is called \textbf{feature selection}, and
-%we'll cover it more fully in a future lesson.
-%
-%\vspace{.1in}
-%In the meantime, here are three useful principles for avoiding the curse:
-%
-%\begin{itemize}
-%\itemsep.1em
-%\item By far the most important thing to recognize is that if you have
-%additional features that are \textit{truly} (and pretty strongly) correlated
-%with the target, it's okay to include them. Adding more stuff that actually
-%contains useful information for prediction isn't generally a problem. The
-%problem is when you add features that are largely \textit{noise}, since
-%they will overwhelm the truly significant features if there are too many of
-%them.
-%\item A common rule of thumb is to make sure you have at least \textit{five}
-%training points for each combination of feature values. (In our Jedi example,
-%with three \texttt{height}s and three \texttt{lightsaber} values and two
-%values for the other features, this would imply a training set of at least $(3
-%\times 3 \times 2 \times 2) \times 5 = 180$ training points.)
-%\item When the size of the training set becomes too low, use
-%\textit{parametric} methods (like Naive Bayes or linear regression) rather
-%than instance-based methods (like kNN) because they suffer less from the
-%curse.
-%\end{itemize}
-%
-%
+\index{curse@``the curse of dimensionality''}
+
+A second key ML principle goes by the humorous name ``\textbf{the curse of
+dimensionality}.'' It goes something like this. Suppose that in addition to
+\texttt{height}, \texttt{demeanor}, \texttt{lightsaber}, and \texttt{face}, we
+also have at our disposal many other features about Jedi \& Sith: their ages,
+salaries, home planets, personality profiles, number of traffic tickets,
+\textit{etc.} This is good news, right? It gives us more and more data to sift
+through statistically and discover potential correlations with, right? What's
+not to like?
+
+\index{data sparsity}
+\index{sparsity}
+
+Yes, but there's a catch. It turns out that as we increase the number of
+features more and more (or, put another way, as we increase the
+``dimensionality'' of the problem from our original four dimensions to 5, 6, 7,
+..., and up into the hundreds) we have a \textbf{data sparsity} problem. This
+means there aren't enough training points to adequately cover all of this
+ground.
+
+In terms of kNN classifiers, you can think of it this way: effectively,
+\textit{all} the points become far apart. We want to find the 3 (or 15, or 77)
+``nearest neighbors,'' but when we have so many features (many of which will
+turn out to be irrelevant for the problem), we find that \textit{any} two data
+points will differ on a large number of them. Essentially, our noise swamps our
+signal.
+
+When we have tons of features, we need an enormous number of training samples
+in order to guarantee that we have several samples with each combination of
+values (or their ranges). In our original problem, we didn't need too much data
+to ensure that we'd have at least a few \texttt{tall},
+\texttt{green}-lightsabered, \texttt{menacing} individuals with a
+\texttt{clean} face. But how many training points will we need before we have
+several \texttt{tall}, \texttt{green}-lightsabered, \texttt{menacing},
+38-year-old, extroverted, abstract-thinking individuals from Tatooine with 4
+traffic tickets and a beard who earn 6,000 Galactic credits annually? Answer: a
+lot. And if we don't have that many, a kNN classifier trained on all those
+features is going to struggle trying to find ``people like this one'' in order
+to make a prediction.
+
+\index{feature selection}
+
+The moral to the story is that we will often need to trim our set of features,
+sometimes aggressively, if we have too many. It feels wasteful -- all this
+great data on all these people, and we're throwing it away! -- but it's the
+right thing to do. This process is called \textbf{feature selection}, and
+we'll cover it more fully in the next chapter.
+% FIX: actually add the feature selection chapter. (lesson 14 from 2019)
+
+\medskip
+In the meantime, here are three useful principles for avoiding the curse:
+
+\begin{enumerate}
+
+\item By far the most important thing to recognize is that if you have
+additional features that are \textit{truly} correlated with the target -- and
+don't simply repeat information contained in the features you already have --
+it's okay to include them. Adding more stuff that actually contains useful
+information for prediction isn't generally a problem. The problem is when you
+add features that are largely \textit{noise}, since they will overwhelm the
+truly significant features if there are too many of them.
+
+\item A common rule of thumb is to make sure you have at least \textit{five}
+training points for each combination of feature values. (In our Jedi example,
+with three \texttt{height}s and three \texttt{lightsaber} values and two
+values for the other features, this would imply a training set of at least $(3
+\times 3 \times 2 \times 2) \times 5 = 180$ training points.)
+
+\index{parametric model}
+
+\item When the size of the training set becomes too small, use
+\textbf{parametric} methods (like Na\"{i}ve Bayes or linear regression) rather
+than instance-based methods (like kNN) because they suffer less from the curse.
+
+\end{enumerate}
+
+
