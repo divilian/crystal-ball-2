@@ -45,7 +45,8 @@ if a variable is ``distributed normally'' it means that its values are
 farther and farther from that average are less and less likely to occur.
 
 Now suppose we had a numeric \texttt{height} feature (measured in inches)
-instead of a categorical one. Our data might look like this:
+instead of a categorical one. Our training data (in the ``\texttt{t}''
+\texttt{DataFrame}) might look like this:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
                     face  height  demeanor lightsaber  type
@@ -70,8 +71,8 @@ estimated mean and standard deviation. So we take all the \texttt{Jedi} rows,
 and calculate their \texttt{height}s' mean and standard deviation:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-warriors[warriors.type=='Jedi'].height.mean()
-warriors[warriors.type=='Jedi'].height.std()
+t[t.type=='Jedi'].height.mean()
+t[t.type=='Jedi'].height.std()
 \end{Verbatim}
 \vspace{-.3in}
 
@@ -84,8 +85,8 @@ warriors[warriors.type=='Jedi'].height.std()
 Performing the same calculation for the \texttt{Sith} rows gives us:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-warriors[warriors.type=='Sith'].height.mean()
-warriors[warriors.type=='Sith'].height.std()
+t[t.type=='Sith'].height.mean()
+t[t.type=='Sith'].height.std()
 \end{Verbatim}
 \vspace{-.3in}
 
