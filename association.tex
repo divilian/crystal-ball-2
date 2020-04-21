@@ -1,0 +1,327 @@
+
+\chapter{Association Analysis}
+
+\index{association analysis}
+\index{machine learning (ML)}
+
+Classification isn't the only machine learning task. Another one is called
+\textbf{association analysis}, in which the goal isn't to predict the class of
+new data items, but rather to determine which features of a data set have
+``interesting'' relationships. Usually, ``interesting'' means ``correlated in a
+way that can be taken advantage of.''
+
+The principles of association analysis are used in fields as diverse as
+bioinformatics, recommender systems, and cybersecurity intrusion detection.
+Another common application is \textbf{market basket analysis}, in which it can
+be employed to detect which sets of products tend to be bought together. This
+information is useful, for instance, to retailers who seek optimal product
+placement and effective marketing campaigns.
+
+\section{Market basket analysis}
+\index{market basket analysis}
+\index{VIP card}
+\index{MVP card}
+\index{transaction}
+
+All competitive grocery stores today keep track of their customers' purchases
+as they check out. Even if they don't have a rewards program to lure customers
+into getting a store-specific ``VIP card,'' they still know which sets of
+products were bought together in a single trip to the store. Each such trip,
+consisting of multiple products being purchased, is called a
+\textbf{transaction}.
+
+This type of association analysis relies on a huge table (\texttt{DataFrame})
+of 1's and 0's. Each row is a transaction, and each column is a product the
+store sells. A ``1'' in an entry indicates that \textit{at least one} of that
+product was bought in that transaction. (Interestingly, quantities typically
+aren't stored; just binary information about ``did this purchase contain at
+least one of that item or not?'') Here's one such data set:
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+diet\_soda & apples & beer & chips\_ahoy & diapers & cat\_food \\
+\hline
+0 & 1 & 0 & 0 & 0 & 0 \\
+1 & 1 & 0 & 0 & 0 & 1 \\
+1 & 1 & 1 & 0 & 1 & 0 \\
+0 & 0 & 1 & 1 & 1 & 0 \\
+1 & 1 & 0 & 1 & 1 & 0 \\
+1 & 1 & 1 & 1 & 1 & 1 \\
+0 & 0 & 0 & 0 & 0 & 1 \\
+. & . & . & . & . & . \\
+\hline
+\end{tabular}
+\end{center}
+
+The first customer in this set apparently just ran into the store to grab a bag
+of apples, while the second one bought some Diet Coke, an apple, and a couple
+bags of cat food, \textit{etc.}
+
+\bigskip
+Now, some terms:
+\vspace{-.15in}
+
+\begin{itemize}
+\itemsep.1em
+
+\index{itemset}
+
+\item \textbf{itemset}: An itemset is a group of one or more items. For
+instance, ``\{apples,beer,cat\_food\}'' is an itemset, as is
+``\{diet\_soda\}''.
+
+\index{support count}
+
+\item \textbf{support count}: The support count for a given itemset is
+\textit{the fraction of transactions in the entire data set that contain that
+itemset.} In the sample data above, the support count for ``\{diet\_soda\}'' is
+$\frac{4}{7} = .571$, since four out of the seven transactions contained
+diet soda. The support for ``\{apples,chips\_ahoy,diapers\}'' is just $\frac{2}{7}
+= .286$.
+
+\index{association rule}
+\index{rule, association}
+\index{antecedent}
+\index{consequent}
+
+\item \textbf{association rule}: An association rule is a statement of a
+relationship between two itemsets. It looks like this: ``\{A,B\} $\Rightarrow$
+\{C\},'' which means ``people who buy A and B tend to also buy C.'' The itemset
+before the arrow is called the \textbf{antecedent} and the one after it is
+called the \textbf{consequent}. Association
+rules are general correlations, not hard-and-fast mandates. Their reliability
+can be measured with the metrics below:
+
+\vspace{-.15in}
+
+\begin{itemize}
+
+    \index{support}
+
+    \item \textbf{support}: An association rule's ``support\footnote{Note that
+    the term \textbf{support} applies to a rule, whereas the term
+    \textbf{support \textit{count}} applies to an itemset.}'' is the fraction
+    of transactions in the data set that contain \textit{both} its antecedent
+    \textit{and} its consequent. It's a measure of how widespread and
+    applicable it is. The rule ``\{diet\_soda, apples\} $\Rightarrow$
+    \{beer\}'' has a support of just $\frac{2}{7} = .286$ in the data set
+    above. A rule's support is always between 0 and 1.
+
+    \index{confidence}
+
+    \item \textbf{confidence}: An association rule's ``confidence,'' on the
+    other hand, is a measure of its reliability. It's \textit{the fraction of
+    the times that it could apply where it's actually correct}. In terms of
+    support, it's $\frac{\textrm{support(whole
+    rule)}}{\textrm{support\_count(antecedent)}}$ The rule
+    ``\{diet\_soda,apples\} $\Rightarrow$ \{beer\}'' has a support of
+    $\frac{2}{4} = .5$ in the data set above, since out of the four times that
+    diet soda and apples were purchased together, beer was also purchased in
+    two of them. A rule's confidence is always between 0 and 1.
+
+    \index{lift}
+
+    \item \textbf{lift}: Finally, an association rule's ``lift'' is a numerical
+    measure of how much predictive power it has. The key concept is that we
+    want to know how likely the consequent is to be satisfied when the
+    antecedent is satisfied \textit{relative to how likely the consequent is to
+    be satisfied anyway.} Quantitatively, it's $\frac{\textrm{confidence(whole
+    rule)}}{\textrm{support\_count(consequent)}}$. A rule's lift is always
+    \textit{between 1 and $\infty$.} A lift of 1 means it's essentially
+    useless: knowing the antecedent is true doesn't really make the consequent
+    any more likely. \end{itemize}
+
+\end{itemize}
+
+\vspace{-.1in}
+
+If we crunch all the numbers, we want to look for association rules with high
+support, high confidence, and high lift. Which of those three end up being
+the greatest priority depends somewhat on the application. If a rule doesn't
+have high support, it doesn't come up much, so it may not be very useful. If
+it doesn't have high confidence, then the trend it signifies isn't super
+reliable, and we need to be aware of that. And if it doesn't have high lift,
+then its antecedent doesn't tell us a whole lot that we didn't already know.
+
+\vspace{-.1in}
+
+\section{Implementation: the \texttt{mlxtend} library}
+
+\index{conda install@``\texttt{conda install}'' command}
+\index{mlxtend@\texttt{mlxtend} (package)}
+\index{scikit-learn@\texttt{scikit-learn} (package)}
+\index{Raschka, Sebastian}
+
+Surprisingly, \texttt{scikit-learn} doesn't seem to have an association
+analysis implementation out of the box. (At least, Stephen couldn't find one.)
+There is one in the open source \texttt{mlxtend} library, though, by Sebastian
+Raschka \& friends. You may need to run ``\texttt{conda install mlxtend}'' at
+the command line for Spyder to access it.
+
+\index{synthetic data set}
+\index{association}
+\index{prior (probability)}
+
+Let's take it for a spin. First, we'll generate a synthetic data set with a
+known association. We'll stock five items for sale in our pretend store, each
+of which will have a different prior probability of being purchased (about 60\%
+of all transactions will have bananas, 80\% will have pizza, \textit{etc.})
+However, we'll ensure that in addition to 2,000 purely random ones, we'll have
+a solid \textit{thousand} transactions with both bacon and eggs. This should
+guarantee that ``\{bacon\} $\Rightarrow$ \{eggs\}'' comes out to be a
+meaningful association.\footnote{``...and \{eggs\} $\Rightarrow$ \{bacon\} too,
+right?'' you ask. Well, not necessarily, or at least not as strong: since 70\%
+of the random transactions have eggs anyway, and only 10\% of them have bacon,
+we're going to get a lot of bacon-less egg-full transactions, which will dial
+down the confidence of that association. But let's wait and see what
+\texttt{mlxtend} says.}
+
+Here's the code to synthesize this:
+
+\index{banana (fruit)}
+\index{coffee}
+\index{bacon}
+\index{egg}
+\index{pizza}
+\begin{Verbatim}[fontsize=\footnotesize,frame=single,framesep=3mm]
+eggs = []
+bacon = []
+bananas = []
+pizza = []
+coffee = []
+
+for i in range(2000):
+    eggs.append(np.random.choice([1,0],p=[.7,.3]))
+    bacon.append(np.random.choice([1,0],p=[.1,.9]))
+    bananas.append(np.random.choice([1,0],p=[.6,.4]))
+    pizza.append(np.random.choice([1,0],p=[.8,.2]))
+    coffee.append(np.random.choice([1,0],p=[.3,.7]))
+
+for i in range(1000):
+    eggs.append(1)
+    bacon.append(1)
+    bananas.append(np.random.choice([1,0],p=[.6,.4]))
+    pizza.append(np.random.choice([1,0],p=[.8,.2]))
+    coffee.append(np.random.choice([1,0],p=[.3,.7]))
+
+transactions = pd.DataFrame({ 'eggs':eggs, 'bacon':bacon, 'bananas':bananas,
+    'pizza':pizza, 'coffee':coffee})
+\end{Verbatim}
+
+Okay, let's analyze. First, just for giggles, let's shuffle the
+\texttt{DataFrame}'s rows so they're in a random order (not strictly necessary,
+but just on principle) and then let \texttt{mlxtend} do its work:
+
+\index{sample@\texttt{.sample()} (Pandas)}
+\index{import@\texttt{import}}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+transactions = transactions.sample(frac=1)
+
+from mlxtend.frequent_patterns import apriori
+from mlxtend.frequent_patterns import association_rules
+
+itemsets = apriori(transactions, min_support=0.1, use_colnames=True)
+\end{Verbatim}
+
+(Note that passing \texttt{frac=1} to the \texttt{.sample()} method says ``give
+me \textit{all} the rows, please; but in a shuffled order.)
+
+\index{apriori algorithm}
+\index{min\_support@\texttt{min\_support}}
+
+The code above uses the so-called \textbf{apriori algorithm}. It takes place in
+two steps: first, generate all itemsets, and compute their ``support,'' but
+only those for a certain minimum support level (in this case,
+\texttt{min\_support=0.1}). The ``but only'' phrase is for simple combinatorics
+reasons: if you think about it, the number of possible itemsets is rather large
+if we have many columns. In fact, if we have $N$ columns, there are $2^N$
+different itemsets!\footnote{Sample numbers: if we have 100 different items for
+sale in our store -- certainly not a very large number at all -- we'll have
+1,267,650,600,228,229,401,496,703,205,376 different itemsets to consider. This
+is far, far more than the number of atoms in the universe.} The apriori
+algorithm is smart about not evaluating them all, because it uses an easy
+trick: in order for an itemset to have greater than (say) .1 support,
+\textit{all of its subsets} must also have at least that much support. This
+lets apriori whittle down greatly the number of itemsets it needs to consider.
+
+\bigskip
+Now let's print out the ten itemsets with the greatest support:
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+itemsets.sort_values('support',ascending=False).head(10)
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+               support                itemsets
+              0.816000                  [eggs]
+              0.801667                 [pizza]
+              0.650667           [eggs, pizza]
+              0.593333               [bananas]
+              0.486000         [bananas, eggs]
+              0.475333        [bananas, pizza]
+              0.401667                 [bacon]
+              0.387667  [bananas, eggs, pizza]
+              0.380667           [bacon, eggs]
+              0.316000          [bacon, pizza]
+\end{Verbatim}
+
+Not surprisingly, the one-item itemsets feature prominently in the list, with
+eggs on the very top since not only did all of our second batch of 1000
+transactions have eggs, but about 70\% of the others did as well.
+
+\medskip
+
+And now, the second step: generate (and compute stats on) all possible
+association rules involving those item sets:
+
+\pagebreak
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+rules = association_rules(itemsets)
+print(rules.sort_values('confidence',ascending=False).head(10))
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+                 antecedants consequents  support  confidence      lift 
+                     (bacon)      (eggs) 0.375000    0.953390  1.192731 
+              (pizza, bacon)      (eggs) 0.302333    0.947753  1.185680 
+            (bananas, bacon)      (eggs) 0.228333    0.947441  1.185289 
+     (pizza, bananas, bacon)      (eggs) 0.183333    0.940171  1.176194 
+             (coffee, bacon)      (eggs) 0.116000    0.938005  1.173485 
+             (coffee, bacon)     (pizza) 0.102667    0.830189  1.036872 
+              (eggs, coffee)     (pizza) 0.193667    0.812587  1.014889 
+                     (bacon)     (pizza) 0.319000    0.811017  1.012927 
+            (bananas, bacon)     (pizza) 0.195000    0.809129  1.010569 
+               (eggs, bacon)     (pizza) 0.302333    0.806222  1.006939 
+\end{Verbatim}
+
+As expected, ``\{bacon\} $\Rightarrow$ \{eggs\}'' has a very high confidence
+(and support, and lift), as do rules of the form ``\{bacon + various other
+stuff\} $\Rightarrow$ \{eggs\}.'' Even in this synthetic case, however, the
+lift values aren't all that high numerically, so don't expect them to be.
+
+\section{Applying the knowledge}
+
+\index{bacon}
+\index{egg}
+
+This is the point where the ML ends and the domain application begins. What
+should a store do if armed with these statistics? In this case, we've learned
+that \{bacon\} $\Rightarrow$ \{eggs\} is a good bet. So we might ask ourselves:
+what product(s) that we're currently not selling very frequently (at least to
+bacon \& egg lovers) would we like to sell more of? That choice of product will
+have lots to do with inventory levels, the amount of markup we have on the
+product (\textit{i.e.}, how much profit we make on it), and so forth.
+
+\index{bagel}
+
+Let's say we've identified a target product to market to these bacon \& egg
+lovers: a new brand of bagels that's targeted specifically to big breakfast
+eaters. It might make sense to position this item in our store somewhere
+\textit{between} the aisles that bacon and eggs are sold on, so that every
+person buying both bacon and eggs will have to walk past it. This is just one
+simple example, but profit margins in grocery stores are so small that the
+difference between booming and going out of business can rely precisely on many
+micro-decisions like this, each inspired by a micro-insight from the data.
