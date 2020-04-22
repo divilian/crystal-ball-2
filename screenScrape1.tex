@@ -41,12 +41,13 @@ they say, ``yeah, I've done programming in HTML,'' you know they're lying.
 \index{JSON}
 \index{CSV file}
 \index{hierarchical data}
+\index{tree}
 
-The second thing to know about HTML is that it is \textit{hierarchical}, not
-flat. This makes it more like JSON than CSV. Even though every HTML file is a
-single sequence of characters, it encodes a tree-like structure in which
-elements can exist inside other elements, which can exist inside other
-elements, \textit{etc.}, with no limit to the amount of nesting.
+The second thing to know is that it is \textit{hierarchical}, not flat. This
+makes it more like JSON than CSV. Even though every HTML file is a single
+sequence of characters, it encodes a tree-like structure in which elements can
+exist inside other elements, which can exist inside other elements,
+\textit{etc.}, with no limit to the amount of nesting.
 
 \index{element (HTML)}
 \index{tag (HTML)}
@@ -78,10 +79,13 @@ Lots going on there. The first way to get your bearings is to start visually
 lining up starting tags with their corresponding ending tags and perceive the
 structure. Notice that this entire page begins with ``\texttt{<html>}'' and
 ends with ``\texttt{</html>}''. This is in essence the ``root node'' of the
-page's entire hierarchical tree. It has two immediate ``children'': a
-\texttt{head} element, and a \texttt{body} element. Each of those have
-starting and ending tags as well. Inside the \texttt{head} element is a
-\texttt{title} element, \textit{etc.}
+page's entire hierarchical tree\footnote{I'm using the term \textbf{tree} here
+in much the same way as the \textbf{decision tree}s from volume I of this
+series. Remember that they start at the top with a \textbf{root}, and branch
+out wider and wider as they are drawn down the page.} It has two immediate
+``children'': a \texttt{head} element, and a \texttt{body} element. Each of
+those have starting and ending tags as well. Inside the \texttt{head} element
+is a \texttt{title} element, \textit{etc.}
 
 \begin{figure}
 \begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=lines]
@@ -157,21 +161,22 @@ indicate structure (like \texttt{table} and \texttt{h2}) and things that
 specify specific formatting (like \texttt{i} and \texttt{u}). All of this is
 eminently look-up-able online.
 
-\pagebreak
 
-\index{attribute (of an HTML element)}
+\index{attribute!of an HTML element}
 \index{img@\texttt{<img>} (HTML tag)}
 
 Some starting tags (not ending) contain additional information called
 \textbf{attributes}. You can see this with the \texttt{a} and \texttt{img}
 tags from the example:
 
+\vspace{-.15in}
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=lines]
 <a href="http://buildings.umwblogs.org/trinkle-hall/">Trinkle Hall</a>
 \end{Verbatim}
+\vspace{-.15in}
 
 \index{a@\texttt{<a>} (HTML tag)}
-\index{attribute (of an HTML element)}
+\index{attribute!of an HTML element}
 \index{key-value pair}
 
 The \texttt{a} tag stands for ``anchor'' and is the most common way of
@@ -183,9 +188,11 @@ the string \texttt{href} and the value is the URL the user will be directed to
 if they click on the link. This key/value pair is called an
 \textbf{attribute}.
 
+\vspace{-.15in}
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=lines]
 <img src="http://clipart.com/prof.jpg" width=200 />
 \end{Verbatim}
+\vspace{-.15in}
 
 In the \texttt{img} example, we have \textit{two} attributes: one for the
 filename of the image, and the other for some specific formatting suggestions
@@ -207,12 +214,14 @@ Lastly, I'll point out that near the top of this example, there's a bunch of
 stuff which looks a bit visually jarring; it doesn't look like HTML. And it's
 not. I'm referring to this:
 
+\vspace{-.15in}
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=lines]
     <style>
         img { width:150px; }
         td { border-width:1px; }
     </style>
 \end{Verbatim}
+\vspace{-.15in}
 
 \index{CSS}
 
@@ -261,10 +270,11 @@ operation'' table (which begins about half-way down the page; squint until you
 see the word \texttt{table}), then we're in the easy case, thank heavens. We
 can use Pandas' \texttt{read\_html()} function as follows:
 
-
+\vspace{-.1in}
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 the_tables = pd.read_html("http://theURLtoTheWebpageIWantToScrape.html")
 \end{Verbatim}
+\vspace{-.1in}
 
 \index{URL}
 \index{network connection}
@@ -394,7 +404,7 @@ print(areas)
 At this point, we're out of screen-scraping-land and into ordinary-Python land.
 What we do next depends on what we want to analyze. One interesting question I
 could imagine asking is: ``how much of Stephen's total time does he spend doing
-`fun' things? `important' things? `exhausting' things? \textit{etc.}
+`fun' things? `important' things? `exhausting' things?
 
 \index{adjectives@\texttt{adjectives}}
 \index{ul@\texttt{<ul>} (HTML tag)}
