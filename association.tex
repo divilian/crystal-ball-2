@@ -76,9 +76,9 @@ instance, ``\{apples,beer,cat\_food\}'' is an itemset, as is
 \item \textbf{support count}: The support count for a given itemset is
 \textit{the fraction of transactions in the entire data set that contain that
 itemset.} In the sample data above, the support count for ``\{diet\_soda\}'' is
-$\frac{4}{7} = .571$, since four out of the seven transactions contained
-diet soda. The support for ``\{apples,chips\_ahoy,diapers\}'' is just $\frac{2}{7}
-= .286$.
+$\frac{4}{7} = .571$, since four out of the seven transactions contained diet
+soda. The support count for ``\{apples,chips\_ahoy,diapers\}'' is just
+$\frac{2}{7} = .286$.
 
 \index{association rule}
 \index{rule, association}
@@ -100,8 +100,9 @@ can be measured with the metrics below:
     \index{support}
 
     \item \textbf{support}: An association rule's ``support\footnote{Note that
-    the term \textbf{support} applies to a rule, whereas the term
-    \textbf{support \textit{count}} applies to an itemset.}'' is the fraction
+    the term \textbf{support} properly applies to a rule, whereas the term
+    \textbf{support \textit{count}} applies to an itemset. The \texttt{mlxtend}
+    package calls them both ``support,'' though.}'' is the fraction
     of transactions in the data set that contain \textit{both} its antecedent
     \textit{and} its consequent. It's a measure of how widespread and
     applicable it is. The rule ``\{diet\_soda, apples\} $\Rightarrow$
@@ -232,7 +233,7 @@ me \textit{all} the rows, please; but in a shuffled order.)
 \index{min\_support@\texttt{min\_support}}
 
 The code above uses the so-called \textbf{apriori algorithm}. It takes place in
-two steps: first, generate all itemsets, and compute their ``support,'' but
+two steps: first, generate all itemsets, and compute their support count, but
 only those for a certain minimum support level (in this case,
 \texttt{min\_support=0.1}). The ``but only'' phrase is for simple combinatorics
 reasons: if you think about it, the number of possible itemsets is rather large
@@ -242,12 +243,12 @@ sale in our store -- certainly not a very large number at all -- we'll have
 1,267,650,600,228,229,401,496,703,205,376 different itemsets to consider. This
 is far, far more than the number of atoms in the universe.} The apriori
 algorithm is smart about not evaluating them all, because it uses an easy
-trick: in order for an itemset to have greater than (say) .1 support,
+trick: in order for an itemset to have greater than (say) .1 support count,
 \textit{all of its subsets} must also have at least that much support. This
 lets apriori whittle down greatly the number of itemsets it needs to consider.
 
 \bigskip
-Now let's print out the ten itemsets with the greatest support:
+Now let's print out the ten itemsets with the greatest support count:
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 itemsets.sort_values('support',ascending=False).head(10)
 \end{Verbatim}
@@ -284,17 +285,17 @@ print(rules.sort_values('confidence',ascending=False).head(10))
 \vspace{-.2in}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-                 antecedants consequents  support  confidence      lift 
-                     (bacon)      (eggs) 0.375000    0.953390  1.192731 
-              (pizza, bacon)      (eggs) 0.302333    0.947753  1.185680 
-            (bananas, bacon)      (eggs) 0.228333    0.947441  1.185289 
-     (pizza, bananas, bacon)      (eggs) 0.183333    0.940171  1.176194 
-             (coffee, bacon)      (eggs) 0.116000    0.938005  1.173485 
-             (coffee, bacon)     (pizza) 0.102667    0.830189  1.036872 
-              (eggs, coffee)     (pizza) 0.193667    0.812587  1.014889 
-                     (bacon)     (pizza) 0.319000    0.811017  1.012927 
-            (bananas, bacon)     (pizza) 0.195000    0.809129  1.010569 
-               (eggs, bacon)     (pizza) 0.302333    0.806222  1.006939 
+             antecedents consequents    support  confidence      lift
+         (bacon, coffee)      (eggs)   0.119000    0.954545  1.186262
+          (bacon, pizza)      (eggs)   0.299667    0.946316  1.176035
+                 (bacon)      (eggs)   0.381000    0.946192  1.175881
+        (bacon, bananas)      (eggs)   0.225000    0.945378  1.174869
+ (bacon, bananas, pizza)      (eggs)   0.175667    0.942755  1.171609
+         (bacon, coffee)     (pizza)   0.101333    0.812834  1.027603
+                (coffee)     (pizza)   0.249333    0.807775  1.021208
+          (eggs, coffee)     (pizza)   0.200000    0.806452  1.019534
+                 (pizza)      (eggs)   0.636333    0.804467  0.999752
+                (coffee)      (eggs)   0.248000    0.803456  0.998495
 \end{Verbatim}
 
 As expected, ``\{bacon\} $\Rightarrow$ \{eggs\}'' has a very high confidence
