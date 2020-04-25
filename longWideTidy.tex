@@ -371,12 +371,16 @@ By the way, the inverse operation of ``melt'' is often called
 ``\textbf{pivot}''. To reverse the above transformation in Pandas, you can use
 the \texttt{.pivot()} method:
 
+% TODO: "long" in the following code is undefined:
+
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 wide = long.pivot(index='religion', columns='income', values='frequency')
 \end{Verbatim}
 
 and get back your original wide form \texttt{DataFrame}.
 
+% TODO: add .pivot_table() info. This is useful for things like association
+% analysis; see final exam problem about genres.
 
 % Exercise:
 % load http://cs.umw.edu/~stephen/data219/students.csv and tidy it to:
