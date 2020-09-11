@@ -502,7 +502,7 @@ level of nesting. Here's another example:
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=lines,framesep=3mm]
 [{"prefix": "DATA", "num": 219, "creds": 3, "instructor": "Davies",
 "meetings": [{"time": {"day": "TR", "time": "12:30pm"}, "location": {"bldg":
-"Trinkle", "room": "B6"}}], "roster": [{"first": "Lady", "last": "Gaga",
+"Farmer", "room": "B6"}}], "roster": [{"first": "Lady", "last": "Gaga",
 "email": "lgaga@umw.edu"}, {"first": "The", "last": "Rock", "email":
 "trock@umw.edu"}, ...
 \end{Verbatim}
@@ -561,9 +561,9 @@ contrast to so-called \textbf{flat} data, like a CSV:
 
 \begin{Verbatim}[fontsize=\normalsize,samepage=true,frame=lines,framesep=3mm]
 Prefix,Num,Instructor,Creds,Bldg,Room,Day,Time
-DATA,219,Davies,3,Trinkle,B6,TR,12:30pm
+DATA,219,Davies,3,Farmer,B6,TR,12:30pm
 ENGL,286,Rigsby,3,Combs,112,MWF,11am
-CPSC,305,Finlayson,4,Trinkle,B52,MWF,8am
+CPSC,305,Finlayson,4,Farmer,B52,MWF,8am
 \end{Verbatim}
 
 It should be clear that hierarchical data is intrinsically \textit{more
@@ -592,7 +592,7 @@ width of the table?
 \item What do we do for rows which don't have the maximum number of meetings?
 Leave the others blank?
 \item How do we perform standard queries like ``find all courses that have at
-least one meeting in Trinkle?'' (We have to split this up into an awkward query
+least one meeting in Farmer?'' (We have to split this up into an awkward query
 that separately queries each of the columns and unions the answer.)
 \end{compactenum}
 
