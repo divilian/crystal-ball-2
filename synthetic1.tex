@@ -278,7 +278,7 @@ the possible values, and it chooses one:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 np.random.seed(13)
-np.random.choice(['Steelers','Redskins','Giants'])
+np.random.choice(['Steelers','Patriots','Giants'])
 \end{Verbatim}
 \vspace{-.2in}
 
@@ -287,7 +287,7 @@ np.random.choice(['Steelers','Redskins','Giants'])
 \end{Verbatim}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-np.random.choice(['Steelers','Redskins','Giants'])
+np.random.choice(['Steelers','Patriots','Giants'])
 \end{Verbatim}
 \vspace{-.2in}
 
@@ -316,17 +316,17 @@ must sum to 1; and NumPy, stupidly, will not normalize it for you.)
 To illustrate:
 
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
-print(np.random.choice(['Steelers','Redskins','Giants'], size=14, p=[.3,.6,.1]))
+print(np.random.choice(['Steelers','Patriots','Giants'], size=14, p=[.3,.6,.1]))
 \end{Verbatim}
 \vspace{-.2in}
 
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-['Steelers' 'Redskins' 'Redskins' 'Redskins' 'Giants' 'Steelers' 'Steelers'
- 'Redskins' 'Redskins' 'Steelers' 'Redskins' 'Giants' 'Steelers' 'Redskins']
+['Steelers' 'Patriots' 'Patriots' 'Patriots' 'Giants' 'Steelers' 'Steelers'
+ 'Patriots' 'Patriots' 'Steelers' 'Patriots' 'Giants' 'Steelers' 'Patriots']
 \end{Verbatim}
 
 We asked for 14 random teams, and we told it to give us \texttt{Steelers} 30\%
-of the time, \texttt{Redskins} 60\%, and \texttt{Giants} only 10\%. I think
+of the time, \texttt{Patriots} 60\%, and \texttt{Giants} only 10\%. I think
 you'll agree that the resulting array was pretty faithful to that. (Of course,
 you'll get a different random array each time.)
 
@@ -334,13 +334,13 @@ Finally, let's test a large random array and verify that the requested
 percentages are approximately correct:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-pd.Series(np.random.choice(['Steelers','Redskins','Giants'], size=1000,
+pd.Series(np.random.choice(['Steelers','Patriots','Giants'], size=1000,
     p=[.3,.6,.1])).value_counts() 
 \end{Verbatim}
 \vspace{-.2in}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-Redskins    584
+Patriots    584
 Steelers    319
 Giants       97
 dtype: int64
