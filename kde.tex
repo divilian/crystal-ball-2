@@ -14,9 +14,9 @@ histogram: instead, we must specify parameters such as the bin size and the
 ``alignment'' of the bins (\textit{i.e.}, where exactly the breaks occur), and
 the resulting display is colored (no pun intended) by those choices.
 
-Consider this simple data set\footnote{From Janert, P. K. (2010). Data Analysis
-with Open Source Tools: A Hands-On Guide for Programmers and Data Scientists (1
-edition). O'Reilly Media.}:
+Consider this simple data set\footnote{From Janert, P. K. (2010). \textit{Data
+Analysis with Open Source Tools: A Hands-On Guide for Programmers and Data
+Scientists}. O'Reilly Media.}:
 
 \begin{center}
 \texttt{2.1, 2.3, 1.9, 1.8, 1.4, 2.6, 1.7, 2.2}
@@ -26,7 +26,7 @@ Suppose we choose a bin width of 1. If we positioned the \textit{left} edge of
 each bin at 0, 1, 2, 3, ..., we would get the histogram on the left side of
 Figure~\ref{fig:histBinParadox}.
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 data = np.array([2.1, 2.3, 1.9, 1.8, 1.4, 2.6, 1.7, 2.2])
 plt.hist(data, bins=[0,1,2,3,4])
 \end{Verbatim}
@@ -38,7 +38,7 @@ But if we shifted our bin alignment to be on the ``halves'' (0.5, 1.5, 2.5,
 ...), we get this histogram on the \textit{right} side of
 Figure~\ref{fig:histBinParadox}.
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 plt.hist(data, bins=[-.5,0.5,1.5,2.5,3.5,4.5])
 \end{Verbatim}
 
@@ -71,12 +71,12 @@ the first place.}
 
 In Data Science, paradoxically, very often we don't actually care about the
 \textit{data} so much as we care about the underlying \textit{process} that
-generated the data. This ``Data-Generating Process'' (DGP) -- whether it's a
-geographic fault, a mystery author, a sports team, or an economy -- leaves
-behind evidence of its behavior (seismic tremors, sentences, sports statistics,
-income levels) which we dutifully collect and then analyze. The purpose is
-(almost) always to draw inferences about how that DGP works, not to learn about
-the individual bread crumbs themselves.
+generated the data. This ``\textbf{data-generating process}'' \textbf{(DGP)} --
+whether it's a geographic fault, a mystery author, a sports team, or an economy
+-- leaves behind evidence of its behavior (seismic tremors, sentences, sports
+statistics, income levels) which we dutifully collect and then analyze. The
+purpose is (almost) always to draw inferences about how that DGP works, not to
+learn about the individual bread crumbs themselves.
 
 To our present point, when we look at a histogram of (say) GPAs of a sample of
 UMW students, we're not actually interested in what those sampled GPAs
@@ -161,6 +161,7 @@ coming right up in Section~\ref{kdes}, below.
 Just to finish venting, I'll list yet another couple of problems with
 histograms:
 
+\vspace{-.15in}
 \begin{itemize}
 \itemsep.1em
 \item They inherently lose information, since by definition data points with
@@ -192,7 +193,7 @@ randomly-generated data.
 
 When we talk about a ``\textbf{kernel},'' we just mean a density shape that
 we're going to make lots of copies of and add up together. Normally (no pun
-intended!) we will use a \textit{Gaussian kernel}, which means ``a bell curve a
+intended!) we will use a \textbf{Gaussian kernel}, which means ``a bell curve a
 la the normal distribution'':
 
 \index{normal distribution}
@@ -226,7 +227,7 @@ the jaggedy ups and downs of the actual histogram. The goal is to reflect the
 \index{kdeplot@\texttt{kdeplot()} (Seaborn)}
 
 There are several different ways to do this with Python packages. The Seaborn
-library has a good ``\texttt{kdeplot()}'' function. Using straight SciPy, we
+library has a good ``\texttt{kdeplot()}'' function. Using plain SciPy, we
 can call the \texttt{gaussian\_kde()} function and pass it the bandwidth as a
 second argument. This returns a function that can be used to evaluate the KDE
 at any data point. (Read that sentence again: a function that returns a
@@ -238,7 +239,7 @@ It's easier than it sounds when you run the actual code:
 
 \index{bw\_method@\texttt{bw\_method} (for \texttt{gaussian\_kde()})}
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 import scipy.stats
 kde = scipy.stats.gaussian_kde(data,bw_method=.5)
 x_vals = np.arange(0,10,.1)

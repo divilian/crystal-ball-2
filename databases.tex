@@ -144,7 +144,8 @@ the database. You can run this command:
 \index{FROM clause@``\texttt{FROM}'' clause (SQL)}
 
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
-print(pd.read_sql("SELECT name FROM sqlite_master WHERE type='table'", conn))
+print(pd.read_sql(
+    "SELECT name FROM sqlite_master WHERE type='table'", conn))
 \end{Verbatim}
 
 to find out. If this were the output:
@@ -258,7 +259,7 @@ name:
 \begin{BVerbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm,bgcolor=AliceBlue]
 SELECT * FROM table_name WHERE col1==val1
 SELECT col2 FROM table_name WHERE col1==val1 AND col2>val2
-SELECT col1,col2 FROM table_name WHERE col1==val1 AND NOT col2>val2 LIMIT 10
+SELECT c1,c2 FROM t WHERE c1==val1 AND NOT c2>val2 LIMIT 10
 \end{BVerbatim}
 
 (The usual boolean operations work with keywords \texttt{AND}, \texttt{OR},
@@ -274,14 +275,15 @@ SELECT col1,col2 FROM table_name WHERE col1==val1 AND
             NOT col2 IN (val1,val2,val3) LIMIT 10
 \end{BVerbatim}
 
+\index{unique@unique rows (with \texttt{DISTINCT})}
 \index{DISTINCT@\texttt{DISTINCT} (SQL)}
-\item To get only unique rows (similar to Pandas' \texttt{.drop\_duplicates()}
-functionality) use the word \texttt{DISTINCT} before the column names:
+\item To get only unique rows (like Pandas' \texttt{.drop\_duplicates()}
+gives) use the word \texttt{DISTINCT} before the column names:
 
 \begin{BVerbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm,bgcolor=AliceBlue]
 SELECT DISTINCT * FROM table_name
-SELECT col1,col2 FROM table_name WHERE not col1 in (val1,val2,val3) or
-            col2!=val4 LIMIT 5
+SELECT col1,col2 FROM table_name WHERE NOT col1 IN
+            (val1,val2,val3) OR col2!=val4 LIMIT 5
 \end{BVerbatim}
 
 \index{DISTINCT@\texttt{DISTINCT} (SQL)}
@@ -292,15 +294,14 @@ The \texttt{DISTINCT} option is useful in conjunction with \texttt{COUNT()}:
 SELECT COUNT(DISTINCT col1) FROM table_name
 \end{BVerbatim}
 
-\pagebreak
 \index{ORDER BY@\texttt{ORDER BY} (SQL)}
 \item You can have SQLite do sorting with ``\texttt{ORDER BY}'':
 
 \index{DESC@\texttt{DESC} (``descending'') (SQL)}
 \begin{BVerbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm,bgcolor=AliceBlue]
 SELECT * FROM table_name ORDER BY col1
-SELECT DISTINCT col1,col2 FROM table_name WHERE col3==val1
-            ORDER BY col2,col1 DESC LIMIT 5
+SELECT DISTINCT c1,c2 FROM table_name WHERE c1==val1
+            ORDER BY c2,c1 DESC LIMIT 5
 \end{BVerbatim}
 
 As you can see, you can sort on multiple columns, and sort in reverse order
@@ -313,8 +314,8 @@ with the \texttt{DESC} keyword.
 
 \begin{BVerbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm,bgcolor=AliceBlue]
 SELECT col1,count(*) FROM table_name GROUP BY col1
-SELECT col1,max(col2) FROM table_name WHERE col3==val1 GROUP BY col2
-            ORDER BY col1 DESC LIMIT 5
+SELECT col1,max(col2) FROM table_name WHERE col3==val1
+            GROUP BY col2 ORDER BY col1 DESC LIMIT 5
 \end{BVerbatim}
 
 \index{join!JOIN@\texttt{JOIN} (SQL)}
@@ -322,8 +323,8 @@ SELECT col1,max(col2) FROM table_name WHERE col3==val1 GROUP BY col2
 
 \begin{BVerbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm,bgcolor=AliceBlue]
 SELECT * FROM table_1 join table_2 ON col1==col2
-SELECT col1,col2 FROM table_1 join table_2 ON table_1.x==table_2.q
-            WHERE col3>val1 LIMIT 5
+SELECT c1,c2 FROM t1 join t2 ON t1.x==t2.q
+            WHERE c2>val1 LIMIT 5
 \end{BVerbatim}
 
 The \texttt{JOIN} keyword supports \texttt{LEFT}, \texttt{RIGHT}, and

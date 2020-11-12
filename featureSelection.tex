@@ -154,21 +154,21 @@ w = pd.read_csv("security_cam2.csv")
 train = w.sample(frac=.7)
 test = w.drop(train.index)
 
-# Given a DataFrame and a set of column headings to include, return a NumPy
-# matrix with all these features prepared and concatenated. "Prepared" means:
-# (1) for categorical variables, one-hot them, and (2) for numeric variables,
-# compute their Z-scores.
+# Given a DataFrame and a set of column headings to include, return a
+# NumPy matrix with all these features prepared and concatenated.
+# "Prepared" means: (1) for categorical variables, one-hot them, and
+# (2) for numeric variables, compute their Z-scores.
 def prepare_this_puppy(df, include):
-    ohe = OneHotEncoder(sparse=False)
-    prepared_features = []
-    for feature in include:
-        if is_numeric_dtype(df[feature].dtype):
-            thing = df[feature]-df[feature].mean()/df[feature].std()
-            prepared_features.append(np.array([thing.values]).transpose())
-        else:
-            prepared_features.append(ohe.fit_transform(
-                df[feature].values.reshape(-1,1)))
-    return np.concatenate(prepared_features, axis=1)
+   ohe = OneHotEncoder(sparse=False)
+   prepared_features = []
+   for feature in include:
+      if is_numeric_dtype(df[feature].dtype):
+         thing = df[feature]-df[feature].mean()/df[feature].std()
+         prepared_features.append(np.array([thing.values]).transpose())
+      else:
+         prepared_features.append(ohe.fit_transform(
+             df[feature].values.reshape(-1,1)))
+   return np.concatenate(prepared_features, axis=1)
 
 feature_sets = [ 'lightsaber,face,height,demeanor',
                  'lightsaber,face,height',
@@ -188,19 +188,19 @@ feature_sets = [ 'lightsaber,face,height,demeanor',
 scores = pd.Series()
 
 for feature_set in feature_sets:
-    train_features = prepare_this_puppy(train,feature_set.split(","))
-    test_features = prepare_this_puppy(test,feature_set.split(","))
-    naive_bayes = CategoricalNB()
-    naive_bayes.fit(train_features,train.type.values)
-    nb_predictions = naive_bayes.predict(test_features)
-    scores[feature_set] = round(
-        sum(nb_predictions == test.type)/len(test)*100,2)
+   train_features = prepare_this_puppy(train,feature_set.split(","))
+   test_features = prepare_this_puppy(test,feature_set.split(","))
+   naive_bayes = CategoricalNB()
+   naive_bayes.fit(train_features,train.type.values)
+   nb_predictions = naive_bayes.predict(test_features)
+   scores[feature_set] = round(
+      sum(nb_predictions == test.type)/len(test)*100,2)
 
 scores = scores.sort_values(ascending=False)[:10]
 for feature_set, score in scores.items():
-    print("{}: {:.2f}".format(feature_set,score))
+   print("{}: {:.2f}".format(feature_set,score))
 \end{Verbatim}
-\caption{Trying all possible feature subsets with Na\"{i}ve Bayes.}
+\caption{Trying \textit{all} possible feature subsets with Na\"{i}ve Bayes.}
 \label{fig:allSubsetsCode}
 \end{figure}
 
@@ -224,6 +224,7 @@ have had:
 \begin{align*}
 2^{40} = 1,099,511,627,776
 \end{align*}
+\vspace{-.2in}
 
 or over a trillion different possible sets of features. Even if we could train
 a \textit{thousand} different classifiers on our training data \textit{every
@@ -238,7 +239,8 @@ second}, here's how long it would take:
     \frac{1\ \textrm{minute}}{60\ \textrm{seconds}} \times
     \frac{1\ \textrm{hour}}{60\ \textrm{minutes}} \times
     \frac{1\ \textrm{day}}{24\ \textrm{hours}} \times
-    \frac{1\ \textrm{year}}{365\ \textrm{days}} = \textrm{\textbf{34.9\ years}}
+    \frac{1\ \textrm{year}}{365\ \textrm{days}}\\
+{\normalsize \textrm{\textbf{= 34.9\ years}\ !}}
 \end{align*}
 \end{center}
 \normalsize

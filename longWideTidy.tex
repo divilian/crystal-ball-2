@@ -11,7 +11,7 @@ print(g)
 \end{Verbatim}
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=3mm,framerule=1mm]
        name year    Q1    Q2    Q3    Q4    Q5    Q6    Q7    Q8
 0   Beyonce   So   9.0  10.0   7.0  10.0   8.0  10.0   9.0  10.0
 1     Jay-Z   Jr   7.0  10.0   4.0  10.0  10.0   8.0   3.0  10.0
@@ -38,16 +38,18 @@ Now there's nothing wrong with wide form. All the data is there, and it allows
 us to ask many questions easily, like:
 
 \begin{compactitem}
-\item[\leftthumbsup] What was Inara's score on Quiz \#5? \ (\texttt{g[g.name=="Inara"].Q5})
-\item[\leftthumbsup] What was the high score on Quiz \#3? \ (\texttt{g.Q3.max()})
-\item[\leftthumbsup] What was Mal's average quiz score? \ 
-(\texttt{g[g.name=="Mal"].mean(axis=1)})
+\small
+\item[\leftthumbsup] What was Inara's score on Quiz \#5? \ \texttt{g[g.name=="Inara"].Q5}
+\item[\leftthumbsup] The high score on Quiz \#3? \ \texttt{g.Q3.max()}
+\item[\leftthumbsup] Mal's average quiz score? \ 
+\texttt{g[g.name=="Mal"].mean(axis=1)}
 \end{compactitem}
 
 \smallskip
 Other kinds of questions, though, defy easy answers, like these:
 
 \begin{compactitem}
+\small
 \item[\leftthumbsdown] What was the overall average score (for all quizzes)? \ (?)
 \item[\leftthumbsdown] How did class performance compare between the first half
 of the semester (quizzes 1-4) and the second half (quizzes 5-8)? \ (?)
@@ -74,7 +76,8 @@ collapses all the quiz data into a single column. For this, we use the
 \texttt{melt()} function from the Pandas package:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-gl = pd.melt(g, ["name","year"], var_name="quiz", value_name="score")
+gl = pd.melt(g, ["name","year"], var_name="quiz",
+    value_name="score")
 \end{Verbatim}
 
 Now this is kind of complicated so pay attention. 
@@ -111,12 +114,12 @@ score.
 We set the result of the \texttt{melt()} call to a variable called \texttt{gl}
 (where ``\texttt{l}'' stands for ``long.'') Here's what it looks like:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 print(gl)
 \end{Verbatim}
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm,xleftmargin=2cm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm,xleftmargin=2cm]
        name year quiz  score
 0   Beyonce   So   Q1    9.0
 1     Jay-Z   Jr   Q1    7.0
@@ -135,13 +138,6 @@ print(gl)
 14  Obi-wan   So   Q2   10.0
 15     Finn   Jr   Q2    3.0
 16  Beyonce   So   Q3    7.0
-17    Jay-Z   Jr   Q3    4.0
-18   Bortis   Sr   Q3    7.0
-19      Han   So   Q3    NaN
-20      Mal   Jr   Q3    9.0
-21    Inara   Jr   Q3    4.0
-22  Obi-wan   So   Q3    9.0
-23     Finn   Jr   Q3    5.0
             . . .
 60      Mal   Jr   Q8   10.0
 61    Inara   Jr   Q8    5.0
@@ -156,14 +152,17 @@ every single quiz score. It might seem wordy, and I'll admit it's not as
 easy to locate and eyeball a single result. However, all our ``hard'' questions
 from above can be easily answered:
 
+\index{isin@\texttt{.isin()} method (Pandas)}
+
 \begin{compactitem}
-\item[\leftthumbsup] What was the overall average score (for all quizzes)? \
-(\texttt{gl.score.mean()})
+\small
+\item[\leftthumbsup] What was the overall average score (for all quizzes)? \\
+\texttt{gl.score.mean()}
 \item[\leftthumbsup] How did class performance compare between the first half
 of the semester (quizzes 1-4) and the second half (quizzes 5-8)? \\
-(\texttt{gl[gl.quiz.isin(["Q1","Q2","Q3","Q4"])].mean()})
+\texttt{gl[gl.quiz.isin(["Q1","Q2","Q3","Q4"])].mean()}
 \item[\leftthumbsup] How did freshmen, sophomores, juniors, and seniors
-compare? \\ (\texttt{gl.groupby("year").score.mean()})
+compare? \\ \texttt{gl.groupby("year").score.mean()}
 \end{compactitem}
 
 Turning what were column headings into \textit{values} gave us all the
@@ -175,7 +174,9 @@ As an aside, one thing I'd probably do to this \texttt{DataFrame} is get rid of
 the leading ``\texttt{Q}'' before each \texttt{quiz} value, and convert that
 column to integers to boot:
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm,xleftmargin=1cm]
+\index{astype@\texttt{.astype()} method}
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 gl.quiz = gl.quiz.str[1]
 gl.quiz = gl.quiz.astype(int)
 print(gl)
@@ -222,13 +223,15 @@ also allows us to do things like query for things like ``quizzes after quiz
 \section{``Tidy'' data}
 
 \index{Wickham, Hadley}
+\index{tidy@``tidy'' data}
 
 The term ``tidy'' to describe a data set has sprung into prominence recently
 as a result of the excellent paper by Hadley Wickham (of R fame) who neatly
-captured the perils of various data formatting choices. Hadley first defines
+captured the perils of various data formatting choices. Hadley first defined
 these terms:
 
 \begin{compactitem}
+\itemsep.2em
 \item \textbf{variable} -- a category of something, for which individual
 objects have a value. Examples: name, height, gender, center field distance.
 \item \textbf{value} -- an actual individual piece of data corresponding to a
@@ -245,10 +248,8 @@ separate from a ``golfers'' unit which contains information about golfers
 themselves, not their particular performances.)
 \end{compactitem}
 
+\pagebreak
 \index{tidy@``tidy'' data}
-
-\vspace{.2in}
-
 Then, he outlined one simple rule. A data set is considered \textbf{tidy} if
 and only if:
 
@@ -270,6 +271,7 @@ section~\ref{normalized} (p.\pageref{normalized}). Points \#\ref{obsRow} and
 \#\ref{colHeader} are essentially ``long form,'' as described in the previous
 section. Hence, I usually think of ``tidy'' as meaning ``normalized and long.''
 
+\smallskip
 Our \texttt{gl} grade book was long, but not tidy, because it had repeated
 information in it: namely, every student's \texttt{year} was repeated for every
 one of their quiz scores. To normalize it, we'd want to divide it into two
@@ -280,10 +282,12 @@ tables; say, \texttt{student\_years} and \texttt{grades}:
 \index{drop@\texttt{.drop()} (Pandas)}
 \index{axis argument@\texttt{axis} argument}
 
+\vspace{-.2in}
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 student_years = gl[['name','year']].drop_duplicates()
 grades = gl.drop('year',axis=1)
 \end{Verbatim}
+\vspace{-.2in}
 
 The \texttt{.drop\_duplicates()} method gets rid of identical rows, retaining
 only one. The \texttt{.drop()} method keeps all columns except for one, which
@@ -292,11 +296,12 @@ keep. (``\texttt{axis=1}'' means ``I'm talking about columns here, not rows.'')
 
 Our two remaining (tidy!) \texttt{DataFrames} are now:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm,xleftmargin=1cm,xrightmargin=1cm]
+\pagebreak
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 print(student_years)               print(grades)
 \end{Verbatim}
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm,xleftmargin=1cm]
+\vspace{-.3in}
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
       name year                           name  quiz  score
 0  Beyonce   So                    0   Beyonce     1    9.0
 1    Jay-Z   Jr                    1     Jay-Z     1    7.0
@@ -317,6 +322,7 @@ print(student_years)               print(grades)
                                    16  Beyonce     3    7.0
                                    17    Jay-Z     3    4.0
                                    18   Bortis     3    7.0
+                                             . . .
 \end{Verbatim}
 
 Every piece of information in one and only one place. Very tidy indeed.
@@ -328,13 +334,13 @@ Some data sets don't make it easy on us. Check out this decidedly
 affiliation:
 
 \small
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-            religion   <$10k   $10-20k  $20-30k  $30-40k   $40-50k  $50-75k
-0           Agnostic      27        34       60       81        76      137
-1            Atheist      12        27       37       52        35       70
-2           Buddhist      27        21       30       34        33       58
-3           Catholic     418       617      732      670       638     1116
-4  Dont know/refused      15        14       15       11        10       35
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=none]
+   religion   <$10k   $10-20k  $20-30k  $30-40k   $40-50k  $50-75k
+0  Agnostic      27        34       60       81        76      137
+1   Atheist      12        27       37       52        35       70
+2  Buddhist      27        21       30       34        33       58
+3  Catholic     418       617      732      670       638     1116
+4     Other      15        14       15       11        10       35
 ...
 \end{Verbatim}
 \normalsize
@@ -352,7 +358,8 @@ polled in the survey who had that religion and that income level.)
 Now we can tidy this with \texttt{melt()}:
 
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
-tdf = pd.melt(df, ['religion'], var_name='income', value_name='frequency')
+tdf = pd.melt(df, ['religion'], var_name='income',
+    value_name='frequency')
 \end{Verbatim}
 \vspace{-.2in}
 
@@ -374,7 +381,8 @@ the \texttt{.pivot()} method:
 % TODO: "long" in the following code is undefined:
 
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
-wide = long.pivot(index='religion', columns='income', values='frequency')
+wide = long.pivot(index='religion', columns='income',
+    values='frequency')
 \end{Verbatim}
 
 and get back your original wide form \texttt{DataFrame}.

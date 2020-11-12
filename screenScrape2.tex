@@ -230,7 +230,7 @@ print([ x.name for x in body_children ])
 \end{Verbatim}
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=2mm,framerule=1mm]
 [None, 'h1', None, 'p', None, 'p', None, 'h2', None, 'table', None]
 \end{Verbatim}
 
@@ -302,9 +302,9 @@ in the middle of the HTML content in Figure~\ref{fig:bottomUpSearch}.
 <table border=2 cellpadding=15>
 <tr><td class="pic"><img src="a.jpg"></td>
     <td class="role">College professor</td>
-    <td class="description">
-    Stephen teaches computer science and data science to willing undergraduates,
-    shaping them into the heroes of tomorrow.
+    <td class="description">Stephen teaches computer science and data
+    science to willing undergraduates, shaping them into the heroes of
+    tomorrow.</td>
     </td>
     <td>
     <ul>
@@ -440,7 +440,7 @@ that it only grabs the first matching element rather than all of them.) The
 complete code is shown in Figure~\ref{fig:getRolesComplete}.
 
 \begin{figure}[ht]
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 roles = []
 percs = []
 
@@ -538,12 +538,12 @@ that point down in the hierarchy, ignoring all tags. Check it out:
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 soup.body.find("p").get_text()
 \end{Verbatim}
-\vspace{-.2in}
+\vspace{-.3in}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-'Deep in the bowels of Farmer Hall resides a\ncarbon-based life form known to
-outsiders only as Stephen. This\nmysterious being fulfills several roles not
-widely known to\nhumankind.'
+\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+'Deep in the bowels of Farmer Hall resides a\ncarbon-based life form
+known to outsiders only as Stephen. This\nmysterious being fulfills
+several roles not widely known to\nhumankind.'
 \end{Verbatim}
 
 \subsubsection{Finding more than one tag name at once}

@@ -7,7 +7,7 @@ One of the most common categories of information you'll ever deal with are
 those dealing with various aspects of \textit{time}. It turns out this is
 considerably more complex than you might think at first. For one thing, the
 English word ``time'' can mean several different things -- a point in time
-(12:05pm on Feb.~20, 2020), an abstract wall clock time (12:05pm), a duration
+(12:05pm on Feb.~20, 2021), an abstract wall clock time (12:05pm), a duration
 of time (1 hour and 15 minutes), and possibly other things.
 
 For another, the clock and calendar systems that humans have devised are just
@@ -111,7 +111,7 @@ datetime.date
 Note that if your \texttt{timedelta} has precision more granular than days, it
 is lost in these operations:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=single,framesep=3mm]
 if dt.date.today() == dt.date.today() + finger_snap:
     print("It'll still be the same day a finger snap from now.")
 if dt.date.today() == dt.date.today() + this_class:
@@ -121,7 +121,7 @@ if dt.date.today() == dt.date.today() + one_semester:
 \end{Verbatim}
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
 It'll still be the same day a finger snap from now.
 It'll still be the same day one lecture from now.
 \end{Verbatim}
@@ -130,7 +130,7 @@ It'll still be the same day one lecture from now.
 You can also compare dates with comparison operators like \texttt{<} and
 \texttt{>=}:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 if primary_day < election_day:
     print("The primary occurs before the election, duh!")
 else:
@@ -149,7 +149,7 @@ abstract wall clock time, independent of any particular day. It doesn't mean
 ``5pm this afternoon'' but rather ``5pm's in general.''
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-start_of_class = dt.time(hour=12, minute=30)
+start_of_class = dt.time(hour=12, minute=35)
 dinner_time = dt.time(hour=18, minute=0)
 \end{Verbatim}
 
@@ -163,16 +163,17 @@ suggests, combines features of both dates and times. In fact, a
 \texttt{datetime} variable represents \textit{an absolute, specific point in
 history}. Creation options include:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 this_exact_moment = dt.datetime.now()
 terrorist_attack = dt.datetime(2001, 9, 11, 10, 33)
 print("Right now it's: {}".format(this_exact_moment))
-print("A horrible thing occurred at: {}".format(terrorist_attack))
+print("A horrible thing occurred at: {}".format(
+    terrorist_attack))
 \end{Verbatim}
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-Right now it's: 2020-03-10 09:33:57.015432
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+Right now it's: 2021-03-10 09:33:57.015432
 A horrible thing occurred at: 2001-09-11 10:33:00
 \end{Verbatim}
 
@@ -181,14 +182,15 @@ A horrible thing occurred at: 2001-09-11 10:33:00
 We can also use the \texttt{datetime}'s \texttt{.combine()} method to put a
 \texttt{date} and a \texttt{time} together into a \texttt{datetime}:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-todays_class = dt.datetime.combine(here_we_are, start_of_class)
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+todays_class = dt.datetime.combine(here_we_are,
+    start_of_class)
 print("Today's lecture is at: {}".format(todays_class))
 \end{Verbatim}
 \vspace{-.2in}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-Today's lecture is at: 2020-03-10 12:30:00
+Today's lecture is at: 2021-03-03 12:35:00
 \end{Verbatim}
 
 \index{time@\texttt{.time()} method (datetime)}
@@ -226,14 +228,14 @@ There are a seemingly unlimited number of ways that dates and times can be
 expressed in strings. Just consider a few possibilities:
 
 \begin{compactitem}
-\item Feb. 29, 2020 4pm
-\item Feb 29, 2020 4:00pm
-\item Feb 29, 2020 4:00 P.M.
-\item 4/29/19 4:00 P.M.
-\item 4/29/19 16:00
-\item 02/29/19 16:00:00
-\item 29-Feb-2020 4:00pm
-\item 2020-Feb-29 16:00:00
+\item Feb. 29, 2021 4pm
+\item Feb 29, 2021 4:00pm
+\item Feb 29, 2021 4:00 P.M.
+\item 4/29/21 4:00 P.M.
+\item 4/29/21 16:00
+\item 02/29/21 16:00:00
+\item 29-Feb-2021 4:00pm
+\item 2021-Feb-29 16:00:00
 \item ...
 \end{compactitem}
 
@@ -291,13 +293,9 @@ print(contribs)
 0       Barack X. Tyrell  Tue 09/05/17  $3370     I
 1       Gandalf A. Trump  Tue 07/18/17    $70     R
 2     Jay-Z G. Targaryen   18-Dec-2017   $170     D
-3         Brad T. Bolton  Thu 01/26/17  $1840     R
-4          Luke T. Obama   29-Sep-2017  $4230     D
 ...                  ...           ...    ...   ...
-7179       Zoe N. Tyrell   10-Jun-2016  $5460     R
-7180    Taylor T. Thrace   10-Mar-2016  $4365     D
 7181      Katy I. Tyrell  Thu 11/02/17   $140     R
-7182     Katy T. Baggins  Fri 01/22/16  $1255     R
+7182     Brad T. Baggins  Fri 01/22/16  $1255     R
 7183    Taylor E. Thrace  Sun 02/26/17  $3235     D
 \end{Verbatim}
 
@@ -368,7 +366,7 @@ characters.
 So we fix all this in an instant by simply passing a \texttt{parse\_dates}
 argument with the names of the column(s) we want it to parse:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 contribs = pd.read_csv("contribs.csv", parse_dates=['Date'])
 \end{Verbatim}
 
@@ -405,20 +403,17 @@ print(contribs.sort_values(['Date']))
 6698         Wash T. Thrace 2015-06-28  1365     I
 2561        Frodo X. Tyrell 2015-06-28  3500     R
 4149      Katy U. Skywalker 2015-06-28  1855     I
-1623          Bilbo R. Pitt 2015-06-28  5130     R
-4656          Lady K. Obama 2015-06-29   775     R
 ...                     ...        ...   ...   ...
-5031  Jennifer W. Lannister 2020-02-21  1455     R
-179       Aragorn Q. Thrace 2020-02-21  2625     R
-5651         Rey U. Aniston 2020-02-21  2915     D
-2408        Tyrion M. Perry 2020-02-21  4755     I
-6735       Taylor W. Tyrell 2020-02-21  2780     D
+5651         Rey U. Aniston 2021-02-21  2915     D
+2408        Tyrion M. Perry 2021-02-21  4755     I
+6735       Taylor W. Tyrell 2021-02-21  2780     D
 \end{Verbatim}
 
 or query by dates:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-print(contribs[contribs.realdate < dt.date(year=2016, month=11, day=8)])
+print(contribs[contribs.realdate < dt.date(year=2016,
+    month=11, day=8)])
 \end{Verbatim}
 \vspace{-.2in}
 
@@ -447,6 +442,7 @@ and stayed that way through the end of the data set.
 
 \bigskip
 \index{str suffix@\texttt{.str} suffix (Pandas)}
+\index{astype@\texttt{.astype()} method}
 
 Btw, if you're wondering how to fix the \texttt{Amt} column, you can do so
 with the same \texttt{.str} suffix we used on p.~\pageref{strSuffix}:
@@ -472,7 +468,7 @@ Pandas' \texttt{to\_datetime()} method is that solution. All you have to do is
 pass it a \texttt{Series} (or NumPy array) with your strings, and it returns
 the \texttt{datetime} equivalents:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 revolutions_strings = pd.Series(["March 8, 1917", "4-July-1776",
     "5/5/1789", "Jan. 5 2011"])
 revolutions_actual_dates = pd.to_datetime(revolutions_strings)
@@ -502,15 +498,15 @@ passing (1) a string representing a date, time, or datetime, and (2) a
 formatting string telling the method how to interpret it. This is best seen
 through an example:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-my_string = "2/20/2019 14:00"
-start_of_class = dt.datetime.strptime(my_string, "%m/%d/%Y %H:%M")
-print(start_of_class)
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+s = "4/30/2021 12:35"
+last_class = dt.datetime.strptime(s, "%m/%d/%Y %H:%M")
+print(last_class)
 \end{Verbatim}
 \vspace{-.2in}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-2019-02-20 14:00:00
+2021-04-30 12:35:00
 \end{Verbatim}
 
 This example demonstrates a full ``round-trip'' operation: we started with a
@@ -581,7 +577,8 @@ One common error: note that you call \texttt{.strptime()} directly on the
 two arguments:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-a_datetime = dt.datetime.strptime(my_birthday_string, "%m/%d/%Y %H:%M")
+a_datetime = dt.datetime.strptime(my_birthday_string,
+    "%m/%d/%Y %H:%M")
 \end{Verbatim}
 
 but you call \texttt{.strftime()} on the variable in question (a specific

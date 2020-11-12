@@ -1,5 +1,6 @@
 
-\chapter{ML classifiers: kNN (2 of 2)}
+\chapter[kNN (2 of 2)]
+{\LARGE ML classifiers: kNN (2 of 2)}
 \label{ch:kNN2}
 
 Last chapter gave the theory of kNN classifiers. Now how to code one in
@@ -16,17 +17,19 @@ the smallest distance, and take a majority vote.
 We'll use our bank loan example, but with a lot more rows. Let's synthesize a
 data set real quick:
 
+\index{astype@\texttt{.astype()} method}
+
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 NUM = 1000
 default = np.random.choice(['yes','no'], p=[.3,.7], size=NUM)
 cc_debt = np.where(default == 'yes',
-    np.random.normal(12000, 4000, NUM).clip(0, 40000).astype(int),
-    np.random.normal(7000, 3000, NUM).clip(0, 40000).astype(int))
+   np.random.normal(12000,4000,NUM).clip(0,40000).astype(int),
+   np.random.normal(7000,3000,NUM).clip(0,40000).astype(int))
 num_yrs = np.where(default == 'yes',
-    np.random.uniform(0, 10, NUM).round(1),
-    np.random.uniform(2, 12, NUM).round(1))
-bank = pd.DataFrame({'cc_debt':cc_debt, 'num_yrs':num_yrs,
-    'default':default})[['cc_debt','num_yrs','default']]
+   np.random.uniform(0,10,NUM).round(1),
+   np.random.uniform(2,12,NUM).round(1))
+bank = pd.DataFrame({'debt':cc_debt,'num_yrs':num_yrs,
+   'default':default})[['debt','num_yrs','default']]
 \end{Verbatim}
 
 In our simplistic, synthesized world, we're assuming that 30\% of our 1,000
@@ -34,8 +37,9 @@ people default on their loans, and that those who do tend to have a bit more
 credit card debt and somewhat fewer years at their current job. The resulting
 \texttt{DataFrame} looks like this:
 
+\vspace{-.1in}
 \begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-                     cc_debt  num_yrs default
+                        debt  num_yrs default
                 0       7318      8.3     yes
                 1       2524      9.5      no
                 2      14866      5.1     yes
@@ -51,12 +55,14 @@ credit card debt and somewhat fewer years at their current job. The resulting
 \end{Verbatim}
 
 and we can plot it: 
+\vspace{-.1in}
 \index{grouped scatter plot}
 \index{scatter plot!grouped}
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
-sns.pairplot(data=bank, x_vars=['num_yrs'], y_vars=['cc_debt'], hue='default')
+\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=single,framesep=2mm]
+sns.pairplot(data=bank,x_vars=['num_yrs'],y_vars=['debt'],hue='default')
 \end{Verbatim}
+\vspace{-.1in}
 
 to get the grouped scatter plot in Figure~\ref{synthesized_bank}.
 
@@ -82,18 +88,18 @@ use.
 def zscores(arr):
     return (arr - arr.mean()) / arr.std()
 
-cc_debt_mean = bank.cc_debt.mean()
-cc_debt_std = bank.cc_debt.std()
+debt_mean = bank.debt.mean()
+debt_std = bank.debt.std()
 num_yrs_mean = bank.num_yrs.mean()
 num_yrs_std = bank.num_yrs.std()
 
-bank.cc_debt = zscores(bank.cc_debt)
+bank.debt = zscores(bank.debt)
 bank.num_yrs = zscores(bank.num_yrs)
 \end{Verbatim}
 \vspace{-.2in}
 
 \begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-                  cc_debt   num_yrs default
+                     debt   num_yrs default
             0    1.321445  0.152280     yes
             1    0.877662 -0.407452      no
             2    0.150633 -1.000109     yes
@@ -129,9 +135,9 @@ determine that point's Euclidean distance from our test point. Then, it will
 sort those by distance, pick the top $k$, and choose the majority:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-def predict(cc_debt, num_yrs, k):
-    bank['dists'] = dist([bank.cc_debt, bank.num_yrs],
-        [(cc_debt - cc_debt_mean) / cc_debt_std,
+def predict(debt, num_yrs, k):
+    bank['dists'] = dist([bank.debt, bank.num_yrs],
+        [(debt - debt_mean) / debt_std,
         (num_yrs - num_yrs_mean) / num_yrs_std])
     k_closest_pts = bank.sort_values('dists').iloc[0:k]
     return k_closest_pts.default.value_counts().index[0]
@@ -153,7 +159,7 @@ is passed a value of 7 for \texttt{k} (to do 7-NN). The variable
 that looks like so:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-              cc_debt   num_yrs default     dists
+                 debt   num_yrs default     dists
         651 -0.058795 -0.720668     yes  0.101662
         254 -0.010493 -0.720668     yes  0.105948
         515  0.057728 -0.854746      no  0.106971
@@ -189,10 +195,11 @@ code we wrote back on p.~\pageref{evaluateNBcode}:
 num_correct = 0
 for i in range(len(test)):
     row = test.iloc[i]
-    p = predict(row['cc_debt'], row['num_yrs'], 3)
+    p = predict(row['debt'], row['num_yrs'], 3)
     if p == row['default']:
         num_correct += 1
-print("We got {}% correct.".format(num_correct/len(test)*100))
+print("We got {}% correct.".format(
+    num_correct/len(test)*100))
 \end{Verbatim}
 \vspace{-.2in}
 
@@ -230,13 +237,13 @@ print(train)
 \vspace{-.2in}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-                  face  height  demeanor lightsaber  type
-            879  beard    tall      calm      green  Jedi
-            770  beard  medium      calm       blue  Jedi
-            49   clean   short      calm       blue  Sith
-            892  clean   short      calm        red  Sith
-            774  clean  medium  menacing       blue  Jedi
-            ..     ...     ...       ...        ...   ...
+          face  height  demeanor lightsaber  type
+    879  beard    tall      calm      green  Jedi
+    770  beard  medium      calm       blue  Jedi
+    49   clean   short      calm       blue  Sith
+    892  clean   short      calm        red  Sith
+    774  clean  medium  menacing       blue  Jedi
+    ..     ...     ...       ...        ...   ...
 \end{Verbatim}
 
 \index{OneHotEncoder@\texttt{OneHotEncoder}}
@@ -252,24 +259,25 @@ returns a NumPy array:
 from sklearn.preprocessing import OneHotEncoder
 
 ohe = OneHotEncoder(sparse=False)
-one_hotted_features = ohe.fit_transform(train.drop(['type'], axis=1))
+one_hotted_features = ohe.fit_transform(
+    train.drop(['type'], axis=1))
 \end{Verbatim}
 \vspace{-.2in}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-            [[1. 0. 0. 0. 1. 1. 0. 0. 1. 0.]
-             [1. 0. 1. 0. 0. 1. 0. 1. 0. 0.]
-             [0. 1. 0. 1. 0. 1. 0. 1. 0. 0.]
-             [0. 1. 0. 1. 0. 1. 0. 0. 0. 1.]
-             [0. 1. 1. 0. 0. 0. 1. 1. 0. 0.]
-                        . . .
+    [[1. 0. 0. 0. 1. 1. 0. 0. 1. 0.]
+     [1. 0. 1. 0. 0. 1. 0. 1. 0. 0.]
+     [0. 1. 0. 1. 0. 1. 0. 1. 0. 0.]
+     [0. 1. 0. 1. 0. 1. 0. 0. 0. 1.]
+     [0. 1. 1. 0. 0. 0. 1. 1. 0. 0.]
+                 . . .
 \end{Verbatim}
 
 It'd be good practice to run your eyeballs over those five rows and compare
-them with the categorical data, to verify that they line up. In particular, the
-first row, which says ``\texttt{1 0 0 0 1 1 0 0 1 0},'' means: ``yes, a
-\texttt{beard}; no, not \texttt{clean}; not \texttt{medium} or \texttt{short},
-but \texttt{tall}; yes \texttt{calm}, but no, not \texttt{menacing}; and a
+them with the categorical data, to verify that they line up. The first row,
+which says ``\texttt{1 0 0 0 1 1 0 0 1 0},'' means: ``yes, a \texttt{beard};
+no, not \texttt{clean}; not \texttt{medium} or \texttt{short}, but
+\texttt{tall}; yes \texttt{calm}, but no, not \texttt{menacing}; and a
 lightsaber that is \textit{not} \texttt{blue}, \textit{is} \texttt{green}, and
 is \textit{not} \texttt{red}.'' (Remember, the \texttt{OneHotEncoder} puts the
 feature values in alphabetical order.)
@@ -308,19 +316,20 @@ Comparing the true answers with the kNN predictions, side-by-side, lets us see
 how well we did:
 
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
-results = pd.DataFrame({'true_answer':test.type, 'prediction':knn_predictions})
+results = pd.DataFrame({'true_answer':test.type,
+    'prediction':knn_predictions})
 print(results)
 \end{Verbatim}
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-    true_answer prediction
-1          Sith       Sith
-4          Jedi       Sith
-8          Jedi       Jedi
-13         Jedi       Jedi
-21         Sith       Sith
-..          ...        ...
+\begin{Verbatim}[fontsize=\normalsize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+      true_answer prediction
+  1          Sith       Sith
+  4          Jedi       Sith
+  8          Jedi       Jedi
+  13         Jedi       Jedi
+  21         Sith       Sith
+  ..          ...        ...
 \end{Verbatim}
 
 and we can sum up how many times they coincided to get a measure of accuracy:
@@ -328,7 +337,7 @@ and we can sum up how many times they coincided to get a measure of accuracy:
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 (test.type == knn_predictions).sum() / len(test) * 100
 \end{Verbatim}
-\vspace{-.2in}
+\vspace{-.3in}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
 85.667
@@ -341,6 +350,8 @@ array of \texttt{True}s and \texttt{False}s, specifying whether each test point
 was classified correctly or incorrectly. Taking the \texttt{.sum()} of that
 array treats the \texttt{True}s as 1's and the \texttt{False}s as 0's, which is
 a nice and easy way to simply count the number of \texttt{True}s.)
+
+\bigskip
 
 \subsection{\texttt{scikit-learn} for Na\"{i}ve Bayes}
 
@@ -358,7 +369,8 @@ named \texttt{OrdinalEncoder}:
 from sklearn.preprocessing import OrdinalEncoder
 
 oe = OrdinalEncoder()
-converted_features = oe.fit_transform(train.drop(['type'], axis=1))
+converted_features = oe.fit_transform(
+    train.drop(['type'], axis=1))
 \end{Verbatim}
 
 (Don't confuse this with the \texttt{OneHotEncoder} from the same package; they
@@ -379,20 +391,20 @@ ask me.
 The result of this is an array of numbers:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-                  face  height  demeanor lightsaber
-            879  beard    tall      calm      green
-            770  beard  medium      calm       blue
-            49   clean   short      calm       blue
-            892  clean   short      calm        red
-            774  clean  medium  menacing       blue
-            ..     ...     ...       ...        ...
+          face  height  demeanor lightsaber
+    879  beard    tall      calm      green
+    770  beard  medium      calm       blue
+    49   clean   short      calm       blue
+    892  clean   short      calm        red
+    774  clean  medium  menacing       blue
+    ..     ...     ...       ...        ...
 
-            [[0. 2. 0. 1.]
-             [0. 0. 0. 0.]
-             [1. 1. 0. 0.]
-             [1. 1. 0. 2.]
-             [1. 0. 1. 0.]
-                . . .
+    [[0. 2. 0. 1.]
+     [0. 0. 0. 0.]
+     [1. 1. 0. 0.]
+     [1. 1. 0. 2.]
+     [1. 0. 1. 0.]
+        . . .
 \end{Verbatim}
 
 You can see that for the \texttt{lightsaber} feature, the

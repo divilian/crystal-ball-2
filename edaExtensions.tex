@@ -49,13 +49,13 @@ books.iloc[0:5,:]
 \vspace{-.2in}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-                       gender  year     lang   words  chaps
+                    gender  year     lang   words  chaps
 name
-Jane Eyre                   F  1847  English  183858     38
-The Brothers Karamazov      M  1879  Russian  364153     92
-Anna Karenina               M  1877  Russian  349736    219
-The Inferno                 M  1320  Italian   45750     34
-Huck Finn                   M  1884  English  109571     43
+Jane Eyre                F  1847  English  183858     38
+Brothers Karamazov       M  1879  Russian  364153     92
+Anna Karenina            M  1877  Russian  349736    219
+The Inferno              M  1320  Italian   45750     34
+Huck Finn                M  1884  English  109571     43
 \end{Verbatim}
 
 For each book, we have the \texttt{gender} of the author, the \texttt{year} and
@@ -74,7 +74,7 @@ and \texttt{chaps} are numeric.
 When looking at just one variable, which is categorical in nature, the
 appropriate analysis is the \textbf{one-dimensional contingency table}, which
 shows the counts of the various values. Let's create a contingency table for
-the book languages, using Pandas' \texttt{.value\_counts()} function:
+the book languages, using the \texttt{.value\_counts()} function from Pandas:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 books['lang'].value_counts()
@@ -149,13 +149,13 @@ books['words'].plot(kind="hist",bins=30)
 which shows the entire ``lay of the land'' of the distribution of values.
 Remember to experiment with the number of \texttt{\textbf{bins}}, since you
 can get very different pictures of how the data is distributed depending on
-your bin size (more on that in Lesson~\ref{ch:KDEs}).
+your bin size (more on that in Chapter~\ref{ch:KDEs}).
 
 \begin{center}
 \includegraphics[width=.7\textwidth]{histogram.png}
 \end{center}
 
-\section{Case 3 -- bivariate data: categorical--categorical}
+\section{Case 3 -- bivariate data: cat--cat}
 
 \index{value\_counts@\texttt{.value\_counts()} (Pandas)}
 \index{groupby@\texttt{.groupby()} (Pandas)}
@@ -193,8 +193,8 @@ bit easier on the eyes for this, though:
 
 \index{gender\_lang@\texttt{gender\_lang}}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-gender_lang = pd.crosstab(books['lang'], columns=books['gender'])
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+gender_lang = pd.crosstab(books['lang'], books['gender'])
 print(gender_lang)
 \end{Verbatim}
 \vspace{-.2in}
@@ -229,7 +229,8 @@ Our first use of margins will be to simply compute \textbf{raw counts}:
 \index{gender\_lang\_m@\texttt{gender\_lang\_m}}
 
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
-gender_lang_m = pd.crosstab(books['lang'], columns=books['gender'], margins=True)
+gender_lang_m = pd.crosstab(books['lang'], books['gender'],
+    margins=True)
 print(gender_lang_m)
 \end{Verbatim}
 \vspace{-.2in}
@@ -265,7 +266,7 @@ Now suppose we \textit{divide every value of this table} by the grand total.
 obtain the value of the bottom-right-hand entry.) This gives us \textbf{overall
 proportions}, and if we multiply by 100, \textbf{overall percentages}:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 print(gender_lang_m / gender_lang_m.loc['All']['All'] * 100)
 \end{Verbatim}
 \vspace{-.2in}
@@ -295,7 +296,7 @@ like so:
 
 \index{div@\texttt{.div() (NumPy)}}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 print(gender_lang_m.div(gender_lang_m.loc['All'],axis=1) * 100)
 \end{Verbatim}
 \vspace{-.2in}
@@ -329,7 +330,7 @@ this:
 
 \index{gender\_lang\_m@\texttt{gender\_lang\_m}}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 print(gender_lang_m.div(gender_lang_m['All'],axis=0) * 100)
 \end{Verbatim}
 \vspace{-.2in}
@@ -382,7 +383,7 @@ information) and if you give \texttt{chi2\_contingency()} this extraneous data
 it messes up the whole $\chi ^2$ computation.
 
 This is why in all the examples above, I deliberately changed my variable name
-for the ``margined'' table from \texttt{gender\_lang} to
+for the ``margined'' table from \texttt{gender\_lang} to\linebreak
 \texttt{gender\_lang\_m} (\texttt{m} stands for ``margins.'') This is a nice
 visual reminder that I \textit{don't} want to pass this table as an argument to
 \texttt{scipy.stats.chi2\_contingency()}: instead, I want to pass the vanilla,
@@ -424,21 +425,22 @@ create simply by passing the Seaborn function a contingency table:
 sns.heatmap(gender_lang)
 \end{Verbatim}
 
-(Notice I passed \texttt{gender\_lang}, without the margins, not
-\texttt{gender\_lang\_m}.) The result is shown in Figure~\ref{heatmap}
-(p.~\pageref{heatmap}). It's disorienting at first, but the key to grasping the
-message is to look at the color spectrum at the far right of the diagram. Here
-we see \textit{a mapping of numbers to colors}. In this particular color scheme
-(there are many others to choose from), a light tan color indicates a high
-value up near 200, whereas a dark black color indicates a low color down below
-40. In between, the colors go through shades of purple and red and orange, each
-indicating progressively higher values.\footnote{Btw, there are lots of other
-color schemes available; you can add a value for the ``\texttt{cmap}'' argument
-to your \texttt{heatmap()} call giving the color scheme's name. I personally
-like the \index{seismic@\texttt{seismic} (color scheme)}``\texttt{seismic}''
-one since it makes it extremely clear which colors go with high vs.~low values.
-You can get a list of the available ones by passing \texttt{cmap="list"} as the
-second argument to \texttt{heatmap()}.}
+(Notice I passed \texttt{gender\_lang}, not \texttt{gender\_lang\_m}. We don't
+want to plot the margins as though they were entries!) The result is shown in
+Figure~\ref{heatmap} (p.~\pageref{heatmap}). It's disorienting at first, but
+the key to grasping the message is to look at the color spectrum at the far
+right of the diagram. Here we see \textit{a mapping of numbers to colors}. In
+this particular color scheme (there are many others to choose from), a light
+tan color indicates a high value up near 200, whereas a dark black color
+indicates a low color down below 40. In between, the colors go through shades
+of purple and red and orange, each indicating progressively higher
+values.\footnote{Btw, there are lots of other color schemes available; you can
+add a value for the ``\texttt{cmap}'' argument to your \texttt{heatmap()} call
+giving the color scheme's name. I personally like the
+\index{seismic@\texttt{seismic} (color scheme)}``\texttt{seismic}'' one since
+it makes it extremely clear which colors go with high vs.~low values. You can
+get a list of the available ones by passing \texttt{cmap="list"} as the second
+argument to \texttt{heatmap()}.}
 
 
 \begin{figure}[ht]
@@ -485,7 +487,7 @@ rectangles are almost exactly the same shade of purple.
 
 
 
-\section{Case 4 -- bivariate data: categorical--numerical}
+\section{Case 4 -- bivariate data: cat--num}
 
 Suppose the two variables you're interested in are one categorical and one
 numerical. For instance, maybe you're wondering whether men or women have
@@ -502,7 +504,7 @@ books.boxplot(column='words', by='lang')
 \end{Verbatim}
 
 \begin{center}
-\includegraphics[width=0.6\textwidth]{boxplot.png}
+\includegraphics[width=0.8\textwidth]{boxplot.png}
 \end{center}
 
 \index{t-test@$t$-test}
@@ -516,6 +518,8 @@ out is a \textbf{$t$-test for the difference of means}, using
 
 \index{box plot!notched}
 \index{notched box plot}
+
+\medskip
 
 Here's another way. You can use a \textbf{\textit{notched} boxplot}:
 \label{notched}
@@ -538,7 +542,7 @@ declaring that on average, English works are longer than Italian ones.
 \includegraphics[width=0.8\textwidth]{notchedboxplot.png}
 \end{center}
 
-\section{Case 5 -- bivariate data: numerical--numerical}
+\section{Case 5 -- bivariate data: num--num}
 
 \index{scatter plot}
 
@@ -715,8 +719,9 @@ are the most common, but different shapes can be used too.
 The Seaborn library lets us do this with its \texttt{pairplot()} function. It
 has a lot of parameters, but see if you can make sense of it:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-sns.pairplot(data=books, x_vars=["year"], y_vars=["words"], hue="lang")
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+sns.pairplot(data=books, x_vars=["year"], y_vars=["words"],
+    hue="lang")
 \end{Verbatim}
 
 \index{boxies (square brackets)}

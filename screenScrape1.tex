@@ -101,32 +101,35 @@ is a \texttt{title} element, \textit{etc.}
 <h1>Stephen Davies, Esquire</h1>
 
 <p>Deep in the bowels of
-<a href="http://buildings.umwblogs.org/james-farmer-hall/">James Farmer Hall</a> resides a
-carbon-based life form known to outsiders only as <b>Stephen</b>. This
-mysterious being fulfills several roles <u>not</u> widely known to
-humankind.</p>
+<a href="http://buildings.umwblogs.org/james-farmer-hall/">James Farmer
+Hall</a> resides a carbon-based life form known to outsiders only as
+<b>Stephen</b>. This mysterious being fulfills several roles <u>not</u>
+widely known to humankind.</p>
 
-<p><i>Some</i> of these functions are delineated below. Please memorize them
-and then immediately destroy this page upon reading it.</p>
+<p><i>Some</i> of these functions are delineated below. Please memorize
+them and then immediately destroy this page upon reading it.</p>
 
 <h2>Areas of operation</h2>
 
 <table border=2 cellpadding=15>
-    <tr><td class="pic"><img src="http://clipart.com/prof.jpg" width=200 /></td>
+    <tr><td class="pic"><img src="http://clipart.com/prof.jpg" width=200 />
+        </td>
         <td class="role">College professor</td>
-        <td class="description">Stephen teaches computer science and data science
-    to willing undergraduates, shaping them into the heroes of tomorrow. </td>
+        <td class="description">Stephen teaches computer science and data
+    science to willing undergraduates, shaping them into the heroes of
+    tomorrow.</td>
         <td><ul><li>Super rewarding</li>
             <li>Exciting</li>
             <li>Ever-changing</li>
             <li>Fun</li></ul></td>
         <td><b>50%</b> of total time</td>
     </tr>
-    <tr><td class="pic"><img src="http://clipart.com/dad.png" width=200 /></td>
+    <tr><td class="pic"><img src="http://clipart.com/dad.png" width=200 />
+        </td>
         <td class="role">Dad</td>
-        <td class="description"> With a wife, three teenagers, and two cats (one
-    of whom throws up a lot), Stephen's home life is a constant source of love,
-    anxiety, and Hallmark moments.</td>
+        <td class="description"> With a wife, three teenagers, and two cats
+        (one of whom throws up a lot), Stephen's home life is a constant
+        source of love, anxiety, and Hallmark moments.</td>
         <td><ul><li>Amazing</li>
             <li>Loving</li>
             <li>Complicated</li>
@@ -170,7 +173,7 @@ Some starting tags (not ending) contain additional information called
 tags from the example:
 
 \vspace{-.15in}
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=lines]
+\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=lines]
 <a href="http://buildings.umwblogs.org/james-farmer-hall/">Farmer Hall</a>
 \end{Verbatim}
 \vspace{-.15in}
@@ -232,12 +235,11 @@ sort of a companion technology to HTML to give additional formatting control.
 that structure. This strict separation of concerns, which was a good idea, has
 gotten very muddy in the intervening years, however.)
 
-\pagebreak
 The whole thing, once rendered, looks something like this:
 
 \begin{center}
 \label{stephenpage}
-\includegraphics[width=0.9\textwidth]{stephenpage.pdf}
+\includegraphics[width=0.9\textwidth]{stephenpage.png}
 \end{center}
 
 \section{The easy case: reading from \texttt{<table>}s}
@@ -271,8 +273,8 @@ see the word \texttt{table}), then we're in the easy case, thank heavens. We
 can use Pandas' \texttt{read\_html()} function as follows:
 
 \vspace{-.1in}
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-the_tables = pd.read_html("http://theURLtoTheWebpageIWantToScrape.html")
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+the_tables = pd.read_html("http://theURLtoTheWebpage.html")
 \end{Verbatim}
 \vspace{-.1in}
 
@@ -308,8 +310,9 @@ well contain \textit{multiple} \texttt{<table>}s, and therefore
 
 Let's try this approach with \texttt{allAboutStephen.html}:
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
-the_tables = pd.read_html("http://stephendavies.org/allAboutStephen.html")
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+the_tables = pd.read_html(
+    "http://stephendavies.org/allAboutStephen.html")
 print(len(the_tables))
 \end{Verbatim}
 \vspace{-.2in}
@@ -350,6 +353,7 @@ number.'' But that phrase is misleading here. Of \textit{course} the value is
 not a \textit{number}: why would we expect text on a web page to necessarily be
 a number? Really it means ``not a value Python could do anything with.''}.
 
+\pagebreak
 The root causes of these conundrums are as follows:
 
 \begin{compactenum}
@@ -371,7 +375,8 @@ p.~\pageref{stephenpage}).
 We can \textit{give} the \texttt{DataFrame} meaningful column names with:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-areas.columns = ['pic','role','description','adjectives','allocation']
+areas.columns = ['pic','role','description','adjectives',
+    'allocation']
 \end{Verbatim}
 
 and we can get rid of the columns we don't care about (the image, and perhaps
@@ -383,20 +388,19 @@ areas = areas[['role','adjectives','allocation']]
 
 Now we can see better what's going on:
 
-\pagebreak
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 print(areas)
 \end{Verbatim}
 
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-                role                                     adjectives          allocation
-0  College professor   Empowering  Important  Fun  Cool  All-enc...   50% of total time
-1  Dad                            Amazing Fun Important Challenging   30% of total time
-2  Kids Club Leader    Cute  Exhausting  Character-building  Imp...   10% of total time
-3  Secret Agent        Thrilling  High-impact  Dangerous  Cool  ...    5% of total time
-4  Jedi Master         Important  Thrilling  Challenging  Daring...    5% of total time
+\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=leftline,framesep=3mm,framerule=1mm]
+             role                        adjectives          allocation
+College professor   Empowering  Important  Fun  ...   50% of total time
+Dad                            Amazing Fun Impor...   30% of total time
+Kids Club Leader    Cute  Exhausting  Character-...   10% of total time
+Secret Agent        Thrilling  High-impact  Dang...    5% of total time
+Jedi Master         Important  Thrilling  Challe...    5% of total time
 \end{Verbatim}
 
 \subsection{Some text cleaning stuff}
@@ -420,12 +424,12 @@ My strategy to dealing with it is to split these up, putting each role's
 adjective in its own row of a new table that looks like this:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-                             role           adjective
-                College professor          Empowering
-                College professor           Important
-                              Dad             Amazing
-                 Kids Club Leader           Important
-                             . . . etc . . .
+                   role           adjective
+      College professor          Empowering
+      College professor           Important
+                    Dad             Amazing
+       Kids Club Leader           Important
+                   . . . etc . . .
 \end{Verbatim}
 
 \index{object@``\texttt{object}'' (a.k.a. \texttt{str}) \texttt{dtype}}
@@ -448,6 +452,7 @@ for row in areas.itertuples():
         adjs = np.append(adjs, adjective)
 \end{Verbatim}
 
+\pagebreak
 Two other notable things about this code:
 
 \begin{compactitem}
@@ -480,7 +485,7 @@ just like we did on p.~\pageref{stitching}:
 
 \index{adjectives\_df@\texttt{adjectives\_df}}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 adjectives_df = pd.DataFrame({'role':roles, 'adjective':adjs})
 \end{Verbatim}
 \vspace{-.2in}
@@ -526,7 +531,7 @@ nested \texttt{for} loop.}
 And now that we've done that, we can get rid of the old, awkward,
 separated-by-spaces column:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 areas = areas[['role','allocation']]
 \end{Verbatim}
 
@@ -537,7 +542,7 @@ We'll use the \texttt{.split()} method again, this time passing a delimiter:
 \index{split@\texttt{.split()}}
 \index{delimiter}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 percentages = np.array([], dtype=int)
 
 for row in areas.itertuples():
@@ -556,6 +561,7 @@ Putting \texttt{[0]} after it gets the first element of this list. Then, by
 wrapping the result in ``\texttt{int(...)}'', we convert it from a string of
 digits to an actual number, which we can do something with.
 
+\smallskip
 The last step in that code was to reassign the \texttt{DataFrame}'s
 \texttt{allocation} column to be our new percentages. The result is now:
 

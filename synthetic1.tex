@@ -162,9 +162,9 @@ print(np.random.normal(65,4,8))
 \end{Verbatim}
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-[60.81849148 61.8440439  59.95357622 67.25138714 64.02669499 68.65496282
- 66.26940369 65.50921312]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+[60.81849148 61.8440439  59.95357622 67.25138714 64.02669499
+ 68.65496282 66.26940369 65.50921312]
 \end{Verbatim}
 
 Notice that each time we call \texttt{normal()}, we get an array back (even if
@@ -215,6 +215,7 @@ print(np.random.uniform(0,60,1))
 [14.2524732]
 \end{Verbatim}
 
+\medskip
 And the next one?
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
@@ -226,6 +227,7 @@ print(np.random.uniform(0,60,1))
 [49.45671196]
 \end{Verbatim}
 
+\medskip
 And the next eleven?
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
@@ -233,11 +235,12 @@ print(np.random.uniform(0,60,11))
 \end{Verbatim}
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-[57.94495188 58.35606683 27.20695485 36.54254777 46.53159088 38.49680069
- 43.32109377  2.10219145 17.90696825  3.51074951 51.42365656]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+[57.944951 58.356066 27.206954 36.542547 46.531591 38.496800
+ 43.321093  2.102191 17.906968  3.510749 51.423656]
 \end{Verbatim}
 
+\medskip
 Of course, resetting the seed gives us our original sequence back:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
@@ -249,8 +252,10 @@ print(np.random.uniform(0,60,5))
 [46.66214463 14.2524732  49.45671196 57.94495188 58.35606683]
 \end{Verbatim}
 
+\medskip
 (Check those numbers with the previous ones to convince yourself.)
 
+\medskip
 And finally, let's sanity check the average:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
@@ -262,6 +267,7 @@ print(np.random.uniform(0,60,1000).mean())
 29.2049841447296
 \end{Verbatim}
 
+\medskip
 Yay. ``On average,'' our thousand synthetic babies are born at about half past
 the hour, which is what we'd expect.
 
@@ -298,7 +304,6 @@ np.random.choice(['Steelers','Patriots','Giants'])
 (As always, resetting the seed will restart the same sequence of random team
 choices from the beginning.)
 
-\pagebreak
 \begin{samepage}
 Other useful arguments to \texttt{choice()} include:
 
@@ -316,13 +321,15 @@ must sum to 1; and NumPy, stupidly, will not normalize it for you.)
 To illustrate:
 
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
-print(np.random.choice(['Steelers','Patriots','Giants'], size=14, p=[.3,.6,.1]))
+print(np.random.choice(['Steelers','Patriots','Giants'], size=14,
+    p=[.3,.6,.1]))
 \end{Verbatim}
 \vspace{-.2in}
 
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-['Steelers' 'Patriots' 'Patriots' 'Patriots' 'Giants' 'Steelers' 'Steelers'
- 'Patriots' 'Patriots' 'Steelers' 'Patriots' 'Giants' 'Steelers' 'Patriots']
+['Steelers' 'Patriots' 'Patriots' 'Patriots' 'Giants'
+ 'Steelers' 'Steelers' 'Patriots' 'Patriots' 'Steelers'
+ 'Patriots' 'Giants'   'Steelers' 'Patriots']
 \end{Verbatim}
 
 We asked for 14 random teams, and we told it to give us \texttt{Steelers} 30\%
@@ -333,9 +340,9 @@ you'll get a different random array each time.)
 Finally, let's test a large random array and verify that the requested
 percentages are approximately correct:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-pd.Series(np.random.choice(['Steelers','Patriots','Giants'], size=1000,
-    p=[.3,.6,.1])).value_counts() 
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+pd.Series(np.random.choice(['Steelers','Patriots','Giants'],
+    size=1000, p=[.3,.6,.1])).value_counts() 
 \end{Verbatim}
 \vspace{-.2in}
 

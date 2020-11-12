@@ -105,9 +105,10 @@ to remember you did this when interpreting the plot!
 Here's a (fictitious) example of some American and British celebrities, and
 their total Instagram ``likes'':
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
-plt.plot(uk, linestyle='None', color="red", marker=".", label="UK")
-plt.plot(us, linestyle='None', color="green", marker=".", label="US")
-plt.yscale('log')
+plt.plot(uk, linestyle='None', color="red", marker=".",
+    label="UK")
+plt.plot(us, linestyle='None', color="green", marker=".",
+    label="US")
 plt.legend()
 plt.show()
 \end{Verbatim}
@@ -143,8 +144,6 @@ but log-number-of-likes.
 \caption{A logarithmic plot of the same data from Figure~\ref{fig:rein1}.}
 \label{fig:rein2}
 \end{figure}
-
-\pagebreak
 
 \index{relative vs.~absolute changes}
 \index{absolute vs.~relative changes}
@@ -203,7 +202,6 @@ bigger windfall for investors than event B.
 \caption{A semi-logarithmic plot of a company's stock price.}
 \label{fig:stock2}
 \end{figure}
-\pagebreak
 
 \index{exponential relationship}
 \index{power-law relationship}

@@ -60,27 +60,27 @@ same values in them.''
 \begin{figure}[ht]
 \centering
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-                                  roles:
-          actor           film                   salary (millions)
-          --------------------------------------------------------
-          Downey Jr.      The Avengers           50
-          Johansson       The Avengers           20
-          DiCaprio        Inception              59
-          Hanks           Forrest Gump           70
-          Bullock         Gravity                77
-          Downey Jr.      Iron Man 3             51
-          Hanks           Saving Private Ryan    40
-          ...
-          
-                                  movies:
-          title           director               year
-          -------------------------------------------
-          Inception       Nolan                  2010
-          The Avengers    Whedon                 2012
-          Forrest Gump    Zemeckis               1994
-          Gravity         Cuaron                 2013
-          Star Wars       Lucas                  1977
-          ...
+                          roles:
+  actor           film                   salary (millions)
+  --------------------------------------------------------
+  Downey Jr.      The Avengers                  50
+  Johansson       The Avengers                  20
+  DiCaprio        Inception                     59
+  Hanks           Forrest Gump                  70
+  Bullock         Gravity                       77
+  Downey Jr.      Iron Man 3                    51
+  Hanks           Saving Private Ryan           40
+                   . . .
+  
+                         movies:
+      title           director               year
+      -------------------------------------------
+      Inception       Nolan                  2010
+      The Avengers    Whedon                 2012
+      Forrest Gump    Zemeckis               1994
+      Gravity         Cuaron                 2013
+      Star Wars       Lucas                  1977
+                       . . .
 \end{Verbatim}
 \caption{Two \texttt{DataFrame}s from an IMDB-like source.}
 \label{fig:imdb}
@@ -120,12 +120,18 @@ foreign key relationship is supposed to suggest that for every row in the
 \texttt{roles} table, its \texttt{film} value \textit{will} appear in one row
 of the \texttt{movies} table (namely, in that row's \texttt{title} column).
 
-To ``join'' these two \texttt{DataFrame}s all in one fell swoop, we execute a command
-like this:
+\bigskip
+\bigskip
 
+To ``join'' these two \texttt{DataFrame}s all in one fell swoop, we execute a
+command like this:
+
+\vspace{-.3in}
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-roles_movies = pd.merge(roles, movies, left_on="film", right_on="title")
+roles_movies = pd.merge(roles, movies, left_on="film",
+    right_on="title")
 \end{Verbatim}
+\vspace{-.2in}
 
 This produces a new \texttt{DataFrame} that contains (1) all the columns of the
 two, and (2) a row for each pair of original rows that match on their movie
@@ -135,20 +141,20 @@ merging column in the first \texttt{DataFrame}) and ``\texttt{right\_on}'' (for 
 second). If these two columns had the same name, we could just specify a single
 argument called ``\texttt{on}'' for the two.
 
-\medskip
+\pagebreak
 The \texttt{roles\_movies} table will look like this:
 
 \bigskip
 \label{roles_movies}
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=none]
                             roles_movies:
-actor      film         salary (millions)  title         director     year
---------------------------------------------------------------------------
-Bullock    Gravity      77                 Gravity       Cuaron       2013
-DiCaprio   Inception    59                 Inception     Nolan        2010
-Johansson  The Avengers 20                 The Avengers  Whedon       2012
-Downey Jr. The Avengers 50                 The Avengers  Whedon       2012
-....
+actor      film         salary     title         director     year
+------------------------------------------------------------------
+Bullock    Gravity        77       Gravity       Cuaron       2013
+DiCaprio   Inception      59       Inception     Nolan        2010
+Johansson  The Avengers   20       The Avengers  Whedon       2012
+Downey Jr. The Avengers   50       The Avengers  Whedon       2012
+                               . . .
 \end{Verbatim}
 \bigskip
 
@@ -163,12 +169,13 @@ operations if you wish.
 \section{Odds and ends}
 
 \begin{enumerate}
-\itemsep1em
-\item Sometimes we want to merge on more than one column; for instance:
+%\itemsep1em
+\item Sometimes we want to merge on more than one column:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-df = pd.merge(votes, contribs, left_on=['first_name','last_name'],
-        right_on=['candidate_first','candidate_last'])
+df = pd.merge(votes, contribs,
+    left_on=['first_name','last_name'],
+    right_on=['candidate_first','candidate_last'])
 \end{Verbatim}
 
 This gives us rows in the result only when the values in \textit{both} the
@@ -177,9 +184,9 @@ the \texttt{candidate\_first} and \texttt{candidate\_last} columns of
 \texttt{contribs}.
 
 \item If we're lucky, the name(s) of the column(s) we want to merge on are
-named exactly the same in both \texttt{DataFrame}s. In this case, we actually
-don't have to specify \texttt{on}, \texttt{left\_on}, or \texttt{right\_on}: we
-can just do the \texttt{merge()} with two arguments:
+named exactly the same in both \texttt{DataFrame}s. In this case, we don't have
+to specify \texttt{on}, \texttt{left\_on}, or \texttt{right\_on}: we can just
+do the \texttt{merge()} with two arguments:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 merged_df = pd.merge(df1, df2)
@@ -206,6 +213,7 @@ to include any of the actors in that film in the resulting merged \texttt{DataFr
 \index{join!outer}
 \index{join!left}
 \index{join!right}
+\index{how@``\texttt{how}''}
 
 Sometimes, we want to make sure that every row in the left (or right, or both)
 \texttt{DataFrame} appears in the result \textit{at least once}, though, with
@@ -214,26 +222,27 @@ corresponding null values if necessary. We can do this by specifying
 \texttt{\textquotesingle how\textquotesingle } argument to \texttt{pd.merge()}:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-df = pd.merge(votes, contribs, left_on=['first_name','last_name'],
-        right_on=['candidate_first','candidate_last'], how='outer')
+df = pd.merge(votes, contribs, left_on=['first_name',
+    'last_name'], right_on=['candidate_first',
+    'candidate_last'], how='outer')
 \end{Verbatim}
 
 \index{name collision}
 
 \item Sometimes merging two \texttt{DataFrame}s will result in column
-\textbf{name collision}s. Suppose, for example, that our \texttt{roles} table
-had also had a \texttt{year} column indicating the birth year of the actor:
+\textbf{name collision}s. Say that our \texttt{roles} table had also had a
+\texttt{year} column indicating the birth year of the actor:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=none]
-                            roles:
-    actor           year   film                   salary (millions)
-    ---------------------------------------------------------------
-    Downey Jr.      1965   The Avengers           50
-    Johansson       1984   The Avengers           20
-    DiCaprio        1974   Inception              59
-    Hanks           1956   Forrest Gump           70
-    Bullock         1964   Gravity                77
-    ...
+                        roles:
+actor           year   film                   salary
+----------------------------------------------------
+Downey Jr.      1965   The Avengers             50
+Johansson       1984   The Avengers             20
+DiCaprio        1974   Inception                59
+Hanks           1956   Forrest Gump             70
+Bullock         1964   Gravity                  77
+                     . . .
 \end{Verbatim}
 
 Then the resulting \texttt{DataFrame} would need to have two columns named
@@ -241,22 +250,21 @@ Then the resulting \texttt{DataFrame} would need to have two columns named
 conflicting columns with a ``\texttt{\_x}'' or ``\texttt{\_y}'' suffix,
 corresponding to the left/right tables in the join:
 
-\footnotesize
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=none]
+\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=none]
                             roles_movies:
-actor      year_x   film       salary (millions)   title      director   year_y
--------------------------------------------------------------------------------
-Bullock    1964     Gravity    77                  Gravity    Cuaron     2013
-DiCaprio   1974     Inception  59                  Inception  Nolan      2010
+actor      year_x   film       salary   title      director   year_y
+--------------------------------------------------------------------
+Bullock    1964     Gravity      77     Gravity    Cuaron     2013
+DiCaprio   1974     Inception    59     Inception  Nolan      2010
 \end{Verbatim}
-\normalsize
 
-(which, of course, you can rename at will via
-``\texttt{roles\_movies.columns}''.)
+(which you can rename via ``\texttt{roles\_movies.columns}'' if you want, of
+course.)
 
 \end{enumerate}
 
-\section{One-to-many and many-to-many relationships}
+\section[One-to-many vs.~many-to-many]{One-to-many vs.~many-to-many
+relationships}
 
 \index{one-to-many@``one-to-many'' relationship}
 \index{many-to-many@``many-to-many'' relationship}
@@ -270,13 +278,31 @@ have a ``\textbf{many-to-many}'' relationship, in which both
 Consider the Halloween costumes data set below, with \texttt{costumes} and
 \texttt{children} tables:
 
-%\begin{samepage}
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
-print(costumes)
+print(children)
 \end{Verbatim}
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+       child  age   costume
+0    Allison   12      Elsa
+1      Kiara    8  Princess
+2      Mason   12    Batman
+3      Jenny   12    Wizard
+4    Wendell   11   Student
+5  Betty Lou   10  Princess
+6   Hermione   11    Wizard
+7      Faith   13    Wizard
+8      Julie   11      Elsa
+\end{Verbatim}
+
+\pagebreak
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+print(costumes)
+\end{Verbatim}
+\vspace{-.5in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
        accessory      costume
 0          crown     Princess
 1           wand     Princess
@@ -299,41 +325,23 @@ print(costumes)
 18    pointy hat       Wizard
 19          wand       Wizard
 \end{Verbatim}
-%\end{samepage}
 
-\begin{samepage}
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
-print(children)
-\end{Verbatim}
-\vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-       child  age   costume
-0    Allison   12      Elsa
-1      Kiara    8  Princess
-2      Mason   12    Batman
-3      Jenny   12    Wizard
-4    Wendell   11   Student
-5  Betty Lou   10  Princess
-6   Hermione   11    Wizard
-7      Faith   13    Wizard
-8      Julie   11      Elsa
-\end{Verbatim}
-\end{samepage}
-
+\bigskip
 In order to represent all these children in their chosen costumes, we need
 multiple matches from both \texttt{DataFrame}s for each costume value. This is
 because each \texttt{Princess} has more than one accessory, and there are also
 multiple children who want to \textit{be} princesses. Therefore, we can
 potentially end up with a lot of rows in our result.
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
-children_costumes = pd.merge(children, costumes, on="costume")
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+children_costumes = pd.merge(children, costumes,
+    on="costume")
 print(children_costumes)
 \end{Verbatim}
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
         child  age   costume     accessory
 0     Allison   12      Elsa          cape
 1     Allison   12      Elsa          wand
@@ -369,47 +377,44 @@ Btw, notice that poor \texttt{Wendell} was left out of the merged
 can include him by doing a ``\textbf{left join}'' (or even a full
 ``\textbf{outer join}'') like this:
 
+\index{how@``\texttt{how}''}
+
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
-children_costumes = pd.merge(children, costumes, on="costume", how="left"))
+children_costumes = pd.merge(children, costumes, on="costume",
+    how="left"))
 print(children_costumes)
 \end{Verbatim}
 
 \index{NaN@\texttt{NaN} (``not a number'')}
-This produces the output in Figure~\ref{withWendell}. \texttt{Wendell}'s entry
-can now be found on line 11. The ``\texttt{NaN}'' is the placeholder Pandas
-uses for rows that didn't match when doing a left/right/outer join.
 
-\begin{figure}[ht]
-\centering
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-                    child  age   costume     accessory
-            0     Allison   12      Elsa          cape
-            1     Allison   12      Elsa          wand
-            2       Kiara    8  Princess         crown
-            3       Kiara    8  Princess          wand
-            4       Kiara    8  Princess         dress
-            5       Mason   12    Batman  utility belt
-            6       Mason   12    Batman         boots
-            7       Mason   12    Batman          cape
-            8       Mason   12    Batman          mask
-            9       Jenny   12    Wizard    pointy hat
-            10      Jenny   12    Wizard          wand
-            11    Wendell   11   Student           NaN
-            12  Betty Lou   10  Princess         crown
-            13  Betty Lou   10  Princess          wand
-            14  Betty Lou   10  Princess         dress
-            15   Hermione   11    Wizard    pointy hat
-            16   Hermione   11    Wizard          wand
-            17      Faith   13    Wizard    pointy hat
-            18      Faith   13    Wizard          wand
-            19      Julie   11      Elsa          cape
-            20      Julie   11      Elsa          wand
+This produces the output below. \texttt{Wendell}'s entry can now be found on
+line 11. The ``\texttt{NaN}'' is the placeholder Pandas uses for rows that
+didn't match when doing a left/right/outer join.
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+          child  age   costume     accessory
+  0     Allison   12      Elsa          cape
+  1     Allison   12      Elsa          wand
+  2       Kiara    8  Princess         crown
+  3       Kiara    8  Princess          wand
+  4       Kiara    8  Princess         dress
+  5       Mason   12    Batman  utility belt
+  6       Mason   12    Batman         boots
+  7       Mason   12    Batman          cape
+  8       Mason   12    Batman          mask
+  9       Jenny   12    Wizard    pointy hat
+  10      Jenny   12    Wizard          wand
+  11    Wendell   11   Student           NaN
+  12  Betty Lou   10  Princess         crown
+  13  Betty Lou   10  Princess          wand
+  14  Betty Lou   10  Princess         dress
+  15   Hermione   11    Wizard    pointy hat
+  16   Hermione   11    Wizard          wand
+  17      Faith   13    Wizard    pointy hat
+  18      Faith   13    Wizard          wand
+  19      Julie   11      Elsa          cape
+  20      Julie   11      Elsa          wand
 \end{Verbatim}
-\caption{The result of a left join, which includes even children whose costumes
-have no accessories (and therefore are not present in the \texttt{accessories}
-\texttt{DataFrame}.}
-\label{withWendell}
-\end{figure}
 
 We're now in a position to perform our analyses. For instance, we could
 assemble a grand shopping list:
@@ -434,24 +439,26 @@ Name: accessory, dtype: int64
 If the wand product turns out to have a safety hazard, we could find all
 children younger than a certain age who were issued wands:
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 print(children_costumes[(children_costumes.age < 10) & 
     (children_costumes.accessory=="wand")])
 \end{Verbatim}
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-3  Kiara    8  Princess      wand
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+          child  age   costume     accessory
+  3       Kiara    8  Princess          wand
 \end{Verbatim}
 
+\smallskip
 Or, if we had another \texttt{DataFrame} with \texttt{accessory} prices:
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 print(accessories)
 \end{Verbatim}
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
        accessory  cost
 0          boots    14
 1           cape    11
@@ -467,6 +474,8 @@ print(accessories)
 11           wig    12
 \end{Verbatim}
 
+\index{three-way@three-way merge}
+
 we could merge \textit{this} \texttt{DataFrame} with our previously merged one,
 thereby producing a three-way merge:
 
@@ -476,28 +485,27 @@ print(full)
 \end{Verbatim}
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
         child  age   costume     accessory  cost
 0     Allison   12      Elsa          cape    11
 1       Mason   12    Batman          cape    11
 2       Julie   11      Elsa          cape    11
-                        .
-                        .
-                        .
+                       . . .
 \end{Verbatim}
 
 Now we could, say, compute the total cost of clothing these trick-or-treaters:
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
-print("These kids will cost a total of ${}.".format(full.cost.sum()))
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print("These kids will cost a total of ${}.".format(
+    full.cost.sum()))
 \end{Verbatim}
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
 These kids will cost a total of $212.
 \end{Verbatim}
 
-Ouch.
+Ouch. Consider these costs when contemplating family size.
 
 
 \section{``By the way...why?''}

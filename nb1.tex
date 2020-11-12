@@ -1,6 +1,6 @@
 
-\chapter[ML classifiers: Na\"{i}ve Bayes (1 of 3)]
-{\huge ML classifiers: Na\"{i}ve Bayes (1 of 3)}
+\chapter[Na\"{i}ve Bayes (1 of 3)]
+{\LARGE ML classifiers: Na\"{i}ve Bayes (1 of 3)}
 \label{ch:naiveBayes1}
 
 \index{machine learning (ML)}
@@ -18,8 +18,8 @@ Recall that a \textbf{classifier} is an algorithm/program to predict which of
 several \textbf{labels} (or \textbf{classes}) to assign to a data point.
 Perhaps we're trying to predict what political party someone is affiliated
 with, and our labels are ``Democrat,'' ``Republican,'' and ``Green.'' Perhaps
-we're trying to predict whether someone will default on a loan we're
-considering giving them, and the labels are ``safe'' and ``high-risk.''
+we're trying to predict whether someone will default on a loan, and the labels
+are ``safe'' and ``high-risk.''
 
 \index{labeled example}
 \index{unlabeled example}
@@ -81,22 +81,18 @@ we can observe about them, can we tell good guys from bad guys?
 \index{security\_cam@\texttt{security\_cam.csv}}
 \label{jediTraining}
 
-Here's some training data, in a \texttt{DataFrame} called ``\texttt{t}'' (for
-``training''):
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-             face  height  demeanor lightsaber  type
-            clean   short  menacing      green  Sith
-            beard  medium      calm      green  Jedi
-            clean    tall  menacing        red  Sith
-            beard  medium      calm       blue  Jedi
-            beard  medium      calm       blue  Jedi
-            clean  medium      calm       blue  Sith
-            clean    tall  menacing        red  Jedi
-            clean  medium  menacing        red  Sith
-            clean   short      calm       blue  Jedi
-            beard  medium  menacing      green  Sith
-            beard  medium  menacing       blue  Jedi
-                            . . .
+     face  height  demeanor lightsaber  type
+    clean   short  menacing      green  Sith
+    beard  medium      calm      green  Jedi
+    clean    tall  menacing        red  Sith
+    beard  medium      calm       blue  Jedi
+    beard  medium      calm       blue  Jedi
+    clean  medium      calm       blue  Sith
+    clean    tall  menacing        red  Jedi
+    clean  medium  menacing        red  Sith
+    clean   short      calm       blue  Jedi
+                    . . .
 \end{Verbatim}
 
 \index{feature}
@@ -105,8 +101,9 @@ Here's some training data, in a \texttt{DataFrame} called ``\texttt{t}'' (for
 \index{Jedi}
 \index{Sith}
 
-Our features are the first four columns: whether the \texttt{face} of the
-person in question has a \texttt{beard} or is \texttt{clean}-shaven, what their
+The training data above, in a \texttt{DataFrame} called ``\texttt{t}'' (for
+``training''), has four features: whether the \texttt{face} of the person in
+question has a \texttt{beard} or is \texttt{clean}-shaven, what their
 \texttt{height} is (clustered in three broad ranges), whether their
 \texttt{demeanor} is \texttt{menacing} or \texttt{calm}, and what color
 \texttt{lightsaber} they wield. The final column is our label: this person is
@@ -114,25 +111,26 @@ known to be a \texttt{Jedi} (good guy) or a \texttt{Sith} (bad guy).
 
 A test point that we might want to evaluate looks like this:
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-                 face  height  demeanor lightsaber  type
-                beard   short  menacing        red   ?? 
+     face  height  demeanor lightsaber  type
+    beard   short  menacing        red   ?? 
 \end{Verbatim}
 
 
-Operationally, a short, menacing, bearded person with a red lightsaber has just
-showed up on security camera \#305. Should we sound the alarm? That, of course,
-depends upon their (as yet unknown) \texttt{type}. We want to predict this
-based on our past examples.
+In other words, a short, menacing, bearded person with a red lightsaber has
+just showed up on security camera \#305. Should we sound the alarm? That, of
+course, depends upon their (as yet unknown) \texttt{type}. We want to predict
+this based on our past examples.
 
 \index{conditional probability}
+\bigskip
 
 The \textbf{Na\"{i}ve Bayes} classification algorithm applies conditional
 probability to this question. Really, what we're asking is: ``which of the
 following two quantities is greater:
 
 \begin{compactenum}
-\item P(Jedi\ $|$\ beard,\ short,\ menacing,\ red),  or
-\item P(Sith\ $|$\ beard,\ short,\ menacing,\ red)?''
+\item P(Jedi\ $|$\ beard,short,menacing,red),  or
+\item P(Sith\ $|$\ beard,short,menacing,red)?''
 \end{compactenum}
  
 Note that we're combining joint and conditional probabilities here. Given that
@@ -147,27 +145,27 @@ alarm.
 
 With Bayes' rule, we can rewrite these as:
 
-\small
+\footnotesize
 \begin{center}
 (1) Estimated Jedi probability:
 
-\boxed{\textrm{P(Jedi \ | \ beard, short, menacing, red)} =
-\frac{\textrm{P(beard, short, menacing, red \ | \ Jedi)} \cdot \textrm{P(Jedi)}}{\textrm{P(beard, short, menacing, red)}}}
+\boxed{\textrm{P(Jedi | beard,sh,menace,red)} =
+\frac{\textrm{P(beard,sh,menace,red | Jedi)} \cdot \textrm{P(Jedi)}}{\textrm{P(beard,sh,menace,red)}}}
 \end{center}
 \normalsize
 
 and
-\small
+\footnotesize
 \begin{center}
 (2) Estimated Sith probability:
 
-\boxed{\textrm{P(Sith \ | \ beard, short, menacing, red)} =
-\frac{\textrm{P(beard, short, menacing, red \ | \ Sith)} \cdot \textrm{P(Sith)}}{\textrm{P(beard, short, menacing, red)}}}
+\boxed{\textrm{P(Sith | beard,short,menace,red)} =
+\frac{\textrm{P(beard,short,menace,red | Sith)} \cdot \textrm{P(Sith)}}{\textrm{P(beard,short,menace,red)}}}
 \end{center}
 \normalsize
 
 Note that the two equations are identical except for the words ``Jedi'' and
-``Sith,'' which are interchanged. We'll first focus on equation (1).
+``Sith,'' which are interchanged. Let's focus on equation (1) first.
 
 Bayes' Rule has allowed us to turn things on their head. In essence, instead of
 asking ``if they have these physical features, would they likely be a Jedi?''
@@ -188,7 +186,7 @@ The first half of the numerator needs more work. It reads:
 
 \vspace{-.2in}
 \begin{align*}
-P(\textrm{beard},\ \textrm{short},\ \textrm{menacing},\ \textrm{red} \ | \ \textrm{Jedi}) 
+P(\textrm{beard},\textrm{short},\textrm{menacing},\textrm{red}\ |\ \textrm{Jedi}) 
 \end{align*}
 
 \index{independence (probability)}
@@ -229,8 +227,6 @@ Therefore, our estimate for P(beard $|$ Jedi) is $\frac{4}{6} = \frac{2}{3}$.
 In other words, based on this training data, we guesstimate that if you're a
 Jedi, it's about 67\% likely that you're bearded.
 
-
-\pagebreak
 \section{A numerical example}
 
 \label{jediNumerical}
@@ -241,31 +237,37 @@ listed earlier. First, considering \textit{only} the five \texttt{Jedi} rows
 gives us our Jedi numerator:
 
 \smallskip
+\footnotesize
 % Whew! See array package documentation.
+\hspace{-.2in}
 \begin{tabular}{>{$}c<{$}@{$\ \cdot\ $}>{$}c<{$}@{$\ \cdot\ $}>{$}c<{$}@{$\
 \cdot\ $}>{$}c<{$}@{$\ \cdot\ $}>{$}c<{$}>{$}l<{$}}
 P(\textrm{beard}|\textrm{Jedi}) &
 P(\textrm{short}|\textrm{Jedi}) &
-P(\textrm{menacing}|\textrm{Jedi}) &
+P(\textrm{menace}|\textrm{Jedi}) &
 P(\textrm{red}|\textrm{Jedi}) & P(\textrm{Jedi}) &= \\
 \frac{4}{6} & \frac{1}{6} & \frac{2}{6} & \frac{1}{6} &
 \frac{6}{11} &= .0034
 \end{tabular}
+\normalsize
 
 \bigskip
 Now let's do the same thing for the five \texttt{Sith} rows to get the Sith
 numerator:
 
+\footnotesize
 \smallskip
+\hspace{-.2in}
 \begin{tabular}{>{$}c<{$}@{$\ \cdot\ $}>{$}c<{$}@{$\ \cdot\ $}>{$}c<{$}@{$\
 \cdot\ $}>{$}c<{$}@{$\ \cdot\ $}>{$}c<{$}>{$}l<{$}}
 P(\textrm{beard}|\textrm{Sith}) &
 P(\textrm{short}|\textrm{Sith}) &
-P(\textrm{menacing}|\textrm{Sith}) &
+P(\textrm{menace}|\textrm{Sith}) &
 P(\textrm{red}|\textrm{Sith}) & P(\textrm{Sith}) &= \\
 \frac{1}{5} & \frac{1}{5} & \frac{4}{5} & \frac{2}{5} &
 \frac{5}{11} &= .0058\\
 \end{tabular}
+\normalsize
 
 \bigskip
 Look very very carefully at the training data on p.~\pageref{jediTraining} and

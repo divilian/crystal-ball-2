@@ -1,6 +1,6 @@
 
-\chapter[ML classifiers: Na\"{i}ve Bayes (2 of 3)]
-{\huge ML classifiers: Na\"{i}ve Bayes (2 of 3)}
+\chapter[Na\"{i}ve Bayes (2 of 3)]
+{\LARGE ML classifiers: Na\"{i}ve Bayes (2 of 3)}
 \label{ch:naiveBayes2}
 
 How can we automate the calculations of the previous chapter in Python? Let's
@@ -89,7 +89,8 @@ fraction also have \texttt{calm} labels? That boils down to this:
 \label{calcConditionals}
 \footnotesize
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-probs['calm|Sith'] = (len(t[(t.type=='Sith') & (t.demeanor=='calm')]) /
+probs['calm|Sith'] = (
+    len(t[(t.type=='Sith') & (t.demeanor=='calm')]) /
     len(t[(t.type=='Sith')]))
 \end{Verbatim}
 \normalsize
@@ -112,7 +113,20 @@ all the \texttt{probs}, and once we've done that, the \texttt{DataFrame} and
 the data itself ceases to matter. We run the function just by passing it the
 values derived from our spycam:
 
-\begin{figure}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+print(predict("beard","tall","calm","blue"))
+print(predict("clean","tall","menacing","red"))
+\end{Verbatim}
+\vspace{-.4in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+'Jedi'
+'Sith'
+\end{Verbatim}
+\vspace{.4in}
+
+\begin{figure}[hb]
 \index{predict@\texttt{predict()}}
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 def predict(face, height, demeanor, lightsaber):
@@ -134,18 +148,6 @@ def predict(face, height, demeanor, lightsaber):
 \caption{Our Na\"{i}ve Bayes ML \texttt{predict()} function.}
 \label{fig:predictFunc}
 \end{figure}
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-print(predict("beard","tall","calm","blue"))
-print(predict("clean","tall","menacing","red"))
-\end{Verbatim}
-\vspace{-.2in}
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-'Jedi'
-'Sith'
-\end{Verbatim}
-
 
 \section{Estimating confidence}
 
@@ -239,7 +241,8 @@ for label in t[target].drop_duplicates():
     for feature in features:
         for value in t[feature].drop_duplicates():
             probs[value+"|"+label] = (
-                len(t[(t[target] == label) & (t[feature] == value)]) / 
+                len(t[(t[target] == label) &
+                                (t[feature] == value)]) / 
                     len(t[t[target] == label]))
 \end{Verbatim}
 
@@ -260,7 +263,6 @@ this is true, we know we have a unique string to use as a key (like
 ``\texttt{medium|Sith}'') and it won't have a name collision with any other
 conditional.
 
-\pagebreak
 The \texttt{predict()} method itself will be generalized as follows: instead
 of taking exactly four parameters named ``\texttt{face}'',
 ``\texttt{demeanor}'', \textit{etc.}, it will take a \textit{list} of
@@ -272,10 +274,20 @@ parameter values, so that it can be called like this:
 \end{verbatim}
 \vspace{-.1in}
 
-Here's one way to implement the function:
-\label{codingNbGenerallyPredict}
+The code is in Figure~\ref{fig:generalPredict}
+(p.~\pageref{fig:generalPredict}). \label{codingNbGenerallyPredict} We use the
+variable \texttt{scores} to keep a list of the numerators for each target
+label: this is only necessary to compute the confidence level in the result. We
+go through all the possible target labels, computing our score for each, and
+adding it to \texttt{scores}. Along the way, each time we encounter a label who
+has a higher score than any previous label, we remember it (and its score) in
+the variables \texttt{top\_label} and \texttt{top\_score}. That way, at the end
+of the loop, we can return our list of two elements: the predicted label, and
+our confidence in it.
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{figure}[ht]
+\centering
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 def predict(values):
 
    # Compute one score for each target label.
@@ -286,28 +298,27 @@ def predict(values):
    top_label = ""
 
    for label in t[target].drop_duplicates():
-       score = probs[label]                   # Start with the prior
+
+       # Start with the prior
+       score = probs[label]
+
+       # Multiply in the conditionals
        for value in values:
-           score *= probs[value+"|"+label]    # Multiply in conditionals
+           score *= probs[value+"|"+label]
        scores.append(score)
 
-       # If the score we just computed is the highest so far, we have a
-       # new most-likely label.
+       # If the score we just computed is the highest so far,
+       # we have a new most-likely label.
        if score > top_score:
            top_score = score
            top_label = label
 
    return [ top_label, top_score / sum(scores) ]
 \end{Verbatim}
+\caption{The \texttt{predict()} function, written more generally.}
+\label{fig:generalPredict}
+\end{figure}
 
-We use the variable \texttt{scores} to keep a list of the numerators for each
-target label: this is only necessary to compute the confidence level in the
-result. We go through all the possible target labels, computing our score for
-each, and adding it to \texttt{scores}. Along the way, each time we encounter a
-label who has a higher score than any previous label, we remember it (and its
-score) in the variables \texttt{top\_label} and \texttt{top\_score}. That way,
-at the end of the loop, we can return our list of two elements: the predicted
-label, and our confidence in it.
 
 \section{Measuring performance}
 
@@ -354,11 +365,11 @@ chronologically, then the first 70\% of the spycam measurements would all have
 been taken \textit{earlier} than the ones we'd test our performance on. A big
 deal? Possibly not...but on the other hand, perhaps the makeup of our spaceship
 clientele has changed over time, and thus not shuffling the rows would lead to
-inaccuracies.} chooses 70\% of the original \texttt{DataFrame}'s rows and
-copies them to a new \texttt{DataFrame} called ``\texttt{train}''. Then the
-next line makes ``\texttt{test}'' a \texttt{DataFrame} of all the others (the
-remaining 30\%). For convenience, we then copy \texttt{train} into the
-\texttt{t} variable so that none of our previous code has to change.
+inaccuracies.} chooses 70\% of the original data set's rows and copies them to
+a new \texttt{DataFrame} called ``\texttt{train}''. Then the next line makes
+``\texttt{test}'' a \texttt{DataFrame} of all the others (the remaining 30\%).
+For convenience, we then copy \texttt{train} into the \texttt{t} variable so
+that none of our previous code has to change.
 
 All our probabilities are thus computed based \textit{only} on the training
 data (the random 70\% of the data set). We can then use the \texttt{test} set
@@ -368,15 +379,17 @@ we get the correct answer:
 
 \label{evaluateNBcode}
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 num_correct = 0
 for i in range(len(test)):
     row = test.iloc[i]
-    p = predict([row['face'],row['height'],row['demeanor'],row['lightsaber']])
+    p = predict([row['face'],row['height'],
+        row['demeanor'],row['lightsaber']])
     if p[0] == row['type']:
         num_correct += 1
 
-print("We got {}% correct on the test data.".format(num_correct/len(test)*100))
+print("We got {}% correct on the test data.".format(
+    num_correct/len(test)*100))
 \end{Verbatim}
 \vspace{-.2in}
 
@@ -390,12 +403,13 @@ We got 82.63% correct on the test data.
 If we did want to err on the side of caution, and penalize false-Jedi
 predictions more than false-Sith predictions, we could do that as follows: 
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 num_missed_jedi = 0
 num_missed_siths = 0
 for i in range(len(test)):
     row = test.iloc[i]
-    p = predict([row['face'],row['height'],row['demeanor'],row['lightsaber']])
+    p = predict([row['face'],row['height'],
+        row['demeanor'],row['lightsaber']])
     if p[0] != row['type']:
         if p[0] == 'Jedi':
             num_missed_siths += 1

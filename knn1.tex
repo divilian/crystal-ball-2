@@ -1,12 +1,13 @@
 
-\chapter{ML classifiers: kNN (1 of 2)}
+\chapter[kNN (1 of 2)]
+{\LARGE ML classifiers: kNN (1 of 2)}
 
 \index{machine learning (ML)}
 \index{classifier}
 
 Let's return to the ML classification problem, for which Na\"{i}ve Bayes and
-Friends from Chapters~\ref{ch:naiveBayes1}--\ref{ch:naiveBayes3} are so far our
-only solution.
+Friends from Chapters~\ref{ch:naiveBayes1}--\ref{ch:naiveBayes3} -- and the
+Decision Trees from Volume One -- are so far our only solution.
 
 \index{Na\"{i}ve Bayes classifier}
 \index{kNN@kNN ($k$-nearest neighbors)}
@@ -119,30 +120,31 @@ distance between two people, then, would actually be quite a blunder: clearly a
 difference of \$50 of credit card debt isn't nearly as significant as a
 difference of 50 years in seniority!
 
-To make this concrete, the underlying data for Figures~\ref{bank_training} and
+The underlying data for Figures~\ref{bank_training} and
 \ref{bank_training_13nn} is here:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\vspace{-.2in}
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=2mm]
 print(bank)
 \end{Verbatim}
-\vspace{-.2in}
+\vspace{-.4in}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-                       num_yrs  cc_debt  default
-                    0      1.0    28000      yes
-                    1      0.5    13000      yes
-                    2      1.5     1000       no
-                    3      2.0    21000      yes
-                    4      2.5     5000       no
-                    5      3.1     4000      yes
-                    6      3.2    25500      yes
-                    7      4.1    24000       no
-                    8      4.5    14000       no
-                    9      5.3     2000       no
-                    10     5.9    25500       no
-                    11     6.1    20000       no
-                    12     7.0     6000       no
-                    13     3.2     7500    maybe
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+        num_yrs  cc_debt  default
+     0      1.0    28000      yes
+     1      0.5    13000      yes
+     2      1.5     1000       no
+     3      2.0    21000      yes
+     4      2.5     5000       no
+     5      3.1     4000      yes
+     6      3.2    25500      yes
+     7      4.1    24000       no
+     8      4.5    14000       no
+     9      5.3     2000       no
+     10     5.9    25500       no
+     11     6.1    20000       no
+     12     7.0     6000       no
+     13     3.2     7500    maybe
 \end{Verbatim}
 
 Let's compute the Euclidean distance from each of the points to Mr.~Blue
@@ -151,32 +153,33 @@ Question Mark (row \#13), and sort by that new column (remember that in Python,
 
 \index{sqrt@\texttt{sqrt()} (NumPy)}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\vspace{-.3in}
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 pts_dist = np.array([])
 for row in bank.itertuples():
-    pts_dist = np.append(pts_dist,
-        np.sqrt((row.cc_debt - 7500)**2 + (row.num_yrs - 3.2)**2))
+   pts_dist = np.append(pts_dist,
+      np.sqrt((row.cc_debt - 7500)**2 + (row.num_yrs - 3.2)**2))
 bank['dist'] = pts_dist
 print(bank.sort_values('dist'))
 \end{Verbatim}
 \vspace{-.2in}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-                 num_yrs  cc_debt  default          dist
-            13       3.2     7500    maybe      0.000000
-            12       7.0     6000       no   1500.004813
-            4        2.5     5000       no   2500.000098
-            5        3.1     4000      yes   3500.000001
-            9        5.3     2000       no   5500.000401
-            1        0.5    13000      yes   5500.000663
-            8        4.5    14000       no   6500.000130
-            2        1.5     1000       no   6500.000222
-            11       6.1    20000       no  12500.000336
-            3        2.0    21000      yes  13500.000053
-            7        4.1    24000       no  16500.000025
-            6        3.2    25500      yes  18000.000000
-            10       5.9    25500       no  18000.000202
-            0        1.0    28000      yes  20500.000118
+         num_yrs  cc_debt  default          dist
+    13       3.2     7500    maybe      0.000000
+    12       7.0     6000       no   1500.004813
+    4        2.5     5000       no   2500.000098
+    5        3.1     4000      yes   3500.000001
+    9        5.3     2000       no   5500.000401
+    1        0.5    13000      yes   5500.000663
+    8        4.5    14000       no   6500.000130
+    2        1.5     1000       no   6500.000222
+    11       6.1    20000       no  12500.000336
+    3        2.0    21000      yes  13500.000053
+    7        4.1    24000       no  16500.000025
+    6        3.2    25500      yes  18000.000000
+    10       5.9    25500       no  18000.000202
+    0        1.0    28000      yes  20500.000118
 \end{Verbatim}
 
 It's madness. The ``closest'' point to Mr.~Blue is the one with a
@@ -216,6 +219,7 @@ mean it is. Now no feature gets an advantage in the distance calculation over
 any other feature, even if they're on wildly different scales: 2.5 standard
 deviations is 2.5 standard deviations, no matter what the underlying units.
 
+\smallskip
 Here's code to do that with the bank example:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
@@ -229,33 +233,33 @@ bank.num_yrs = zscores(bank.num_yrs)
 Now, if we compute distances with these Z-scores, instead of the raw values, we
 get something that looks much more reasonable:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 zscore_dist = np.array([])
 for row in bank.itertuples():
-    zscore_dist = np.append(zscore_dist,
-        np.sqrt((row.cc_debt - bank.iloc[len(bank)-1].cc_debt)**2 +
-            (row.num_yrs - bank.iloc[len(bank)-1].num_yrs)**2))
+   zscore_dist = np.append(zscore_dist,
+      np.sqrt((row.cc_debt - bank.iloc[len(bank)-1].cc_debt)**2 +
+         (row.num_yrs - bank.iloc[len(bank)-1].num_yrs)**2))
 bank['dist'] = zscore_dist
 print(bank.sort_values('dist'))
 \end{Verbatim}
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-                 num_yrs    cc_debt  default      dist
-            13 -0.181877  -0.667388    maybe  0.000000
-            5  -0.231804  -1.024786      yes  0.360869
-            4  -0.531366  -0.922673       no  0.432797
-            8   0.467174  -0.003647       no  0.928342
-            2  -1.030636  -1.331128       no  1.077471
-            9   0.866590  -1.229014       no  1.189415
-            1  -1.529906  -0.105761      yes  1.460345
-            3  -0.781001   0.711151      yes  1.503103
-            7   0.267466   1.017493       no  1.743769
-            6  -0.181877   1.170664      yes  1.838051
-            12  1.715350  -0.820559       no  1.903400
-            11  1.266006   0.609037       no  1.930188
-            10  1.166152   1.170664       no  2.279389
-            0  -1.280271   1.425948      yes  2.364006
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+         num_yrs    cc_debt  default      dist
+    13 -0.181877  -0.667388    maybe  0.000000
+    5  -0.231804  -1.024786      yes  0.360869
+    4  -0.531366  -0.922673       no  0.432797
+    8   0.467174  -0.003647       no  0.928342
+    2  -1.030636  -1.331128       no  1.077471
+    9   0.866590  -1.229014       no  1.189415
+    1  -1.529906  -0.105761      yes  1.460345
+    3  -0.781001   0.711151      yes  1.503103
+    7   0.267466   1.017493       no  1.743769
+    6  -0.181877   1.170664      yes  1.838051
+    12  1.715350  -0.820559       no  1.903400
+    11  1.266006   0.609037       no  1.930188
+    10  1.166152   1.170664       no  2.279389
+    0  -1.280271   1.425948      yes  2.364006
 \end{Verbatim}
 
 The data is plotted on Z-score normalized axes in
@@ -314,7 +318,7 @@ a \texttt{sport} feature with values \texttt{baseball}, \texttt{football}, and
 Example:
 
 \begin{center}
-\footnotesize
+\small
 \begin{tabular}{|c|c|c|}
 \hline
 age & edLevel & sport \\
@@ -326,7 +330,8 @@ age & edLevel & sport \\
 \hline
 \end{tabular}
 \quad
-{\Huge $\Rightarrow$}
+{\Huge $\Rightarrow$}\\
+\medskip
 \quad
 \begin{tabular}{|c|c|c|c|c|c|}
 \hline
@@ -357,17 +362,17 @@ form} data, if you think about it.
 \index{sparse@\texttt{sparse=False} (\texttt{OneHotEncoder})}
 \index{sparse matrix}
 
-You can use \texttt{np.where()} function to create one-hot features, or you
-might find the \texttt{scikit-learn} package's
-\texttt{OneHotEncoder.fit\_transform()} function helpful. It's a little weird;
-when you create your \texttt{OneHotEncoder}, you have to pass it an argument of
-``\texttt{sparse=False}'' if you want it to work the way you expect.
+You can use \texttt{np.where()} function to create one-hot features, or the
+\texttt{scikit-learn} package's \texttt{OneHotEncoder.fit\_transform()}
+function. It's a little weird; when you create your \texttt{OneHotEncoder}, you
+have to pass it an argument of ``\texttt{sparse=False}'' if you want it to work
+the way you expect.
 
 \index{import@\texttt{import}}
 \index{double boxies@``double boxies''}
 \index{[]@\texttt{[]} (boxies)}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 from sklearn.preprocessing import OneHotEncoder
 
 ohe = OneHotEncoder(sparse=False)

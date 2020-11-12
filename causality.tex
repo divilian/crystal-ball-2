@@ -26,7 +26,7 @@ about?
 
 \vspace{-.1in}
 \begin{figure}[ht]
-\begin{minipage}{6in}
+\hspace{-.15in}\begin{minipage}{4.7in}
 \raisebox{-.5\height}{\includegraphics[width=0.45\textwidth]{causalDiagram.png}}
 \raisebox{-.5\height}{\includegraphics[width=0.45\textwidth]{causalDiagram2.png}}
 \vspace{-.15in}
@@ -56,9 +56,9 @@ theories is true? In other words, if we have more than one hypothesis giving
 alternate explanations for how the patterns in the data set arrived, can the
 \textit{data itself} be used to judge between them?
 
-And the answer is: sometimes. Let's learn when it can, and when it cannot.
+And the answer is: sometimes. Let's learn when it can and can't.
 
-\section{The bad news: identical ``skeletons''}
+\section{The bad case: identical ``skeletons''}
 
 Before I get you too excited, let me say right at the outset that there are
 times when the data fails us in our quest to nail this down. This happens when
@@ -80,9 +80,8 @@ people who are going through depression are seeking ways to cope with it, and
 that substances like nicotine could be one of those ways?'' This
 depression-causes-smoking hypothesis is on the right side. 
 
-\vspace{-.15in}
 \begin{figure}[ht]
-\begin{minipage}{6in}
+\hspace{-.1in}\begin{minipage}{4.7in}
 \raisebox{-.5\height}{\includegraphics[width=0.45\textwidth]{smokingDepression.png}}
 \raisebox{-.5\height}{\includegraphics[width=0.45\textwidth]{depressionSmoking.png}}
 \vspace{-.15in}
@@ -90,7 +89,6 @@ depression-causes-smoking hypothesis is on the right side.
 \label{smokingDepression}
 \end{minipage}
 \end{figure}
-\vspace{-.05in}
 
 Unfortunately there is no way to resolve this by looking at the data alone.
 This is because if you remove the (one) arrowhead, you get the same skeleton
@@ -103,7 +101,7 @@ page.
 \begin{figure}[ht]
 \begin{center}
 \includegraphics[width=0.8\textwidth]{smokingDepressionSkeleton.png}
-\vspace{-.15in}
+\vspace{-.1in}
 \caption{The bad case: both causal diagrams have the \textit{same} skeleton.}
 \label{smokingDepressionSkeleton}
 \end{center}
@@ -120,7 +118,7 @@ focus groups and learn how often cigarettes are sought by victims of depression
 and why. But the data itself will not give a verdict.
 
 
-\section{The good news: different ``skeletons''}
+\section{The good case: different ``skeletons''}
 
 \index{chopsticks}
 \index{video games}
@@ -205,9 +203,9 @@ other it's \textsf{region of the world}. Just because they're the same shape
 doesn't mean they're the same skeleton: the same bubbles have to be connected
 to the same bubbles.
 
-\vspace{-.15in}
 \begin{figure}[ht]
 \begin{center}
+\hspace{-.25in}\begin{minipage}{4.7in}
 \raisebox{-.5\height}{\includegraphics[width=0.45\textwidth]{chopsticksVGskeleton.png}}
 \quad
 \raisebox{-.5\height}{\includegraphics[width=0.45\textwidth]{regionVGskeleton.png}}
@@ -215,9 +213,9 @@ to the same bubbles.
 \caption{The good case: the causal diagrams have \textit{different}
 skeletons.}
 \label{chopsticksVGskeleton}
+\end{minipage}
 \end{center}
 \end{figure}
-\vspace{-.05in}
 
 And since the skeletons are different, the data can distinguish between the
 two, and tell us which causal model (or neither) is likely to be correct.
@@ -251,7 +249,9 @@ skill} will be \textit{\underline{conditionally} independent given
 P(\textrm{VG}\ |\ \textrm{region}) \neq P(\textrm{VG})
 \end{align*}
 \begin{center}
+\vspace{-.1in}
 \textit{but}
+\vspace{-.1in}
 \end{center}
 \vspace{-.1in}
 \begin{align*}
@@ -358,11 +358,14 @@ the variables. To make a data set reflecting this (certainly wrong) reality, we
 could write code like this:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-region = np.random.choice(['Asian','non-Asian'],p=[.4,.6],size=10000)
-chopsticks = np.random.choice(['yes','no'],p=[.3,.7],size=10000)
+region = np.random.choice(['Asian','non-Asian'],
+    p=[.4,.6],size=10000)
+chopsticks = np.random.choice(['yes','no'],
+    p=[.3,.7],size=10000)
 VG = np.random.choice(['good','bad'],p=[.2,.8],size=10000)
 
-data = pd.DataFrame({'region':region,'chopsticks':chopsticks,'VG':VG})
+data = pd.DataFrame({'region':region,
+    'chopsticks':chopsticks,'VG':VG})
 \end{Verbatim}
 \vspace{-.2in}
 
@@ -380,7 +383,8 @@ If this were the case, we'd run our $\chi ^2$ test and get our expected
 negative result:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-scipy.stats.chi2_contingency(pd.crosstab(data.chopsticks, data.VG))[1]
+scipy.stats.chi2_contingency(
+    pd.crosstab(data.chopsticks, data.VG))[1]
 \end{Verbatim}
 \vspace{-.2in}
 
@@ -402,13 +406,14 @@ Now it turns out this is a hard problem when the variable you're conditioning
 on is numeric, but not so hard when it's categorical. In our case, of course,
 it's categorical, since that's the only kind of data we have.
 
-\subsubsection{Generating, and testing, ``\underline{chopsticks}-cause-videogame-prowess''}
+\subsubsection{``\underline{chopsticks} cause videogame prowess?''}
 
 Suppose for the moment that my student was correct. How could we generate a
 synthetic data set reflecting his view of the world? How about:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-region = np.random.choice(['Asian','non-Asian'],p=[.4,.6],size=10000)
+region = np.random.choice(['Asian','non-Asian'],p=[.4,.6],
+    size=10000)
 chopsticks = np.where(region=='Asian',
     np.random.choice(['yes','no'],p=[.8,.2],size=10000),
     np.random.choice(['yes','no'],p=[.1,.9],size=10000))
@@ -417,7 +422,6 @@ VG = np.where(chopsticks=='yes',
     np.random.choice(['good','bad'],p=[.1,.9],size=10000))
 \end{Verbatim}
 
-\pagebreak
 I'm guessing at the numbers, of course. But compare this code with the
 left-side causal model in Figure~\ref{chopsticksVG} (p.~\pageref{chopsticksVG})
 and see if you agree that they coincide. First, we generate \texttt{region}
@@ -433,13 +437,14 @@ Testing for conditional independence is just a matter of conditioning;
 
 My student predicted these two things, remember:
 
+\vspace{-.2in}
 \begin{align*}
 P(\textrm{VG}\ |\ \textrm{region},\ \textrm{chopsticks}) &=
-P(\textrm{VG}\ |\ \textrm{chopsticks}) & \textit{student prediction \#1} \\
+P(\textrm{VG}\ |\ \textrm{chopsticks}) & \textsl{prediction \#1} \\
 P(\textrm{VG}\ |\ \textrm{chopsticks},\ \textrm{region}) &\neq
-P(\textrm{VG}\ |\ \textrm{region}) & \textit{student prediction \#2} \\
+P(\textrm{VG}\ |\ \textrm{region}) & \textsl{prediction \#2} \\
 \end{align*}
-\vspace{-.1in}
+\vspace{-.2in}
 
 Let's see if they're true (with the synthetic data set that we know should have
 made them true). The first one claims that \textsf{VG} and \textsf{region} are
@@ -452,8 +457,10 @@ chopstick users, or among only the non-chopstick users -- should give us
 choppers = data[data.chopsticks == "yes"]
 nonChoppers = data[data.chopsticks != "yes"]
 
-scipy.stats.chi2_contingency(pd.crosstab(choppers.region, choppers.VG))[1]
-scipy.stats.chi2_contingency(pd.crosstab(nonChoppers.region, nonChoppers.VG))[1]
+scipy.stats.chi2_contingency(pd.crosstab(choppers.region,
+    choppers.VG))[1]
+scipy.stats.chi2_contingency(pd.crosstab(nonChoppers.region,
+    nonChoppers.VG))[1]
 \end{Verbatim}
 \vspace{-.2in}
 
@@ -483,8 +490,10 @@ independent. To wit:
 asians = data[data.region == "Asian"]
 nonAsians = data[data.region != "Asian"]
 
-scipy.stats.chi2_contingency(pd.crosstab(asians.chopsticks, asians.VG))[1]
-scipy.stats.chi2_contingency(pd.crosstab(nonAsians.chopsticks, nonAsians.VG))[1]
+scipy.stats.chi2_contingency(pd.crosstab(asians.chopsticks,
+    asians.VG))[1]
+scipy.stats.chi2_contingency(pd.crosstab(nonAsians.chopsticks,
+    nonAsians.VG))[1]
 \end{Verbatim}
 \vspace{-.2in}
 
@@ -497,7 +506,7 @@ As expected, they are correlated, and therefore \textit{not} independent. There
 is clearly an association between chopstick usage and video game skill, even
 when controlling for region of the world.
 
-\subsubsection{Generating, and testing, ``\underline{culture}-causes-videogame-prowess''}
+\subsubsection{``\underline{culture} causes videogame prowess?''}
 
 Okay, now let's suppose the \textit{I} was correct in saying that chopstick
 usage itself has negligible impact on video game skill: the real effect is that
@@ -505,8 +514,9 @@ certain parts of the world have cultures conducive to video games. To generate
 a synthetic data set reflecting \textit{this} view of the world, we'd do
 something like this:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-region = np.random.choice(['Asian','non-Asian'],p=[.4,.6],size=10000)
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+region = np.random.choice(['Asian','non-Asian'],p=[.4,.6],
+    size=10000)
 chopsticks = np.where(region=='Asian',
     np.random.choice(['yes','no'],p=[.8,.2],size=10000),
     np.random.choice(['yes','no'],p=[.1,.9],size=10000))
@@ -527,13 +537,14 @@ if you agree.
 
 What did my causal model predict? These two things:
 
+\vspace{-.2in}
 \begin{align*}
 P(\textrm{VG}\ |\ \textrm{region},\ \textrm{chopsticks}) &\neq
-P(\textrm{VG}\ |\ \textrm{chopsticks}) & \textit{my prediction \#1} \\
+P(\textrm{VG}\ |\ \textrm{chopsticks}) & \textsl{prediction \#1} \\
 P(\textrm{VG}\ |\ \textrm{chopsticks},\ \textrm{region}) &=
-P(\textrm{VG}\ |\ \textrm{region}) & \textit{my prediction \#2} \\
+P(\textrm{VG}\ |\ \textrm{region}) & \textsl{prediction \#2} \\
 \end{align*}
-\vspace{-.1in}
+\vspace{-.2in}
 
 We test these just as before, though looking for the opposite results. If we
 condition on chopsticks, we should see that \textsf{region} and \textsf{VG} are
@@ -543,8 +554,10 @@ condition on chopsticks, we should see that \textsf{region} and \textsf{VG} are
 choppers = data[data.chopsticks == "yes"]
 nonChoppers = data[data.chopsticks != "yes"]
 
-scipy.stats.chi2_contingency(pd.crosstab(choppers.region, choppers.VG))[1]
-scipy.stats.chi2_contingency(pd.crosstab(nonChoppers.region, nonChoppers.VG))[1]
+scipy.stats.chi2_contingency(pd.crosstab(choppers.region,
+    choppers.VG))[1]
+scipy.stats.chi2_contingency(pd.crosstab(nonChoppers.region,
+    nonChoppers.VG))[1]
 \end{Verbatim}
 \vspace{-.2in}
 
@@ -557,14 +570,17 @@ These low $p$-values confirm just what we thought: using chopsticks has nothing
 to do with it, man: even factoring that out, video game skill still goes with
 region of the world.
 
+\medskip
 And for prediction \#2:
 
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 asians = data[data.region == "Asian"]
 nonAsians = data[data.region != "Asian"]
 
-scipy.stats.chi2_contingency(pd.crosstab(asians.chopsticks, asians.VG))[1]
-scipy.stats.chi2_contingency(pd.crosstab(nonAsians.chopsticks, nonAsians.VG))[1]
+scipy.stats.chi2_contingency(pd.crosstab(asians.chopsticks,
+    asians.VG))[1]
+scipy.stats.chi2_contingency(pd.crosstab(nonAsians.chopsticks,
+    nonAsians.VG))[1]
 \end{Verbatim}
 \vspace{-.2in}
 

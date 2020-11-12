@@ -68,7 +68,7 @@ Now, some terms:
 \index{itemset}
 
 \item \textbf{itemset}: An itemset is a group of one or more items. For
-instance, ``\{apples,beer,cat\_food\}'' is an itemset, as is
+instance, ``\{apples,beer,cat\_food,chips\_ahoy\}'' is an itemset, as is
 ``\{diet\_soda\}''.
 
 \index{support count}
@@ -164,6 +164,7 @@ the command line for Spyder to access it.
 \index{association}
 \index{prior (probability)}
 
+\smallskip
 Let's take it for a spin. First, we'll generate a synthetic data set with a
 known association. We'll stock five items for sale in our pretend store, each
 of which will have a different prior probability of being purchased (about 60\%
@@ -176,10 +177,11 @@ right?'' you ask. Well, not necessarily, or at least not as strong: since 70\%
 of the random transactions have eggs anyway, and only 10\% of them have bacon,
 we're going to get a lot of bacon-less egg-full transactions, which will dial
 down the confidence of that association. But let's wait and see what
-\texttt{mlxtend} says.}
+\texttt{mlxtend} says.} Figure~\ref{fig:synthGroceries}
+(p.~\pageref{fig:synthGroceries}) gives some code to synthesize such a data set.
 
-Here's the code to synthesize this:
-
+\begin{figure}[ht]
+\centering
 \index{banana (fruit)}
 \index{coffee}
 \index{bacon}
@@ -206,13 +208,18 @@ for i in range(1000):
     pizza.append(np.random.choice([1,0],p=[.8,.2]))
     coffee.append(np.random.choice([1,0],p=[.3,.7]))
 
-transactions = pd.DataFrame({ 'eggs':eggs, 'bacon':bacon, 'bananas':bananas,
-    'pizza':pizza, 'coffee':coffee})
+transactions = pd.DataFrame({ 'eggs':eggs, 'bacon':bacon,
+    'bananas':bananas, 'pizza':pizza, 'coffee':coffee})
 \end{Verbatim}
+\caption{Synthesizing a grocery shopping cart data set.}
+\label{fig:synthGroceries}
+\end{figure}
 
-Okay, let's analyze. First, just for giggles, let's shuffle the
-\texttt{DataFrame}'s rows so they're in a random order (not strictly necessary,
-but just on principle) and then let \texttt{mlxtend} do its work:
+\bigskip
+
+Okay, let's analyze. First, let's shuffle the \texttt{DataFrame}'s rows so
+they're in a random order (not strictly necessary, but just on principle) and
+then let \texttt{mlxtend} do its work:
 
 \index{sample@\texttt{.sample()} (Pandas)}
 \index{import@\texttt{import}}
@@ -223,7 +230,8 @@ transactions = transactions.sample(frac=1)
 from mlxtend.frequent_patterns import apriori
 from mlxtend.frequent_patterns import association_rules
 
-itemsets = apriori(transactions, min_support=0.1, use_colnames=True)
+itemsets = apriori(transactions, min_support=0.1,
+    use_colnames=True)
 \end{Verbatim}
 
 (Note that passing \texttt{frac=1} to the \texttt{.sample()} method says ``give
@@ -232,23 +240,23 @@ me \textit{all} the rows, please; but in a shuffled order.)
 \index{apriori algorithm}
 \index{min\_support@\texttt{min\_support}}
 
-The code above uses the so-called \textbf{apriori algorithm}. It takes place in
-two steps: first, generate all itemsets, and compute their support count, but
-only those for a certain minimum support level (in this case,
-\texttt{min\_support=0.1}). The ``but only'' phrase is for simple combinatorics
-reasons: if you think about it, the number of possible itemsets is rather large
-if we have many columns. In fact, if we have $N$ columns, there are $2^N$
-different itemsets!\footnote{Sample numbers: if we have 100 different items for
-sale in our store -- certainly not a very large number at all -- we'll have
-1,267,650,600,228,229,401,496,703,205,376 different itemsets to consider. This
-is far, far more than the number of atoms in the universe.} The apriori
-algorithm is smart about not evaluating them all, because it uses an easy
-trick: in order for an itemset to have greater than (say) .1 support count,
-\textit{all of its subsets} must also have at least that much support. This
-lets apriori whittle down greatly the number of itemsets it needs to consider.
+This code uses the so-called \textbf{apriori algorithm}. It computes the
+support count \textit{only} for those itemsets that have a certain minimum
+support level (in this case, \texttt{min\_support=0.1}). This is for simple
+combinatorics reasons: if you think about it, the number of possible itemsets
+is rather large if we have many columns. In fact, if we have $N$ columns, there
+are $2^N$ different itemsets!\footnote{Sample numbers: if we have 100 different
+items for sale in our store -- certainly not a very large number at all --
+we'll have 1,267,650,600,228,229,401,496,703,205,376 different itemsets to
+consider. This is far, far more than the number of atoms in the universe.} The
+apriori algorithm is smart about not evaluating them all, because it uses an
+easy trick: in order for an itemset to have greater than (say) .1 support
+count, \textit{all of its subsets} must also have at least that much support.
+This lets apriori whittle down greatly the number of itemsets it needs to
+consider.
 
 \bigskip
-Now let's print out the ten itemsets with the greatest support count:
+Let's print out the ten itemsets with the greatest support count:
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 itemsets.sort_values('support',ascending=False).head(10)
 \end{Verbatim}
@@ -274,28 +282,27 @@ transactions have eggs, but about 70\% of the others did as well.
 
 \medskip
 
-And now, the second step: generate (and compute stats on) all possible
-association rules involving those item sets:
+Now, let's generate (and compute stats on) all possible association rules
+involving those item sets:
 
-\pagebreak
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 rules = association_rules(itemsets)
 print(rules.sort_values('confidence',ascending=False).head(10))
 \end{Verbatim}
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-             antecedents consequents    support  confidence      lift
-         (bacon, coffee)      (eggs)   0.119000    0.954545  1.186262
-          (bacon, pizza)      (eggs)   0.299667    0.946316  1.176035
-                 (bacon)      (eggs)   0.381000    0.946192  1.175881
-        (bacon, bananas)      (eggs)   0.225000    0.945378  1.174869
- (bacon, bananas, pizza)      (eggs)   0.175667    0.942755  1.171609
-         (bacon, coffee)     (pizza)   0.101333    0.812834  1.027603
-                (coffee)     (pizza)   0.249333    0.807775  1.021208
-          (eggs, coffee)     (pizza)   0.200000    0.806452  1.019534
-                 (pizza)      (eggs)   0.636333    0.804467  0.999752
-                (coffee)      (eggs)   0.248000    0.803456  0.998495
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=2mm,framerule=1mm]
+            antecedents consequents   support confidence     lift
+        (bacon, coffee)      (eggs)   0.11900    0.95454  1.18626
+         (bacon, pizza)      (eggs)   0.29966    0.94631  1.17603
+                (bacon)      (eggs)   0.38100    0.94619  1.17588
+       (bacon, bananas)      (eggs)   0.22500    0.94537  1.17486
+(bacon, bananas, pizza)      (eggs)   0.17566    0.94275  1.17160
+        (bacon, coffee)     (pizza)   0.10133    0.81283  1.02760
+               (coffee)     (pizza)   0.24933    0.80777  1.02120
+         (eggs, coffee)     (pizza)   0.20000    0.80645  1.01953
+                (pizza)      (eggs)   0.63633    0.80446  0.99975
+               (coffee)      (eggs)   0.24800    0.80345  0.99849
 \end{Verbatim}
 
 As expected, ``\{bacon\} $\Rightarrow$ \{eggs\}'' has a very high confidence

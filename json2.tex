@@ -23,17 +23,17 @@ pretty printed here:
 \index{Lady Gaga}
 \index{Rock, The}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=lines,framesep=3mm]
-[{'creds': 3,
-  'instructor': 'Davies',
-  'meetings': [{'location': {'bldg': 'Farmer', 'room': 'B6'},
-                'time': {'day': 'TR', 'time': '12:30pm'}}],
-  'num': 219,
-  'prefix': 'DATA',
-  'roster': [{'email': 'lgaga@umw.edu', 'first': 'Lady', 'last': 'Gaga'},
-             {'email': 'trock@umw.edu', 'first': 'The', 'last': 'Rock'},
-             ...,
-             ...]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=lines,framesep=2mm]
+[{'creds':3,
+  'instructor':'Davies',
+  'meetings':[{'location':{'bldg':'Farmer', 'room':'B6'},
+                'time':{'day':'TR', 'time':'12:30pm'}}],
+  'num':219,
+  'prefix':'DATA',
+  'roster':[{'email':'lgaga@umw.edu', 'first':'Lady', 'last':'Gaga'},
+            {'email':'trock@umw.edu', 'first':'The', 'last':'Rock'},
+            ...,
+            ...]
  },
  ...
 ]
@@ -134,7 +134,7 @@ we did for class \#17, we now want to do for all the classes, one after
 another. So in essence, we wrap the previous code in a nested, outer loop which
 will perform it once for each course. Check out the following:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 for course in c:
     roster = course['roster']
     for student in roster:
@@ -152,7 +152,7 @@ while:
 
 \index{KeyError@\texttt{KeyError}}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
 Lady Gaga is in DATA 219.
 The Rock is in DATA 219.
 Obi-wan Kenobi is in DATA 219.
@@ -167,12 +167,12 @@ Daenerys Targaryen is in ENGL 101.
 ...
 Han Solo is in CHEM 211.
 Poe Dameron is in CHEM 211.
----------------------------------------------------------------------------
-KeyError                              Traceback (most recent call last)
-     77     for student in roster:
-     78         print("{} {} is in {} {}.".format(student['first'], 
----> 79             student['last'], course['prefix'], course['num'])) 
-     80 
+--------------------------------------------------------------
+KeyError                     Traceback (most recent call last)
+     77 for student in roster:
+     78   print("{} {} is in {} {}.".format(student['first'], 
+---> 79     student['last'], course['prefix'], course['num'])) 
+     80
 
 KeyError: 'last'
 \end{Verbatim}
@@ -192,6 +192,7 @@ source of the error.
 I assume you've done those first two steps. On to the third: the error message.
 It says, quote:
 
+\vspace{-.2in}
 \begin{Verbatim}[fontsize=\normalsize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
 KeyError: 'last'
 \end{Verbatim}
@@ -203,11 +204,15 @@ dictionaries, \textit{it wasn't there.} That's what ``\texttt{KeyError}'' turns
 out to mean: you asked for a particular key but there wasn't one in the
 dictionary.
 
+\medskip
+
 The fourth step is crucial. It marks the difference between fledgling, flailing
 novices and cool, critical-thinking experts. We need to insert (temporarily)
 one or more \texttt{print()} statements into our loop, so that \textit{right
 before the program crashes,} we get some crucial insight into what was about
 to go wrong.
+
+\medskip
 
 This takes some practice and some intuition, but in this case let me simply
 observe what it makes sense to do. If we were about to access a non-existent
@@ -215,9 +220,10 @@ key from a dictionary, it might illuminate things if we printed out the
 dictionary immediately before trying that stunt. That way, we'll see the state
 of affairs just before the error.
 
+\smallskip
 Here's the key line, inserted into the inner loop:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 for course in c:
     roster = course['roster']
     for student in roster:
@@ -229,16 +235,18 @@ for course in c:
 Now look at the revised output, below:
 
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-The dict is: {'email': 'han.solo@corellia.gov', 'first': 'Han', 'last': 'Solo'}
+The dict is: {'email':'han.solo@corellia.gov', 'first':'Han',
+    'last':'Solo'}
 Han Solo is in CHEM 211.
-The dict is: {'email': 'dameron@resistance.org', 'first': 'Poe', 'last': 'Dameron'}
+The dict is: {'email':'dameron@resistance.org', 'first':'Poe',
+    'last':'Dameron'}
 Poe Dameron is in CHEM 211.
-The dict is: {'email': 'root@dagobah.net', 'first': 'Yoda'}
----------------------------------------------------------------------------
-KeyError                                  Traceback (most recent call last)
-     78         print("The dict is: {}".format(student))
-     79         print("{} {} is in {} {}.".format(student['first'], 
----> 80             student['last'], course['prefix'], course['num'])) 
+The dict is: {'email':'root@dagobah.net', 'first':'Yoda'}
+---------------------------------------------------------------
+KeyError                      Traceback (most recent call last)
+     78  print("The dict is: {}".format(student))
+     79  print("{} {} is in {} {}.".format(student['first'], 
+---> 80      student['last'], course['prefix'], course['num'])) 
      81 
 
 KeyError: 'last'
@@ -270,16 +278,16 @@ continue.
 In the case of a missing key which you can sensibly ignore, you can code around
 it as follows:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=2mm]
 for course in c:
     roster = course['roster']
     for student in roster:
         if 'last' in student:
             print("{} {} is in {} {}.".format(student['first'], 
-                student['last'], course['prefix'], course['num'])) 
+                student['last'],course['prefix'],course['num'])) 
         else:
             print("{} is in {} {}.".format(student['first'], 
-                course['prefix'], course['num'])) 
+                course['prefix'],course['num'])) 
 \end{Verbatim}
 
 \index{in@\texttt{in}}
@@ -338,12 +346,12 @@ for each course in the list, we simply need two things:
 \item the length of its \texttt{roster} list.
 \end{compactenum}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 for course in c:
     roster = course['roster']
     for student in roster:
         print("{} {} is in {} {}.".format(student['first'], 
-            student['last'], course['prefix'], course['num'])) 
+            student['last'],course['prefix'],course['num'])) 
 \end{Verbatim}
 
 Now you'll recall from back in section~\ref{stitching} (p.~\pageref{stitching})
@@ -388,6 +396,7 @@ from 0 (the first time through the loop) to \texttt{len(c)-1} (the last time).
 For each value of \texttt{x} (0, 1, 2, ..., 200) we extract the appropriate
 part of the \texttt{c} structure and fill in our two arrays' values.
 
+\smallskip
 Printing these verifies it worked:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
@@ -396,25 +405,25 @@ print(prefixes)
 
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-['DATA' 'CPSC' 'CPSC' 'SOCG' 'MATH' 'CPSC' 'PHYD' 'CLAS' 'SPAN' 'BIOL' 'STAT'
- 'PSCI' 'PHYD' 'PHYD' 'CPSC' 'BIOL' 'CPSC' 'ENGL' 'DATA' 'ENGL' 'CLAS' 'PSCI'
- 'BIOL' 'CLAS' 'STAT' 'BIOL' 'PHYD' 'PHYD' 'STAT' 'MATH' 'SOCG' 'SPAN' 'CPSC'
- 'CLAS' 'CPSC' 'PHYD' 'DATA' 'DATA' 'MATH' 'MATH' 'PHYD' 'MATH' 'STAT' 'CPSC'
- 'MATH' 'BUAD' 'DATA' 'DATA' 'PSCI' 'BIOL' 'CPSC' 'DATA' 'MATH' 'PSCI' 'CLAS'
- 'CLAS' 'BUAD' 'MATH' 'BIOL' 'SPAN' 'PHYD' 'DATA' 'PHYD' 'ENGL' 'STAT' 'PSCI'
- 'MATH' 'ENGL' 'DATA' 'ENGL' 'STAT' 'PSCI' 'SPAN' 'BUAD' 'PHYD' 'PSCI' 'DATA'
- 'CPSC' 'CPSC' 'BUAD' 'SPAN' 'BIOL' 'SPAN' 'STAT' 'BIOL' 'BIOL' 'PHYD' 'PHYD'
- 'PSCI' 'BUAD' 'BUAD' 'SPAN' 'BUAD' 'BUAD' 'BUAD' 'MATH' 'BUAD' 'PSCI' 'BUAD'
- 'DATA' 'PHYD' 'PHYD' 'STAT' 'BUAD' 'PHYD' 'CPSC' 'MATH' 'DATA' 'PHYD' 'SPAN'
- 'BUAD' 'STAT' 'SPAN' 'ENGL' 'CLAS' 'CLAS' 'SOCG' 'ENGL' 'MATH' 'SOCG' 'SPAN'
- 'PSCI' 'MATH' 'SPAN' 'BUAD' 'BUAD' 'BUAD' 'SPAN' 'BIOL' 'DATA' 'CPSC' 'BUAD'
- 'PSCI' 'CPSC' 'SOCG' 'BIOL' 'PSCI' 'STAT' 'PHYD' 'SOCG' 'SPAN' 'BUAD' 'SPAN'
- 'PSCI' 'MATH' 'MATH' 'CLAS' 'STAT' 'MATH' 'SPAN' 'CPSC' 'SPAN' 'DATA' 'STAT'
- 'PSCI' 'SPAN' 'CLAS' 'PHYD' 'CPSC' 'CPSC' 'SOCG' 'PSCI' 'SPAN' 'PSCI' 'DATA'
- 'PSCI' 'CPSC' 'STAT' 'PHYD' 'BIOL' 'BIOL' 'STAT' 'CLAS' 'STAT' 'MATH' 'SPAN'
- 'BUAD' 'PHYD' 'BUAD' 'BIOL' 'DATA' 'SPAN' 'CPSC' 'ENGL' 'CPSC' 'PHYD' 'CLAS'
- 'BUAD' 'BUAD' 'ENGL' 'SOCG' 'PSCI' 'STAT' 'DATA' 'ENGL' 'CPSC' 'DATA' 'MATH'
+\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=leftline,framesep=1mm,framerule=1mm]
+['DATA' 'CPSC' 'CPSC' 'SOCG' 'MATH' 'CPSC' 'PHYD' 'CLAS' 'SPAN' 'BIOL'
+ 'PSCI' 'PHYD' 'PHYD' 'CPSC' 'BIOL' 'CPSC' 'ENGL' 'DATA' 'ENGL' 'CLAS'
+ 'BIOL' 'CLAS' 'STAT' 'BIOL' 'PHYD' 'PHYD' 'STAT' 'MATH' 'SOCG' 'SPAN'
+ 'CLAS' 'CPSC' 'PHYD' 'DATA' 'DATA' 'MATH' 'MATH' 'PHYD' 'MATH' 'STAT'
+ 'MATH' 'BUAD' 'DATA' 'DATA' 'PSCI' 'BIOL' 'CPSC' 'DATA' 'MATH' 'PSCI'
+ 'CLAS' 'BUAD' 'MATH' 'BIOL' 'SPAN' 'PHYD' 'DATA' 'PHYD' 'ENGL' 'STAT'
+ 'MATH' 'ENGL' 'DATA' 'ENGL' 'STAT' 'PSCI' 'SPAN' 'BUAD' 'PHYD' 'PSCI'
+ 'CPSC' 'CPSC' 'BUAD' 'SPAN' 'BIOL' 'SPAN' 'STAT' 'BIOL' 'BIOL' 'PHYD'
+ 'PSCI' 'BUAD' 'BUAD' 'SPAN' 'BUAD' 'BUAD' 'BUAD' 'MATH' 'BUAD' 'PSCI'
+ 'DATA' 'PHYD' 'PHYD' 'STAT' 'BUAD' 'PHYD' 'CPSC' 'MATH' 'DATA' 'PHYD'
+ 'BUAD' 'STAT' 'SPAN' 'ENGL' 'CLAS' 'CLAS' 'SOCG' 'ENGL' 'MATH' 'SOCG'
+ 'PSCI' 'MATH' 'SPAN' 'BUAD' 'BUAD' 'BUAD' 'SPAN' 'BIOL' 'DATA' 'CPSC'
+ 'PSCI' 'CPSC' 'SOCG' 'BIOL' 'PSCI' 'STAT' 'PHYD' 'SOCG' 'SPAN' 'BUAD'
+ 'PSCI' 'MATH' 'MATH' 'CLAS' 'STAT' 'MATH' 'SPAN' 'CPSC' 'SPAN' 'DATA'
+ 'PSCI' 'SPAN' 'CLAS' 'PHYD' 'CPSC' 'CPSC' 'SOCG' 'PSCI' 'SPAN' 'PSCI'
+ 'PSCI' 'CPSC' 'STAT' 'PHYD' 'BIOL' 'BIOL' 'STAT' 'CLAS' 'STAT' 'MATH'
+ 'BUAD' 'PHYD' 'BUAD' 'BIOL' 'DATA' 'SPAN' 'CPSC' 'ENGL' 'CPSC' 'PHYD'
+ 'BUAD' 'BUAD' 'ENGL' 'SOCG' 'PSCI' 'STAT' 'DATA' 'ENGL' 'CPSC' 'DATA'
  'STAT' 'SPAN' 'SOCG']
 \end{Verbatim}
 
@@ -424,21 +433,21 @@ print(sizes)
 
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-[35 29 28 14 25 30 20  7 15 21 22 25 14 18 28 22 28 23 22 23 10 25 24 10 13 24
- 19 18 16 23 22 15 26  8 30 22 29 21 22 12 25 22 12 26 12 25 19 26 12 21 26 25
- 12 18  7 18 23 20 22 16 21 25 16 21 18 20 20 19 29 24 25 24 17 16 22 23 19 26
- 28 22 15 22 17 17 21 21 19 17 25 15 24 16 25 21 16 24 19 15 15 28 19 23 20 18
- 12 29 19 30 17 15 23 24 15 18  9 19 12 21 13 15 15 12 20 15 15 22 17 16 23 22
- 27 21 22 25 20 24 22 20 15 24 15 23 17 22 12 25  8 13 15 17 30 18 25 18 24 15
- 17 18 26 27 16 13 16 22 19 18 29 14 18 21 21 24  6 13 15 17 13 23 21 24 29 17
+\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=leftline,framesep=1mm,framerule=1mm]
+[35 29 28 14 25 30 20  7 15 21 22 25 14 18 28 22 28 23 22 23 10 25 24 10 13
+ 19 18 16 23 22 15 26  8 30 22 29 21 22 12 25 22 12 26 12 25 19 26 12 21 26
+ 12 18  7 18 23 20 22 16 21 25 16 21 18 20 20 19 29 24 25 24 17 16 22 23 19
+ 28 22 15 22 17 17 21 21 19 17 25 15 24 16 25 21 16 24 19 15 15 28 19 23 20
+ 12 29 19 30 17 15 23 24 15 18  9 19 12 21 13 15 15 12 20 15 15 22 17 16 23
+ 27 21 22 25 20 24 22 20 15 24 15 23 17 22 12 25  8 13 15 17 30 18 25 18 24
+ 17 18 26 27 16 13 16 22 19 18 29 14 18 21 21 24  6 13 15 17 13 23 21 24 29
  26 23 28 15  4 20 15 25 15 14 17 28 22 30 19 13 22 18 21]
 \end{Verbatim}
 
 Now we just create our \texttt{DataFrame}:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-course_info = pd.DataFrame({'prefix': prefixes, 'size':sizes})
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+course_info = pd.DataFrame({'prefix':prefixes, 'size':sizes})
 print(course_info)
 \end{Verbatim}
 
@@ -456,20 +465,25 @@ print(course_info)
 
 and do our box plot:
 
+\vspace{-.2in}
+
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 course_info.boxplot("size", by="prefix")
 \end{Verbatim}
 
+Figure~\ref{courseinfo} gives the goods. Looks like our university's Computer
+Science (CPSC) and Data Science (DATA) classes have the highest enrollment (no
+surprise), while Classics (CLAS) is lagging behind the others.
+
+
+\bigskip
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.9\textwidth]{courseinfo.png}
 \caption{A straightforward analysis, culled from JSON data.}
 \label{courseinfo}
 \end{figure}
-
-Figure~\ref{courseinfo} gives the goods. Looks like our university's Computer
-Science (CPSC) and Data Science (DATA) classes have the highest enrollment (no
-surprise), while Classics (CLAS) is lagging behind the others.
+\bigskip
 
 By the way, in this case it was clear from the outset how many rows would be
 in our \texttt{DataFrame}, because the \texttt{c} list had one element in it

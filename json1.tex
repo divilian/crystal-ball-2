@@ -44,16 +44,18 @@ JSON and also important to know about in their own right. They're called
 
 \subsection{Lists}
 
+\smallskip
 If, instead of writing this:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-crew = np.array(["Ed", "Kelly", "Alara", "Bortus", "John", "Claire"])
+crew = np.array(["Ed","Kelly","Alara","Bortus","John",
+    "Claire"])
 \end{Verbatim}
 
 you simply wrote this:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-crew = ["Ed", "Kelly", "Alara", "Bortus", "John", "Claire"]
+crew = ["Ed","Kelly","Alara","Bortus","John","Claire"]
 \end{Verbatim}
 
 \index{list}
@@ -64,7 +66,7 @@ operations and such with it, but it does the basic job. For example:
 
 \index{len@\texttt{len()} function!for lists}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 print("Captain {} initiating roll call for {} officers:".format(
     crew[0], len(crew)))
 for member in crew[1:len(crew)]:
@@ -89,14 +91,19 @@ arrays, so I'm sure you'll pick this right up.
 Incidentally, we've actually used lists several times already, without knowing
 it. For instance, this very line of code:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-good = np.array(["Janet", "Chidi", "Eleanor", "Michael", "Tahani"])
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+good = np.array(["Janet","Chidi","Eleanor","Michael","Tahani"])
 \end{Verbatim}
 
 is actually first creating a \textit{list}, and then passing that list as an
 argument to \texttt{np.array()}. And this code:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\index{Hulk}
+\index{Spiderman}
+\index{Iron Man}
+\index{Thor}
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 alter_egos = pd.Series(['Hulk','Spidey','Iron Man','Thor'],
     index=['Bruce','Peter','Tony','Thor'])
 \end{Verbatim}
@@ -118,9 +125,14 @@ NumPy arrays. Dictionaries contain key-value pairs, accessed in the same sort
 of way (with the boxie \texttt{[]} syntax). You create a dictionary by
 using the syntax from p.~\pageref{mentionDictionary2}:
 
+\index{Wonder Woman}
+\index{Batman}
+\index{Superman}
+\index{Robin}
+
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-alter_egos = { 'Bruce':'Batman', 'Dick':'Robin', 'Diana':'Wonder Woman',
-    'Clark':'Superman' }
+alter_egos = { 'Bruce':'Batman', 'Dick':'Robin',
+    'Diana':'Wonder Woman', 'Clark':'Superman' }
 \end{Verbatim}
 
 Then, just like with \texttt{Series}es, you can retrieve the value for a key,
@@ -128,13 +140,13 @@ change the value for a key, add a new key-value pair, and so forth:
 
 \index{len@\texttt{len()} function!for dictionaries}
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=2mm]
 caped_crusaders = [ alter_egos['Bruce'], alter_egos['Dick'] ]
 alter_egos['Clark'] = 'Man of Steel'
 alter_egos['Victor'] = 'Cyborg'
 
-print("There are now {} heroes, {} of which are the caped crusaders.".format(
-    len(alter_egos), len(caped_crusaders)))
+print("There are {} heroes, {} of whom are the caped crusaders.".
+    format(len(alter_egos), len(caped_crusaders)))
 print("The dynamic duo is: {} and {}!".format(caped_crusaders[0],
     caped_crusaders[1]))
 for key, value in alter_egos.items():
@@ -220,8 +232,9 @@ Next one:
 \index{rainier cherry}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-b = { "apple": 54, "banana": [14, 67], "cherry": { "bing": [ 13, 17,
-21], "rainier": { "sweet": "yes", "juicy": "yes" } } }
+b = { "apple": 54, "banana": [14, 67], "cherry": { "bing":
+[ 13, 17, 21], "rainier": { "sweet": "yes", "juicy":
+"yes" } } }
 \end{Verbatim}
 
 \index{\{\}@\texttt{\{\}} (curlies)}
@@ -256,13 +269,15 @@ dictionary has two key-value pairs:
 Now test yourself and make sure you can predict the right output from these
 lines of code:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=2mm]
 print("b['apple'] is {}".format(b['apple']))
 print("b['banana'] is {}".format(b['banana']))
 print("len(b['banana']) is {}".format(len(b['banana'])))
 print("len(b['cherry']) is {}".format(len(b['cherry'])))
-print("len(b['cherry']['bing']) is {}".format(len(b['cherry']['bing'])))
-print("b['cherry']['bing'][0]) is {}".format(b['cherry']['bing'][0]))
+print("len(b['cherry']['bing']) is {}".format(
+    len(b['cherry']['bing'])))
+print("b['cherry']['bing'][0]) is {}".format(
+    b['cherry']['bing'][0]))
 print("b['cherry']['rainier']['sweet']) is {}".format(
     b['cherry']['rainier']['sweet']))
 \end{Verbatim}
@@ -317,9 +332,12 @@ This is super useful when plunging deep through nested data sets.
 
 One last example:
 
+\index{Duck Donuts}
+\index{Five Guys}
+
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-c = [ { 'x': 5 }, [ 14, 'bob', [ 11, { 'duck': 'donuts', 'five':
-'guys' }, [ 17, 6 ] ] ] ]
+c = [ { 'x': 5 }, [ 14, 'bob', [ 11, { 'duck': 'donuts',
+'five': 'guys' }, [ 17, 6 ] ] ] ]
 \end{Verbatim}
 
 \index{[]@\texttt{[]} (boxies)}
@@ -332,7 +350,8 @@ these answers correct:
 print("len(c) is {}".format(len(c)))
 print("c[0]['x'] is {}".format(c[0]['x']))
 print("c[1][1] is {}".format(c[1][1]))
-print("c[1][2][1]['five'] is {}".format(c[1][2][1]['five']))
+print("c[1][2][1]['five'] is {}".format(
+    c[1][2][1]['five']))
 print("c[1][2][2][1] is {}".format(c[1][2][2][1]))
 print(\end{Verbatim}
 \vspace{-.2in}
@@ -346,6 +365,7 @@ c[1][2][2][1] is 6
 \end{Verbatim}
 
 
+\bigskip
 
 \section{JSON}
 
@@ -361,12 +381,17 @@ elements that are exactly like what we covered in the previous section. A JSON
 ``document'' is, in fact, \textit{essentially a Python list or dictionary with
 embedded contents.}
 
+\medskip
+
 Here's an example file in JSON format:
 
+\index{Skywalker, Luke}
+
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=lines,framesep=3mm]
-{"name": "Luke Skywalker", "rank": "Jedi", "lightsaber color": "blue",
-"episodes": ["IV", "V", "VI", "VIII", "IX"], "relations": {"Leia": "sister",
-"Han": "friend", "Artoo": "servant", "Threepio": "servant", "Rey": "student"}}
+{"name": "Luke Skywalker", "rank": "Jedi", "lightsaber color":
+"blue", "episodes": ["IV", "V", "VI", "VIII", "IX"], "relations":
+{"Leia": "sister", "Han": "friend", "Artoo": "servant",
+"Threepio": "servant", "Rey": "student"}}
 \end{Verbatim}
 
 Its structure is instantly apparent: a dictionary whose values are strings,
@@ -424,7 +449,6 @@ VI
 \end{Verbatim}
 
 \normalsize
-Simple as that!
 
 \subsection{``Pretty printing''}
 
@@ -443,9 +467,11 @@ the import:
 
 \index{import@\texttt{import}}
 
+\vspace{-.15in}
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 from pprint import pprint
 \end{Verbatim}
+\vspace{-.15in}
 
 \index{print()@\texttt{print()} function}
 \index{pprint()@\texttt{pprint()} function}
@@ -460,9 +486,10 @@ print(luke)
 \vspace{-.2in}
 
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-{"name": "Luke Skywalker", "rank": "Jedi", "lightsaber color": "blue",
-"episodes": ["IV", "V", "VI", "VIII", "IX"], "relations": {"Leia": "sister",
-"Han": "friend", "Artoo": "servant", "Threepio": "servant", "Rey": "student"}}
+{"name": "Luke Skywalker", "rank": "Jedi", "lightsaber color":
+"blue", "episodes": ["IV", "V", "VI", "VIII", "IX"], "relations":
+{"Leia": "sister", "Han": "friend", "Artoo": "servant",
+"Threepio": "servant", "Rey": "student"}}
 \end{Verbatim}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
@@ -496,15 +523,16 @@ an Python variable with arbitrarily nested inner structure. This variable can
 be a list or a dictionary, and have embedded lists and dictionaries to any
 level of nesting. Here's another example:
 
+\vspace{-.2in}
 \index{courses (JSON file)}
 \label{coursesJson}
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=lines,framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=lines,framesep=3mm]
 [{"prefix": "DATA", "num": 219, "creds": 3, "instructor": "Davies",
-"meetings": [{"time": {"day": "TR", "time": "12:30pm"}, "location": {"bldg":
-"Farmer", "room": "B6"}}], "roster": [{"first": "Lady", "last": "Gaga",
-"email": "lgaga@umw.edu"}, {"first": "The", "last": "Rock", "email":
-"trock@umw.edu"}, ...
+"meetings": [{"time": {"day": "TR", "time": "12:30pm"}, "location":
+{"bldg": "Farmer", "room": "B6"}}], "roster": [{"first": "Lady",
+"last": "Gaga", "email": "lgaga@umw.edu"}, {"first": "The", "last":
+"Rock", "email": "trock@umw.edu"}, ...
 \end{Verbatim}
 
 When you disentangle this, you'll realize that what you have is:

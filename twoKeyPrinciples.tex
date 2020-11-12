@@ -15,6 +15,7 @@ The \textbf{bias-variance trade-off} is a manifestation of the ``no free
 lunch'' principle. Classifiers that possess one advantage inherently have a
 counteracting disadvantage. Here are the two key terms:
 
+\vspace{-.1in}
 \begin{itemize}
 \itemsep.1em
 
@@ -34,6 +35,8 @@ particular training set that is chosen, because it ``bends'' too much to try
 and catch every data point.
 
 \end{itemize}
+\vspace{.2in}
+\pagebreak
 
 \index{Sith}
 \index{Jedi}
@@ -136,8 +139,8 @@ Let's compare how 3-NN and Na\"{i}ve Bayes perform on these two dimensions.
 Figure~\ref{comparisonCode} at the end of the chapter
 (p.~\pageref{comparisonCode}) defines two functions. One runs a Na\"{i}ve Bayes
 classifier on a security camera data set, using a random sample of 70\% for
-training, and returns the percentage of the test set that it gets correct. The
-other does the same for a kNN classifier (its second parameter is the value of
+training, and returns the percentage accuract on the test set. The other does
+the same for a kNN classifier (its second parameter is the value of
 \texttt{k}.)
 
 We can then run the following code to test each classifier on 200 different
@@ -156,8 +159,10 @@ knn_performances = np.empty(200)
 for i in range(200):
     knn_performances[i] = kNN(s, 3)
 
-results = pd.DataFrame({'Naive Bayes':nb_performances, '3-NN':knn_performances})
-results_l = pd.melt(results, [], var_name='classifier', value_name='accuracy')
+results = pd.DataFrame({'Naive Bayes':nb_performances,
+    '3-NN':knn_performances})
+results_l = pd.melt(results, [], var_name='classifier',
+    value_name='accuracy')
 facet = sns.FacetGrid(results_l, col='classifier')
 facet.map(plt.hist, 'accuracy', bins=20)
 \end{Verbatim}
@@ -174,14 +179,14 @@ The result is shown in Figure~\ref{nb_knn_comparison}. It is very revealing.
 First, notice that on average, the 3-NN classifier beats Na\"{i}ve Bayes. The
 mean accuracies are:
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
-print("Naive Bayes: mean accuracy {:.2f}%.".format(nb_performances.mean()))
+\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=single,framesep=3mm]
+print("NB: mean accuracy {:.2f}%.".format(nb_performances.mean()))
 print("3-NN: mean accuracy {:.2f}%.".format(knn_performances.mean()))
 \end{Verbatim}
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-Naive Bayes: mean accuracy 80.47%.
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+NB: mean accuracy 80.47%.
 3-NN: mean accuracy 86.81%.
 \end{Verbatim}
 
@@ -195,14 +200,14 @@ worst of any of the Na\"{i}ve Bayes runs. The standard deviation bears this
 out:
 
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
-print("Naive Bayes: standard deviation {:.2f}.".format(nb_performances.std()))
-print("3-NN: standard deviation {:.2f}.".format(knn_performances.std()))
+print("NB: std dev {:.2f}.".format(nb_performances.std()))
+print("3-NN: std dev {:.2f}.".format(knn_performances.std()))
 \end{Verbatim}
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-Naive Bayes: standard deviation 2.04.
-3-NN: standard deviation 4.07.
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+NB: std dev 2.04.
+3-NN: std dev 4.07.
 \end{Verbatim}
 
 \index{no free lunch@the ``no free lunch'' principle}
@@ -281,24 +286,27 @@ classify most points the same. Like the simple ``just go based on lightsaber
 color'' classifier described on p.~\pageref{simpleClassifierTable}, too many
 different things would have to simultaneously change between training sets in
 order for any different result.
-
+\vspace{1in}
+\pagebreak
+\vspace{1in}
 
 \begin{figure}[ht]
 \centering
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 # Run Naive Bayes, and return the accuracy as a percentage.
 def naive_bayes(s):
     train = s.sample(frac=.7)
     test = s.drop(train.index)
 
     oe = OrdinalEncoder()
-    converted_features = oe.fit_transform(train.drop(['type'], axis=1))
+    converted_features = oe.fit_transform(
+        train.drop(['type'], axis=1))
 
     naive_bayes = CategoricalNB()
     naive_bayes.fit(converted_features, train.type)
     nb_predictions = naive_bayes.predict(
         oe.fit_transform(test.drop(['type'], axis=1)))
-    return (nb_predictions == test.type).sum() / len(test) * 100
+    return (nb_predictions==test.type).sum() / len(test) * 100
 
 
 ## Run kNN, and return the accuracy as a percentage.
@@ -307,13 +315,14 @@ def kNN(s, k):
     test = s.drop(train.index)
 
     ohe = OneHotEncoder()
-    one_hotted_features = ohe.fit_transform(train.drop(['type'], axis=1))
+    one_hotted_features = ohe.fit_transform(
+        train.drop(['type'], axis=1))
 
     knn = KNeighborsClassifier(n_neighbors=k)
     knn.fit(one_hotted_features, train.type)
     knn_predictions = knn.predict(
         ohe.fit_transform(test.drop(['type'], axis=1)))
-    return (knn_predictions == test.type).sum() / len(test) * 100
+    return (knn_predictions==test.type).sum() / len(test) * 100
 \end{Verbatim}
 
 \caption{Two functions, each of which chooses a random 70\% of a data set's
@@ -324,6 +333,9 @@ random.}
 \label{comparisonCode}
 \end{figure}
 
+\vspace{1in}
+\pagebreak
+\vspace{1in}
 \section{``The curse of dimensionality''}
 \label{sec:curse}
 
@@ -375,9 +387,8 @@ sometimes aggressively, if we have too many. It feels wasteful -- all this
 great data on all these people, and we're throwing it away! -- but it's the
 right thing to do. This process is called \textbf{feature selection}, and
 we'll cover it more fully in the next chapter.
-% FIX: actually add the feature selection chapter. (lesson 14 from 2019)
 
-\medskip
+\smallskip
 In the meantime, here are three useful principles for avoiding the curse:
 
 \begin{enumerate}

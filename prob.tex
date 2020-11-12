@@ -250,10 +250,11 @@ next section.
 Mathematically, here's how these two concepts (joint probability and
 conditional probability) are related. If A and B are two events, then:
 
+\setlength{\fboxsep}{3mm}
 \label{condProbDef}
 \vspace{-.2in}
 \begin{align*}
-\boxed{P(A|B) = \frac{P(A,B)}{P(B)}}
+\framebox{$P(A|B) = \dfrac{P(A,B)}{P(B)}$}
 \end{align*}
 
 In words: the conditional is the joint divided by the marginal of the thing
@@ -351,7 +352,7 @@ possibilities for a customer's order are thus:
 \vspace{-.1in}
 \begin{center}
 \begin{multicols}{3}
-\small
+\scriptsize
 A small vanilla cone \\
 A medium vanilla cone \\
 A large vanilla cone \\
@@ -361,7 +362,7 @@ A medium chocolate cone \\
 A large chocolate cone \\
 \columnbreak
 A small strawberry cone \\
-A medium strawberry cone \\
+A med strawberry cone \\
 A large strawberry cone \\
 \end{multicols}
 \end{center}
@@ -377,8 +378,8 @@ symbols:
 
 \vspace{-.2in}
 \begin{align*}
-P(\textrm{chocolate}) = P(\textrm{chocolate, small}) + P(\textrm{chocolate,
-medium)} + P(\textrm{chocolate, large})
+P(\textrm{chocolate})\ =\ & P(\textrm{chocolate, small}) + P(\textrm{chocolate,
+medium)}\ +\\& P(\textrm{chocolate, large})
 \end{align*}
 \vspace{-.2in}
 
@@ -392,8 +393,8 @@ regardless of flavor? Clearly, it's:
 
 \vspace{-.2in}
 \begin{align*}
-P(\textrm{medium}) = P(\textrm{vanilla, medium}) + P(\textrm{chocolate,
-medium)} + P(\textrm{strawberry, medium})
+P(\textrm{medium})\ =\ & P(\textrm{vanilla, medium}) + P(\textrm{chocolate,
+medium)}\ +\\ &P(\textrm{strawberry, medium})
 \end{align*}
 \vspace{-.2in}
 
@@ -427,7 +428,7 @@ A small chocolate cone with sprinkles\\
 A medium chocolate cone with sprinkles\\
 A large chocolate cone with sprinkles\\
 A small strawberry cone with sprinkles\\
-A medium strawberry cone with sprinkles\\
+A med strawberry cone with sprinkles\\
 A large strawberry cone with sprinkles\\
 \end{multicols}
 \end{center}
@@ -438,18 +439,18 @@ calculate:
 
 \vspace{-.2in}
 \begin{align*}
-P(\textrm{strawberry, small}) = P(\textrm{strawberry, small, plain}) + 
-P(\textrm{strawberry, small, sprinkles})
+P(\textrm{strawberry, small})\ =\ & P(\textrm{strawberry, small, plain})\ +\\ 
+&P(\textrm{strawberry, small, sprinkles})
 \end{align*}
 \vspace{-.2in}
 
-And if we wanted to know (say) the probability of the next customer wanting a
-large cone with sprinkles, we'd compute:
+And if we wanted to know the probability of the next customer wanting a large
+cone with sprinkles, we'd compute:
 
 \vspace{-.2in}
 \begin{align*}
-P(\textrm{large, sprinkles}) = & P(\textrm{vanilla, large, sprinkles}) + \\
-& P(\textrm{chocolate, large, sprinkles}) + \\
+P(\textrm{large, sprinkles})\ =\ & P(\textrm{vanilla, large, sprinkles})\ + \\
+& P(\textrm{chocolate, large, sprinkles})\ + \\
 & P(\textrm{strawberry, large, sprinkles})
 \end{align*}
 \vspace{-.2in}
@@ -465,7 +466,7 @@ P(A,B) = P(B,A), it's easy to derive the following law:
 
 \vspace{-.2in}
 \begin{align*}
-\boxed{P(A|B) = \frac{P(B|A) \cdot P(A)}{P(B)}}
+\framebox{$P(A|B) = \dfrac{P(B|A) \cdot P(A)}{P(B)}$}
 \end{align*}
 
 \index{Bayes' Rule (probability)}
@@ -526,10 +527,21 @@ so we cautiously conclude they are.
 
 Both of the following mathematical identities are true \textit{\textbf{only
 \underline{if}}} the events $A$ and $B$ are independent:
+
+\smallskip
+\fbox{%
+\begin{minipage}{4in}
+\begin{center}
+\textbf{\textit{If}} $A$ and $B$ are independent, then:
+\vspace{-.2in}
+\end{center}
 \begin{align*}
 P(A|B) &= P(A) \\
 P(A,B) &= P(A) \cdot P(B) 
 \end{align*}
+\end{minipage}
+}
+\bigskip
 
 The first of these is basically the definition of independence: if P(white\
 $|$\ female) = P(white), we say they're independent. (And conversely, if
@@ -571,15 +583,20 @@ In this case, we would say that although \texttt{hair} and \texttt{pinterest}
 were not \textit{absolutely} independent, they nevertheless were
 \textit{conditionally} independent given gender. In symbols:
 
-\small
+\vspace{-.15in}
 \begin{align*}
-P(\textrm{long hair}\ |\ \textrm{pinterest}) &\neq P(\textrm{long hair}) \quad
-&\leftarrow \textrm{no absolute independence}\\
+P(\textrm{long hair}\ |\ \textrm{pinterest}) &\neq P(\textrm{long hair})
+\end{align*}
+\vspace{-.5in}
+\begin{center}\textsl{(\textbf{no} absolute independence)}\end{center}
+\medskip
+\begin{align*}
 P(\textrm{long hair}\ |\ \textrm{pinterest,female}) &= P(\textrm{long hair}\ |\
 \textrm{female})
-\quad &\leftarrow \textrm{conditional independence}\\
 \end{align*}
-\normalsize
+\vspace{-.5in}
+\begin{center}\textsl{(yes, conditional independence)}\end{center}
+\smallskip
 
 In other words, once we know the subject is female, whether she's on pinterest
 tells us nothing further about whether or not she will have long hair. The

@@ -129,7 +129,8 @@ access is the \texttt{.get()} command. It can actually be used to retrieve
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 import requests
-class_home_page = requests.get("http://stephendavies.org/data219")
+class_home_page = requests.get(
+    "http://stephendavies.org/data219")
 print(class_home_page.content.decode('utf-8'))
 \end{Verbatim}
 
@@ -174,16 +175,17 @@ print(response.content.decode('utf-8'))
 \vspace{-.2in}
 
 \begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-{'name': 'Chewbacca', 'height': '228', 'mass': '112', 'hair_color': 'brown',
-'skin_color': 'unknown', 'eye_color': 'blue', 'birth_year': '200BBY',
-'gender': 'male', 'homeworld': 'https://swapi.co/api/planets/14/', 'films':
+{'name':'Chewbacca', 'height':'228', 'mass':'112', 'hair_color':'brown',
+'skin_color':'unknown', 'eye_color':'blue', 'birth_year':'200BBY',
+'gender':'male', 'homeworld':'https://swapi.co/api/planets/14/', 'films':
 ['https://swapi.co/api/films/2/', 'https://swapi.co/api/films/6/',
 'https://swapi.co/api/films/3/', 'https://swapi.co/api/films/1/',
-'https://swapi.co/api/films/7/'], 'species': ['https://swapi.co/api/species/3/'],
-'vehicles': ['https://swapi.co/api/vehicles/19/'], 'starships':
-['https://swapi.co/api/starships/10/', 'https://swapi.co/api/starships/22/'],
-'created': '2014-12-10T16:42:45.066000Z', 'edited':
-'2014-12-20T21:17:50.332000Z', 'url': 'https://swapi.co/api/people/13/'}
+'https://swapi.co/api/films/7/'],
+'species':['https://swapi.co/api/species/3/'],
+'vehicles':['https://swapi.co/api/vehicles/19/'], 'starships':
+['https://swapi.co/api/starships/10/',
+'https://swapi.co/api/starships/22/'], 'created':'2014-12-10T16:42:45',
+'edited':'2014-12-20T21:17:50', 'url':'https://swapi.co/api/people/13/'}
 \end{Verbatim}
 
 \index{pretty printing@``pretty printing''}
@@ -241,7 +243,8 @@ retrieve that:
 
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 chewie = json.load(response.content.decode('utf-8'))
-pprint(json.loads(requests.get(chewie['homeworld']).content.decode('utf-8')))
+pprint(json.loads(requests.get(
+    chewie['homeworld']).content.decode('utf-8')))
 \end{Verbatim}
 \vspace{-.2in}
 
@@ -286,9 +289,8 @@ site. Since we'll be dealing only with open APIs, this isn't a security thing
 as much as it's a ``control of information'' thing. By forcing you to register
 with the site and provide some contact info, the organization retains a
 measure of control and knowledge over how its information is used. Also, many
-sites impose \textbf{rate limits} which constrain how much information you can
-suck from the site every hour, and the way they track this is by associating
-data requests with user accounts.
+sites impose \textbf{rate limits} which constrain how much information an
+account can suck from the site every hour.
 
 Every site has a different procedure for this, and the documentation varies
 considerably in helpfulness. It's usually a matter of finding and connecting
@@ -315,15 +317,12 @@ You will now see, on the ``Keys and Access Tokens'' page, \textit{four} strings
 of gobbledygook, all four of which you'll need:
 
 \vspace{.1in}
-\small
 \begin{compactitem}
-\item A ``consumer key.'' Mine is \texttt{\footnotesize 9dFucBtR1P58pJICXGV2gaKhj}.
-\item A ``consumer secret.'' Mine is
-\texttt{\footnotesize uKufTBegOrw5hrjNQmXFwcVtWjSb2bUHsMEoBwjN5gHzTbpJ0U}.
-\item An ``access token.'' Mine is
-\texttt{\footnotesize 1019144197-5dhD0p1VbE80kPnzZrhjq43G08iMbguggkn67q1}.
-\item An ``access token secret.'' Mine is
-\texttt{\footnotesize JOtRHxgzhj6KQhuOuwljB214UImybVANFX6pbSYsDJhTd}.
+\item A ``consumer key.'' Mine is \texttt{9dFucBtR1P58pJICXGV2gaKhj}.
+\item A ``consumer secret.'' (I'll keep mine secret.)
+\item An ``access token.'' Mine is\\
+\texttt{1019144197-5dhD0p1VbE80kPnzZrhjq43G08iMbguggkn67q1}.
+\item An ``access token secret.'' (I'll keep mine secret.)
 \end{compactitem}
 \normalsize
 \vspace{.1in}
@@ -350,11 +349,12 @@ should work:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 from requests_oauthlib import OAuth1
-cons_key = "MlUmay5kA1vGWKokmmFofgRLX"
-cons_secret = "2FFYCyI2rhUIEltkepeNhVcZvYufXJukCJMqE1s3ALKoLYm7LD"
-access_token = "1019144197-cMFsHfxTZiG0oyOidzM7bCW4uX6PzjXVOyNQTUK"
-access_secret = "fmW3KSw0kSYH43QPqSxUscnZD8XF8M8oEJnKm2sRAcq70"
-oauth = OAuth1(cons_key, cons_secret, access_token, access_secret)
+cons_key = "(your key)"
+cons_secret = "(your consumer secret)"
+access_token = "(your access token)"
+access_secret = "(your access secret)"
+oauth = OAuth1(cons_key, cons_secret, access_token,
+    access_secret)
 \end{Verbatim}
 
 We now have a variable called \texttt{oauth} which can be passed to functions
@@ -373,7 +373,7 @@ triggering some operation, passing parameters, and getting a return value. The
 syntax is a bit different though. In Python, you're used to making a function
 call like this:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=single,framesep=3mm]
 get_user_timeline('katyperry',4)     <-- (not real; I'm making this up)
 \end{Verbatim}
 
@@ -382,8 +382,14 @@ to indicate something like ``get the latest four tweets from user
 \textit{API} and ``pass'' these ``parameters,'' you code up a URL with syntax
 like this:
 
-\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=lines,framesep=3mm]
-https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=katyperry&count=4
+\begin{center}
+\scriptsize{(all one string:)}
+\end{center}
+\normalsize
+\vspace{-.5in}
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=lines,framesep=3mm]
+https://api.twitter.com/1.1/statuses/user_timeline.json?scre
+en_name=katyperry&count=4
 \end{Verbatim}
 
 Stare at all that nonsense. Note that our ``parameters'' are expressed as
@@ -392,28 +398,31 @@ and each separated by ``\texttt{\&}'' signs. The following code, then:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 four_from_katy = json.loads(requests.get(
-    "https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=
-            katyperry&count=4",
-            auth=oauth).content.decode('utf-8'))
+   "https://api.twitter.com/1.1/statuses/" +
+      "user_timeline.json?screen_name=katyperry&count=4",
+         auth=oauth).content.decode('utf-8'))
 
 for tweet in four_from_katy:
-    print(tweet.text)
+   print(tweet.text)
 \end{Verbatim}
 \normalsize
 
 produces this result (as of today):
 
 \begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=single,framesep=3mm]
-Sending <3 out to all of you on this #ShoesdayTuesday! I will be donating 10% from the
-sale of every shoe and handb... https://t.co/TsyHuFquc6
+Sending <3 out to all of you on this #ShoesdayTuesday! I will be
+donating 10% from the sale of every shoe and handb...
+https://t.co/TsyHuFquc6
 
 this is how you wash with styyylesss https://t.co/C7rlCUGv9Y
 
-OMGEE We're leaving it to you, America! We couldn't choose between @GraceLeermusic &
-@LaurenMascitti so we're leavi... https://t.co/OH2X3o9XAV
+OMGEE We're leaving it to you, America! We couldn't choose between
+@GraceLeermusic & @LaurenMascitti so we're leavi...
+https://t.co/OH2X3o9XAV
 
-It's the end of the #AmericanIdol journey for #DemiRae - but the beginning of a new
-journey for her. Keep being the... https://t.co/P5Fqx2Q7l5
+It's the end of the #AmericanIdol journey for #DemiRae - but the
+beginning of a new journey for her. Keep being the...
+https://t.co/P5Fqx2Q7l5
 \end{Verbatim}
 
 \section{URL encoding}
@@ -423,15 +432,16 @@ punctuation characters. You'll need to encode those properly in order for the
 URL to be valid and for the API to not get confused.
 
 If a value you want to pass contains a space, you'll need to convert that space
-to a plus sign (``\texttt{+}''). For instance, the standard search endpoint for
-Twitter is \texttt{https://api.twitter.com/1.1/search/tweets.json}, and
+to a plus sign (``\texttt{+}''). The search endpoint for Twitter is
+\texttt{https://api.twitter.com/1.1/search/tweets.json}, for example, and
 requires a ``\texttt{q}'' parameter with your query string. I could search for
 Star Wars toys with:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 toys = json.loads(requests.get(
-    "https://api.twitter.com/1.1/search/tweets.json?q=
-            star+wars+toys&count=5", auth=oauth).content.decode('utf-8'))
+   "https://api.twitter.com/1.1/search/tweets.json?q=" +
+      "star+wars+toys&count=5",auth=oauth).content.decode(
+          'utf-8'))
 \end{Verbatim}
 
 Note how instead of putting ``\texttt{star wars toys}'' in the URL, I put
@@ -441,12 +451,13 @@ endpoint returns a dictionary of information:
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 print(toys.keys())
 \end{Verbatim}
-\vspace{-.2in}
+\vspace{-.4in}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
 ['statuses', 'search_metadata']
 \end{Verbatim}
 
+\smallskip
 It looks like the tweets themselves (``statuses'') are in the \texttt{statuses}
 key, so:
 
@@ -456,18 +467,20 @@ for tweet in toys['statuses']:
 \end{Verbatim}
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-The #StarWars portfolio of #toys is about to get bigger. #Hasbro announced
-it’s going to make #JabbatheHutt's sail... https://t.co/FYC1DLftXX
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=3mm,framerule=1mm]
+The #StarWars portfolio of #toys is about to get bigger. #Hasbro
+announced it’s going to make #JabbatheHutt's sail...
+https://t.co/FYC1DLftXX
 
-RT @hottoysofficial: #HotToys 1/6th scale #ObiWanKenobi (Regular & Deluxe
-Version) collectible figures from #StarWars EP3 are available for...
+RT @hottoysofficial: #HotToys 1/6th scale #ObiWanKenobi (Regular
+& Deluxe Version) collectible figures from #StarWars EP3 are
+available for...
 
-HotToys 1/6 Old Luke Skywalker Star Wars Movie Series 12'' Man Figure
+HotToys Old Luke Skywalker Star Wars Movie Series 12'' Man Figure
 Collection https://t.co/NbHgtpnDwi #Toys https://t.co/ejrGXjVT3F
 
-Star Wars Black Series  6" Rey (JEDI TRAINING )Toys R Us Exclusive
-https://t.co/ArxT9kPjZt https://t.co/lcLbp7pwjG
+Star Wars Black Series  6" Rey (JEDI TRAINING )Toys R Us
+Exclusive https://t.co/ArxT9kPjZt https://t.co/lcLbp7pwjG
 \end{Verbatim}
 \normalsize
 
@@ -485,7 +498,8 @@ but don't worry: the \texttt{quote\_plus()} function from the
 
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 import urllib.parse
-print(urllib.parse.quote_plus("http://cs.umw.edu/star wars toys! 20% off"))
+print(urllib.parse.quote_plus(
+    "http://cs.umw.edu/star wars toys! 20% off"))
 \end{Verbatim}
 \vspace{-.2in}
 
