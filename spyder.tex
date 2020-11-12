@@ -12,21 +12,22 @@ It comes with the Anaconda distribution, as does pretty much everything else
 we'll use this semester (scikit-learn, NumPy, SciPy, Pandas, Matplotlib,
 \textit{etc.}) Download it from here: \url{https://www.anaconda.com/download}. 
 
-\textbf{Note:} make sure to get Python \textbf{3.*}, not \textbf{2.*}!! (They
-are \textit{not} mutually compatible.) The number(s) after the dot don't
-matter so much. But before the dot \textit{must} be a \textbf{``3''}.
+\textbf{Note:} make sure to get Python \textbf{3.something}, not
+\textbf{2.something*}!! (They are \textit{not} mutually compatible.) The
+number(s) after the dot don't matter so much. But before the dot \textit{must}
+be a \textbf{``3''}.
 
 \index{Jupyter Notebooks}
 \index{IDE}
 \index{py file@\texttt{.py} file (Python source code)}
 \index{extension (filename)}
 
-Don't worry: all the stuff you learned using Python Jupyter Notebooks still
-applies! The only difference is that using an IDE (Integrated Development
-Environment) like Spyder is not Web-based: it's entirely offline, responsive,
-and more powerful. Instead of a Notebook, you'll be creating your own Python
-source code files (each of which has a \texttt{.py} extension) and executing
-them directly.
+And don't worry: all the stuff you learned last semester using Python Jupyter
+Notebooks still applies! The only difference is that using an IDE (Integrated
+Development Environment) like Spyder is not Web-based: it's entirely offline,
+responsive, and more feature-rich. Instead of a Notebook in a browser, you'll
+be creating your own Python source code files (each of which has a \texttt{.py}
+extension) and executing them directly.
 
 As with a Notebook, a Python source code file (\texttt{.py}) can have English
 text as well as Python code. However, the English text must be ``commented'' by
@@ -38,7 +39,7 @@ program is run.
 \section{The Spyder tutorial}
 
 First, download the latest version of Anaconda for your platform from
-\url{https://www.anaconda.com/distribution/}. This will take a while, after
+\url{https://www.anaconda.com/download}. This will take a while, after
 which you should be able to start the Spyder IDE (details depend on your
 operating system).
 
@@ -50,10 +51,11 @@ recommend clicking on links in this tutorial, since it brings you to the linked
 section but then gives you no obvious way to get back where you were. Perhaps
 I'm missing how.)
 
-You can \textit{skip over} the following tutorial sections:
+Go through the entire tutorial now. You can \textit{skip over} the following
+sections, however:
 
 \begin{compactitem}
-\item ``PEP 8''
+\item ``Strive for PEP 8 Compliance''
 \item ``Automatic Symbolic Python''
 \item ``Other observations''
 \item ``Documentation string formatting''
@@ -77,8 +79,9 @@ printed-output-of-each-cell. Get very comfortable with using the console.
 
 \item The concept of a ``docstring,'' which is text enclosed in
 triple-double-quotes (\texttt{"""}) immediately after a function
-\texttt{def}inition, which then shows up in the console if you type
-\texttt{help(}\textsl{that\_functions\_name}\texttt{)}. This is mildly useful.
+\texttt{def}inition, and which then shows up in the console if you type
+\texttt{help(}
+\textsl{function\_name}\texttt{)}. This is mildly useful.
 
 \item The concept of an interactive debugger, which can be a very useful IDE
 feature.
@@ -102,12 +105,15 @@ MacOS:
 ``Graphics backend'' to ``Inline.'' Make sure that after doing this, you can
 type a graphics command like this into the console:
 
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,rulecolor=\color{lightgray},framesep=3mm]
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 import pandas as pd
-pd.Series([4,9,8],index=['bill','kevin','jane']).plot(kind='bar')
+silly = pd.Series([4,9,8],index=['bill','kevin','jane'])
+print(silly)
+silly.plot(kind='bar')
 \end{Verbatim}
 
 and see the resulting plot on the ``Plots'' pane of the upper-right window.
+(You may have to click on the word ``Plots'' to show this.)
 
 \end{enumerate}
 
