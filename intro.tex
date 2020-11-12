@@ -1,34 +1,101 @@
 
 \chapter{Intermission and review}
 
-This is a new text! Although we'll do some review, I'm assuming you're good on
-the following items from DATA 101:
+Welcome to Volume Two of the Crystal Ball series: \textit{Foundations for Data
+Science}! I titled the first volume ``\textit{Introduction to Data Science}''
+because it led you through a dip-your-toes-in-the-water experience. You took a
+brief tour through the various elements in this diverse field and got a feel
+for what it was all about.
+
+Since you're still reading, this means you're still interested, and ready to
+explore the next level. In \textit{Foundations}, we'll solidify your growing
+knowledge so that you have a firm base on which to build everything else.
+Future volumes in this series will cover applications, advanced techniques, and
+some special data types that require special treatment. But it all ultimately
+rests on the skill set you'll have built in Volumes One and Two of this series.
+
+We're going to dive right in. But first, let me make a list of some of the
+things I'm counting on you being pretty solid on:
 
 \begin{compactitem}
+\small
 \itemsep.1em
-\item Data stuff
+\item Atomic and aggregate variables
+
+\begin{compactitem}
+\item \texttt{int}s, \texttt{float}s, \texttt{strings}
+\item NumPy \texttt{array}s, Pandas \texttt{Series}es, \texttt{DataFrame}s
+\item What all these look like in memory
+\end{compactitem}
+
+\item Assocation vs.~causality
+
+\item Scales of measure (especially categorical vs.~numeric)
+
+\begin{compactitem}
+\item Causal diagrams
+\item Dependent and independent variables
+\item Observational studies vs.~controlled experiments
+\item Confounding factors
+\end{compactitem}
+
+\item Statistical significance
+
+\item Exploratory Data Analysis
+\vspace{-.18in}
+\begin{multicols}{2}
     \begin{compactitem}
+    \item Bar charts
+    \item Histograms
     \item Contingency tables
     \item Scatterplots
-    \item Histograms
     \item Boxplots
     \item Quantiles
+    \item Outliers
     \end{compactitem}
+\end{multicols}
+\vspace{-.18in}
 
 \item Python stuff
     \begin{compactitem}
-    \item NumPy arrays
+    \item Creating and performing calculations on atomic data
+    \item Creating and accessing NumPy arrays
     \item \texttt{for} loops
-    \item Modifying in-place vs.~returning a copy
+    \item \texttt{if} statements (and \texttt{if}/\texttt{elif}/\texttt{else})
+    \item Functions and methods
+        \begin{compactitem}
+        \item Calling a function/method vs.~writing a function
+        \item Passing arguments (both atomic and aggregate)
+        \item Return values
+        \item Function that modify in-place vs.~returning a copy
+        \end{compactitem}
+
     \item Pandas \texttt{Series} \& \texttt{DataFrames}
         \begin{compactitem}
         \itemsep.1em
         \item Reading from a \texttt{.csv} file
         \item The ``index''
-        \item \texttt{.iloc} vs.~\texttt{.loc} vs.~neither
+        \item \texttt{.value\_counts()}
+        \item \texttt{.groupby()}
+        \item Using \texttt{.iloc} vs.~\texttt{.loc} vs.~neither
         \item Single ints/labels vs.~slices vs.~lists
         \item Queries
+        \item Recoding / transforming columns
         \end{compactitem}
     \end{compactitem}
+
+\item ML concepts
+    \begin{compactitem}
+    \item Classification vs.~regression
+    \item Features and target attribute
+    \item Training data, test data, and new data
+    \item Random sampling
+    \item The ``prior'' vs.~``posterior''
+    \item Evaluating a classifier
+    \end{compactitem}
+
 \end{compactitem}
 
+All these topics were covered in \textit{Crystal Ball} Volume One. If any of
+them are iffy, you might take an hour or two to flip back through them and
+brush up!
