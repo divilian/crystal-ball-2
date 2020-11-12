@@ -1,0 +1,387 @@
+
+\chapter{Correlation, the NumPy library}
+\label{ch:correlation}
+
+\section{``Are these things correlated?''}
+
+A very common exploratory operation is to ask yourself whether two variables
+in a data set are related to each other in some way. After looking at
+variables individually (via things like min/median/mean/max, histograms, bar
+charts) this is often the next thing you do. So how can we tell whether there
+is a genuine relationship between variables, versus just a spurious
+pseudo-connection?
+
+\subsection{Statistical significance}
+
+This question is at the heart of \textbf{statistical significance}, one of the
+most important concepts in data analysis. In general, when you ask whether your
+data shows evidence of some pattern, you need to determine whether that pattern
+is pronounced enough that it is ``statistically significant'' (or ``stat sig,''
+for short.) This essentially means that the pattern (in this chapter,
+the correlation) is so strong that it's very unlikely for it to have been a
+fluke of your particular data set.
+
+It's clearer with an example. Suppose you wanted to know: ``do cats or dogs
+have longer \textit{names}?'' To answer this, you go collect some data from
+your friends who have pets. The cat names you collect are ``\textsf{Felix},''
+``\textsf{Garfield},'' ``\textsf{Smudge},'' ``\textsf{Pillow},'' and a few
+others. The dog names you collect are ``\textsf{Coco},'' ``\textsf{Fido},''
+``\textsf{Mrs. Muggles},'' ``\textsf{Rex},'' and a few others. Ever the Data
+Scientist, you take the average. You discover that in your data set, the mean
+number of letters in a cat name is 6.8, and the mean number of letters in a dog
+name is only 6.3. So cats \textit{in your sample} have longer names. But the
+question that really matters is: ``\textit{generally speaking, on a consistent
+and reliable basis, will cats have longer names on average than dogs will?}''
+
+This is a question about more than just your friends' pets. It's a question
+about \textit{all} pets, of which you have only sampled a tiny fraction. But
+normally, that's the question you actually care about.
+
+Now there are three different ways to answer this question, two of them
+\textbf{wrong}, and one of them \textbf{right}:
+
+\begin{itemize}
+\itemsep.1em
+\item \textbf{Wrong way \#1}: Look at your numbers and say, ``wow, the cats I
+sampled had on average 6.8 letters as opposed to just 6.3. That sure seems like
+a big difference to me! I declare that cats have longer names in general.''
+\item \textbf{Wrong way \#2}: Look at your numbers and say, ``meh, my cat names
+only beat my dog names by 0.5. That sure doesn't seem like a very big
+difference to me! I declare that overall, cats and dogs are about equal.''
+\item \textbf{Right way}: Run the appropriate statistical test, and go with its
+results.
+\end{itemize}
+
+The majority of humans I've ever met choose one of the first two ways.
+(Normally they choose whichever way supports the conclusion they'd like to
+draw.) But we are Data Scientists, and we will always choose the third way. 
+
+All we need to know is what the appropriate statistical test \textit{is} for a
+given situation, and how to interpret its results. For detecting correlations
+between variables, that in turn depends on what \textit{types} of data you're
+dealing with (categorical or numerical, for instance). There are three cases:
+two categorical variables, one categorical and one numeric variable, and two
+numeric variables. Let's look at each in turn.
+
+
+\subsection{Two categorical variables}
+
+As explained in section~\ref{contingencyTable} (p.~\pageref{contingencyTable}),
+the first step in analyzing two categorical variables is creating a contingency
+table. Then, the next question is usually, ``okay, the proportions of the
+values of one variable are different across the other variable...but is this
+statistically significant?'' A quick and dirty way to tell is to run a
+\textbf{$\chi ^2$ test} (sometimes written ``chi-squared,'' but pronounced
+``kai squared''), as shown below.
+
+\label{chisq}
+
+\fbox{\parbox{\textwidth}{
+
+\textbf{*WARNING!} When you run a $\chi ^2$ test on a contingency table, as
+shown below, \textit{it must be a \textbf{margin-less} contingency table!!} In
+other words, if you used any of the techniques from section~\ref{marginsBegin}
+(pp.\pageref{marginsBegin}-\pageref{marginsEnd}) in order to see
+row/column/overall totals, you must \textbf{\textit{not}} use that table with
+the extra ``\texttt{All}'' columns as the argument to the
+\texttt{chi2\_contingency()} function described below. Doing so will give you
+\textit{wrong} and misleading answers, with no obvious indication that they are
+wrong. Always give \texttt{chi2\_contingency()} the original contingency table,
+\textit{without} margins.
+
+}}
+
+\bigskip
+\medskip
+Okay. Warnings aside, here's the code to perform the $\chi ^2$ test:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+>>> import scipy.stats
+>>> scipy.stats.chi2_contingency(my_contingency_table)
+\end{Verbatim}
+
+\begin{samepage}
+For example, using our Star Wars characters DataFrame:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+>>> side_saber = pd.crosstab(characters.side, columns=characters.saber)
+>>> side_saber
+    saber  blue  green  red
+    side                   
+    Dark      0      0    2
+    Light     2      2    0
+
+>>> scipy.stats.chi2_contingency(side_saber)
+    (6.0, 0.049787068367863951, 2, 
+            array([[ 0.66666667,  0.66666667,  0.66666667],
+            [ 1.33333333,  1.33333333,  1.33333333]]))
+\end{Verbatim}
+\end{samepage}
+
+Whew -- that's some strange stuff that \texttt{chi2\_contingency()} printed
+out. It's a list\footnote{Technically, it's a Python ``\textbf{tuple}'' rather
+than a list, as indicated by bananas (parentheses) instead of boxies (square
+brackets) around the outside of it. But to analyze it, you can treat it as a
+list. In particular, you can use ``\texttt{len()}'', ``\texttt{[0]}'',
+``\texttt{[1]}'', ``\texttt{[2]}'',
+\textit{etc.}~to count and extract the different elements.} of four elements.
+Briefly, here's what these elements mean:
+
+\begin{compactenum}
+\item[0.] The raw value of the actual ``$\chi ^2$ statistic.'' \textit{Ignore}
+this.
+\item[1.] The test's ``\textbf{p-value},'' which is by far the most important of
+the four elements. As with many statistical tests that return a ``p-value,'' if
+it's less than \textbf{.05}, you can be confident that the two variables
+\textit{are} correlated in some way. (In the above example, they are...barely.)
+\item[2.] The test's number of ``degrees of freedom.'' \textit{Ignore} this.
+\item[3.] The ``expected frequencies,'' which you also usually \textit{ignore}, but
+for the curious it is sort of interesting. Notice that that fourth element
+(element \#3 of the list) is a thing called an \texttt{array}, which is
+actually a two-dimensional \textbf{NumPy nd-array} (see section~\ref{NumPy},
+below). If you stare at it, you'll realize that it's 6 numbers arranged in a
+box: three on the top row (0.667, 0.667, and 0.667) and three on the bottom
+(1.33, 1.33, and 1.33). This tells you how many of each of the
+lightsaber color / dark-side-light-side combinations we would have expected on average
+\textit{if lightsaber color had no correlation with side.} Here, it's saying,
+``if the color lightsaber you choose really has nothing to do with what side of
+the Force you use, and you had six total people (two blue, two green, and two
+red) then
+we'd expect there to be about $\frac{2}{3}$rds of a blue-sabered Light-side
+person, $\frac{2}{3}$rds of a green-sabered Light-side
+person,
+about $\frac{2}{3}$rds of a red-sabered Light-side person, $1\frac{1}{3}$rd
+blue-sabered Dark-side people, 
+$1\frac{1}{3}$rd green-sabered Dark-side people, and
+$1\frac{1}{3}$rd red-sabered Dark-side people.'' The $\chi ^2$ test is basically
+looking to see how far off the \textit{actual} numbers of the various
+saber/side counts are from this baseline expectation. If they're off by a
+lot, the p-value (in element \#1) will be less than .05, telling us that
+lightsaber color \textit{does} have something to do with what side of the Force
+you use.
+\end{compactenum}
+
+\textbf{TL;DR}\footnote{If you didn't know, the expression ``TL:DR'', commonly
+used on internet posts, stands for ``too long; didn't read.'' It's used to mark
+a super brief overview of a longer post, for those who want to cut to the chase
+and just get a summary. See
+\url{https://www.lifewire.com/what-is-tldr-2483633}.}: ignore everything except
+the second element (element~\texttt{[1]}) of the output from
+\texttt{chi2\_contingency()}. If that number is less than .05, interpret it as
+``these two categories variables \textit{are} in fact correlated,'' and if it's
+higher, interpret it as ``they don't look to be correlated.''
+
+\subsection{One categorical and one numeric variable}
+
+My favorite tool for one categorical and one numeric variable is the
+\textbf{notched boxplot} from section~\ref{notched} on p.~\pageref{notched}.
+(You can also do a t-test if the notches look funny; see
+\texttt{scipy.stats.ttest\_ind} and \texttt{scipy.stats.ttest\_rel} and read
+carefully.)
+
+
+\subsection{Two numeric variables}
+
+Besides visually inspecting scatterplots to spot correlations, the Pearson's
+correlation coefficient can give you a quick-and-dirty answer:
+\label{pearsonsR}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+>>> import scipy.stats.stats
+>>> scipy.stats.stats.pearsonr(my_var1, my_var2)
+\end{Verbatim}
+
+For instance:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+>>> scipy.stats.stats.pearsonr(men_ht,men_sat)
+    (-0.080877008297474018, 0.29443331215713264)
+\end{Verbatim}
+
+The second number is the p-value: if it's greater than about .05, then these
+two variables are likely \textit{not} correlated.
+
+
+\section{NumPy}
+\label{NumPy}
+
+At the near-bottom of the Python data analysis ecosystem is the NumPy
+library. SciPy, Pandas, scikit-learn, and many other things are built on top
+of it.
+
+Its wheelhouse is the \textit{ndarray}, a highly-optimized and efficient
+multidimensional array datatype. It's blazing fast, and supports advanced
+vectorized and broadcasting operations as we'll see. A lot of this boils down
+to \textit{avoiding writing expensive loops in Python} and letting the faster,
+native, underlying language (C) do bulky computations in a fraction of the
+time.
+
+NumPy also has a lot of other really useful stuff in it, including linear
+algebra routines and sophisticated random number generation. In practice, you
+often use some higher-level library to access these things, but under the hood
+they in turn use NumPy.
+
+\subsection{ndarrays}
+
+The standard NumPy import is:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+import numpy as np
+\end{Verbatim}
+
+after which you can make \textit{ndarray}s in a variety of ways:
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
+a = np.array(['larry','curly','moe'])    # 1-d array ("vector")
+b = np.array([[1,2,3],[8,9,10])          # 2-d array ("matrix")
+c = np.zeros(25)                         # 1-d array of all zeros
+d = np.zeros((9,7))                      # 2-d array of all zeros
+                                         # See also ".ones()" and ".empty()"
+e = np.arange(5,855)                     # Like .range(), but for ndarrays
+
+\end{Verbatim}
+
+\subsubsection{dtypes}
+
+Every \textit{ndarray} has a \texttt{dtype}, or ``data type,'' which you can
+access using the ``\texttt{.dtype}'' accessor. You can also call
+``\texttt{.astype(...)}'' to perform data conversion. The types we'll care most
+about are \texttt{np.int32} and \texttt{np.float64} for integers and
+floating-point (``decimal'') numbers, respectively.
+
+\subsubsection{vectorization / broadcasting}
+
+Similar to how you've seen Pandas work, NumPy provides vectorizing and
+broadcasting operations so you can avoid writing and executing loops. For
+example, if you want to add the elements of two arrays together, instead of
+doing something like this:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+for i in range(len(m)):
+    q[i] = m[i] + n[i]
+\end{Verbatim}
+
+you just write this:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+q = m + n
+\end{Verbatim}
+
+Not only is this nicer syntactically, and less typing (and opportunity for
+error), but it's \textit{much, much faster} for large data sets. It cannot be
+overemphasized that you want to avoid loops (and especially nested loops) for
+any serious calculations if you can help it at all. Sometimes this requires
+rewiring your brain a bit to anticipate where you can take advantage of
+vectorized operations.
+
+Play around with this idea using operators like ``\texttt{**}'' and
+``\texttt{<=}''.
+
+In addition to operators, NumPy also provides a number of functions (called
+``\textit{ufuncs}'' or ``universal functions'') that work in a similar way.
+Instead of:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+for i in range(len(f)):
+    g[i] = math.sqrt(f[i])
+\end{Verbatim}
+
+you just write this:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+g = np.sqrt(f)
+\end{Verbatim}
+
+Play around with ufuncs like ``\texttt{np.sin()}'', and
+``\texttt{np.power()}''.
+
+There are also many other standard functions which take an \textit{ndarray}
+and return a single result, like ``\texttt{np.max()}'', ``\texttt{np.any()}'',
+``\texttt{np.cumsum()}'', and many, many others. \textit{Before you ever write
+a loop, take a moment to consider whether it might be a good idea to browse
+the NumPy documentation and avoid it.}
+
+\subsubsection{Reshaping}
+
+NumPy \textit{ndarray}s have a \texttt{.reshape()} function that lets you
+coerce a multi-dimensional array to different dimensions:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+thing = np.array([[1,2,3],[4,5,6],[7,8,9],[10,11,12]])
+print(thing)
+[[ 1  2  3]
+ [ 4  5  6]
+ [ 7  8  9]
+ [10 11 12]]
+
+thing = thing.reshape(2,6)
+print(thing)
+[[ 1  2  3  4  5  6]
+ [ 7  8  9 10 11 12]]
+
+thing = thing.reshape(3,4)
+print(thing)
+[[ 1  2  3  4]
+ [ 5  6  7  8]
+ [ 9 10 11 12]]
+\end{Verbatim}
+
+You can also perform a matrix \textbf{transpose} operation using \texttt{.T}
+(no bananas, note):
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+print(thing.T)
+[[ 1  5  9]
+ [ 2  6 10]
+ [ 3  7 11]
+ [ 4  8 12]]
+\end{Verbatim}
+
+\subsubsection{Slices: warning}
+
+You can take ``slices'' of an \textit{ndarray} just like you can a normal
+Python list, using the colon syntax. Beware, though: \textit{in NumPy, these
+are \textbf{views} on the original list, not copies!} In order to make a copy,
+you must explicitly call ``\texttt{.copy()}'' on the array.
+
+To illustrate the possible weirdness:
+
+\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single]
+x = np.array([4,9,8,3,2])
+y = x[2:4]
+print(y)
+[8 3]
+
+y[1] = 999999999
+print(x)
+[        4         9         8 999999999         2]
+
+\end{Verbatim}
+
+\subsection{Random number generation}
+
+One thing we'll use surprisingly often in Data Science is random number
+generation. NumPy provides a super good library for this, all of which is in
+the namespace \texttt{np.random}. Just about every distribution you can think
+of is present, including:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single]
+print(np.random.normal(10,3,5))
+[ 13.14637747   8.0170962   14.69793015   5.28517005   7.71561529]
+
+print(np.random.normal(10,30,5))
+[ -7.17146      9.32914316   7.63719265  11.72634167  23.12532128]
+
+print(np.random.uniform(6,10,5))
+[ 7.3502029   8.82037522  7.89682321  7.75582494  7.98879983]
+
+print(np.random.exponential(5,5))
+[ 2.41409743  0.59398243  2.12184356  2.04372147  1.56823102]
+
+print(np.random.exponential(50,5))
+[ 47.4720236    6.82838706   5.14356732  60.47055961   0.47463824]
+\end{Verbatim}
+
+In all these examples, the last argument to the function is the desired
+\textit{size} (number of elements) of the resulting array.
+
