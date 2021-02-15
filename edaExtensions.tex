@@ -723,25 +723,19 @@ case, sometimes a good option is to use a \textbf{grouped scatter plot} which
 depicts the categorical values via different styles of point: different colors
 are the most common, but different shapes can be used too.
 
-\index{pairplot@\texttt{pairplot()} (Seaborn)}
+\index{scatterplot@\texttt{scatterplot()} (Seaborn)}
 
-The Seaborn library lets us do this with its \texttt{pairplot()} function. It
-has a lot of parameters, but see if you can make sense of it:
+The Seaborn library's \texttt{scatterplot()} function lets us do this:
 
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
-sns.pairplot(data=books, x_vars=["year"], y_vars=["words"],
-    hue="lang")
+sns.scatterplot(data=books, x="year", y="words", hue="lang")
 \end{Verbatim}
 
-\index{boxies (square brackets)}
-\index{[]@\texttt{[]} (boxies)}
-
-The \texttt{data=books} parameter tells \texttt{pairplot()} which
-\texttt{DataFrame} we want to use. The \texttt{x\_vars} and \texttt{y\_vars}
-parameters are \textit{lists}, notice (in boxies) of what we want on the x and
-y axis of our plot. (I almost always use just one-element lists.) Finally, the
-\texttt{hue="lang"} bit tells Seaborn which variable we want the color -- or
-``hue'' -- to be based on.
+The \texttt{data=books} parameter tells \texttt{scatterplot()} which
+\texttt{DataFrame} we want to use. The \texttt{x} and \texttt{y} parameters
+specify what we want on the x and y axis of our plot, and \texttt{hue="lang"}
+bit tells Seaborn which variable we want the color -- or ``hue'' -- to be based
+on.
 
 The result is in Figure~\ref{groupedscatter}. From it, we can see that (in our
 fictitious data set) although books seem to have been getting shorter over
@@ -752,7 +746,7 @@ here.
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.75\textwidth]{groupedscatter.png}
+\includegraphics[width=0.95\textwidth]{groupedscatter.png}
 \caption{A grouped scatter plot.}
 \label{groupedscatter}
 \end{figure}
@@ -835,7 +829,7 @@ that has particular value(s) for the faceted variable(s).
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.9\textwidth]{scatterplotmatrix.png}
+\includegraphics[width=0.8\textwidth]{scatterplotmatrix.png}
 \caption{A scatter plot matrix of the \texttt{books} \texttt{DataFrame}
 (restricted to only numeric variables).}
 \label{scatterplotmatrix}

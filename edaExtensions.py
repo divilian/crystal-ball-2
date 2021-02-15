@@ -87,7 +87,7 @@ books = books[books.year > 1500]
 #pd.plotting.scatter_matrix(books[['year','words','chaps']], alpha=1,
 #    figsize=(5,5))
 #plt.savefig('scatterplotmatrix.png')
-
+#
 #plt.figure()
 #plot_kws={"s":30}
 #facet = sns.FacetGrid(books, col='lang')
@@ -100,9 +100,8 @@ books = books[books.year > 1500]
 #facet.map(plt.scatter, 'year', 'words', marker=".", color="darkgreen")
 #plt.savefig('scatterplotfacets2d.png')
 
-#plt.figure()
-#sns.set(rc={'figure.figsize':(11,11)})
-#sns.pairplot(data=books,x_vars=["year"],y_vars=["words"],hue="lang",
-#    plot_kws={"s":16})
-#plt.savefig('groupedscatter.png')
-#plt.show()
+plt.figure()
+sns.set(rc={'figure.figsize':(11,11)})
+sns.scatterplot(data=books,x="year",y="words",hue="lang")
+plt.savefig('groupedscatter.png')
+plt.show()
