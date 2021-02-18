@@ -465,6 +465,7 @@ for Republicans). Note that this is \textit{perfectly} correlated with
 \texttt{party}, and to enforce this, we need a different approach.
 
 \index{where@\texttt{where()} (NumPy)}
+\index{np.where@\texttt{np.where()}}
 
 NumPy's \texttt{where()} function comes in handy here. It's tricky but
 powerful. \texttt{np.where()} takes three arguments -- an array of booleans
@@ -719,6 +720,7 @@ that? Just to have a complete set of examples, how about we use ``the year the
 sport was invented.''
 
 \index{where@\texttt{where()} (NumPy)}
+\index{np.where@\texttt{np.where()}}
 \index{nested!function calls}
 We'll use good ol' \texttt{np.where()} again, although there's a bit of a catch
 (pun intended) since we have \textit{three} different values for \texttt{sport}
@@ -799,6 +801,8 @@ athletes['salary'] = salary
 athletes.boxplot("salary", by="sport", notch=True)
 \end{Verbatim}
 
+\index{where@\texttt{where()} (NumPy)}
+\index{np.where@\texttt{np.where()}}
 It's \texttt{np.where()} again. This time, we're generating three complete sets
 of 1000 synthetic salaries: one each to represent baseball, football, and
 basketball players. But then our \texttt{where()} call says ``if the
