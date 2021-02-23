@@ -298,8 +298,9 @@ b['cherry']['rainier']['sweet']) is yes
 Remember, \texttt{len()} plays several roles. When called on a list or array,
 it gives the number of elements; on a dictionary or \texttt{Series}, the number
 of key-value pairs; on a string, the number of characters; and on a
-\texttt{DataFrame}, the number of rows. That's why \texttt{len(b['banana'])}
-and \texttt{len(b['cherry'])} both return 2, even though they're very different
+\texttt{DataFrame}, the number of rows. That's why
+\texttt{len(b[\textquotesingle banana\textquotesingle])}
+and \texttt{len(b[\textquotesingle cherry\textquotesingle])} both return 2, even though they're very different
 types of things.
 
 \index{type@\texttt{type()}}
@@ -426,17 +427,37 @@ variable from the JSON text string.
 
 \end{compactitem}
 
-\index{json file@\texttt{.json} file}
+\index{file object@file object}
 
-So, for instance, to load a file \texttt{info.json} into a Python variable
-called ``\texttt{my\_stuff}'':
+When I refer to ``\textit{aFile}'' in the above list, I'm talking about a
+Python \textbf{file object}, which pros normally obtain using the somewhat
+weird-looking ``\texttt{with}'' syntax. It works like this:
+
+\index{json file@\texttt{.json} file}
+\index{with@``\texttt{with}'' syntax (opening files)}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+with open('whatever.json','r') as f:
+    ...do stuff with the file object f...
+\end{Verbatim}
+
+The name of the file we're opening here is ``\texttt{whatever.json}'', and like
+all files, it must be in the same folder as our Python \texttt{.py} file in
+order for Spyder to find it. The rest of that line is just a pattern to
+memorize. Importantly, the line(s) immediately underneath the ``\texttt{with}''
+in which you use the file object ``\texttt{f}'' are \textit{indented}, just
+like in a \texttt{for} loop or \texttt{if} statement or function
+\texttt{def}inition.
+
+So, to load a file \texttt{info.json} into a Python variable called
+``\texttt{my\_stuff}'', we'd write this code:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 with open('info.json','r') as f:
     my_stuff = json.load(f)
 \end{Verbatim}
 
-We could parse and access the Luke Skywalker file just like this:
+And we could parse and access our Luke Skywalker file just like this:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 with open('luke.json','r') as f:
