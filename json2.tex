@@ -513,7 +513,26 @@ always faster to \textbf{pre-allocate} arrays of the proper length -- or
 perhaps, of a safe ``large enough'' length which we can then truncate at the
 end with a slice -- than to do this repeated-appending approach.
 
-
 Bottom line: once you get your data into a \texttt{DataFrame}, you can bring
 all your powers to bear upon it. Getting it into one is largely a matter of
 looping and selectively extracting.
+
+% TODO: add cheat sheet
+
+%\section*{Cheat sheet}
+%
+%\index{cheat sheet@``cheat sheet'' for JSON}
+%
+%Finally, I end this chapter with a ``cheat sheet'' of the tools that I rely on
+%when dealing with a big JSON file. All of these have already been described in
+%the past two chapters, but here they all are in one handy place:
+
+%- type() to figure out whether something is a list, dictionary, int, float, or string
+%- len() to figure out how long a list is, or how many key/value pairs a dict has
+%- .keys() to see the keys of a dict
+%- [#] to access an element of a list (where "#" is a number)
+%- ['key'] to access a value from a dict (where "'key'" is one of its keys)
+%- for loops to loop through a list
+%- for loops with ".items()" to loop through the key/value pairs in a dict
+%- "in" to see whether a dict has a particular key or not
+
