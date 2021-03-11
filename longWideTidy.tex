@@ -376,12 +376,10 @@ tdf = pd.melt(df, ['religion'], var_name='income',
 
 By the way, the inverse operation of ``melt'' is often called
 ``\textbf{pivot}''. To reverse the above transformation in Pandas, you can use
-the \texttt{.pivot()} method:
-
-% TODO: "long" in the following code is undefined:
+the \texttt{pivot()} function:
 
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
-wide = long.pivot(index='religion', columns='income',
+df = pd.pivot(tdf, index='religion', columns='income',
     values='frequency')
 \end{Verbatim}
 
