@@ -129,12 +129,14 @@ can be measured with the metrics below:
     antecedent is satisfied \textit{relative to how likely the consequent is to
     be satisfied anyway.} Quantitatively, it's $\frac{\textrm{confidence(whole
     rule)}}{\textrm{support\_count(consequent)}}$. A rule's lift is always
-    \textit{between 1 and $\infty$.} A lift of 1 means it's essentially useless:
+    \textit{between 0 and $\infty$.} A lift of 1 means it's essentially useless:
     knowing the antecedent is true doesn't really make the consequent any more
-    likely. The rule ``\{diet\_soda,apples\} $\Rightarrow$ \{beer\}'' has a
-    lift of $\frac{\frac{2}{4}}{\frac{3}{7}} = 1.167$ in the data set above,
-    since diet soda and apples do predict beer somewhat, but it turns out a
-    lot of people (almost half) buy beer anyway.
+    likely. (And a lift of \textit{less than} one means it's \textit{worse}
+    than useless: the antecedent being true actually makes the consequent less
+    likely to be true.) The rule ``\{diet\_soda,apples\} $\Rightarrow$
+    \{beer\}'' has a lift of $\frac{\frac{2}{4}}{\frac{3}{7}} = 1.167$ in the
+    data set above, since diet soda and apples do predict beer somewhat, but
+    it turns out a lot of people (almost half) buy beer anyway.
 
     \end{itemize}
 
