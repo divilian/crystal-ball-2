@@ -1,9 +1,5 @@
-
-% TODO: talk about the "limit" and "offset" fields so common to APIs (including
-% Yelp) whereby you can cursor through pages of results with successive API
-% calls.
-
 \chapter{APIs}
+\label{ch:api}
 
 \index{API}
 \index{CSV file}
@@ -20,12 +16,12 @@ a vast database somewhere, and you need flexibility and power to extract on
 demand exactly the parts you want. This is what a good API lets you do.
 
 API actually stands for ``Application Programming Interface,'' which is a
-pretty uninformative acronym. What it really means is ``a set of functions
-someone has provided for you to call in order to access their data, together
-with clean documentation telling you precisely what each of those functions
-do.'' As you'll see with experience, some APIs are better designed than others,
-and make it easier to get what you want. In this chapter we'll look at two
-examples and generalize some common principles from them.
+pretty uninformative acronym. What it really means, for our purposes, is ``a
+documented way for one program to ask another program for data or services.''
+As you'll see with experience, some APIs are better designed than others,
+and make it easier to get what you want. In this chapter we'll work through one
+main example -- NASA's live feed of near-Earth asteroids, no less -- and
+generalize some common principles from it.
 
 \section{REST APIs}
 \index{REST API}
@@ -50,29 +46,31 @@ retrieve what appear to be pseudo-Web-pages outside our browser.)
 \index{RPC}
 \index{Fielding, Roy}
 
-\item They're simple and elegant. Unlike their predecessor (and competitor)
-protocols SOAP and RPC, REST was designed and promoted by
-people\footnote{Originally Roy Fielding in his 2000 Ph.D. dissertation from
-UC-Irvine.} who didn't like clutter and who wanted communication to be
-streamlined and compactly specified. REST APIs are typically nice to use.
+\item They're generally simple and lightweight. REST became popular in part
+as an alternative to heavier Web-service approaches such as SOAP. It emphasizes
+a uniform interface and the ordinary conventions of the Web, which tends to
+make REST APIs pretty nice to use.
 
 \index{HTTP protocol}
 
-\item They're based directly on the \textbf{HTTP} protocol itself, and under
-the hood make use of the HTTP operations like \texttt{GET}, \texttt{HEAD},
+\item REST APIs on the Web are normally built directly on the \textbf{HTTP}
+protocol, and make use of HTTP methods like \texttt{GET}, \texttt{HEAD},
 \texttt{POST}, \texttt{DELETE}, \texttt{PUT}, \textit{etc.} Because of this,
-different REST APIs tend to be pretty uniform in how they work.
+different REST APIs tend to have a lot in common in how they work.
 
 \index{stateless (protocol)}
 \index{server}
 \index{client}
 
-\item They're ``\textbf{stateless},'' as HTTP is itself. This means the server
-retains no \textit{memory} of the past requests from a client.
-(``\textbf{Server}'' is a word meaning ``a machine on the Internet that you
-want to access,'' and ``\textbf{client}'' here essentially means ``your own
-computer, which makes requests of the server.'') This has some limitations, but
-makes APIs quick and simple to use.
+\item They're ``\textbf{stateless},'' as HTTP is itself. Roughly speaking,
+this means that each request has to stand on its own: the server shouldn't
+need to remember some detail about an earlier request in order to understand
+the current one. The server can certainly maintain databases and other
+persistent data; it's the client's \textit{session state} that isn't carried
+implicitly from one request to the next. (``\textbf{Server}'' is a word
+meaning ``a machine on the Internet that you want to access,'' and
+``\textbf{client}'' here essentially means ``your own computer, which makes
+requests of the server.'')
 
 \index{JSON}
 \index{XML}
@@ -85,8 +83,8 @@ or XML.
 
 \index{RESTful@``RESTful'' API}
 
-APIs that conform to Roy Fielding's original spec are known colloquially as --
-I kid you not -- ``\textbf{RESTful}.'' 
+APIs that follow the constraints of Roy Fielding's REST architectural style
+are known colloquially as -- I kid you not -- ``\textbf{RESTful}.''
 
 \index{Web services}
 \index{SOA (Service-Oriented Architecture)}
@@ -97,17 +95,18 @@ bit broader and communicate something subtly different than just ``the use of
 Web-based APIs'' (REST or otherwise), in practice you will see terms like this
 used jointly to refer to the same technologies. If you hear someone talking
 about ``a Web services approach,'' your ears should perk up and you should
-anticipate being able to apply at least some of the lessons in this module.
+anticipate being able to apply at least some of the lessons in this chapter.
 
 \index{endpoint}
 
 Finally, the term \textbf{endpoint} refers to a particular, addressable part
-of an API that is normally defined by a base URL. For instance, the standard
-Twitter search API is at \url{https://api.twitter.com/1.1/search/tweets.json}
-and the endpoint for getting full information about specific tweets is \url{
-https://api.twitter.com/1.1/statuses/lookup.json}. In general, an API will
-have many different endpoints, each of which defines its own parameters and is
-used for a particular type of information request.
+of an API that is normally defined by a base URL. For instance, NASA's
+near-Earth-object ``feed'' endpoint is at
+\url{https://api.nasa.gov/neo/rest/v1/feed}, and the endpoint for looking up
+everything about one particular asteroid is
+\url{https://api.nasa.gov/neo/rest/v1/neo} followed by that asteroid's ID. In
+general, an API will have many different endpoints, each of which defines its
+own parameters and is used for a particular type of information request.
 
 \section{RESTful APIs and the \texttt{requests} package}
 
@@ -131,247 +130,234 @@ access is the \texttt{.get()} command. It can actually be used to retrieve
 import requests
 class_home_page = requests.get(
     "http://stephendavies.org/data219")
-print(class_home_page.content.decode('utf-8'))
+print(class_home_page.text)
 \end{Verbatim}
 
 \index{HTML}
-\index{content@\texttt{.content} (\texttt{requests} package)}
-\index{decode@\texttt{.decode()} (\texttt{requests} package)}
+\index{text@\texttt{.text} (\texttt{requests} package)}
 \index{Unicode}
 
-That ``\texttt{.content.decode(\textquotesingle utf-8\textquotesingle)}'' thing
-is kind of a pain. The first part (\texttt{.content}) gives you the actual HTML
-code of the page itself (rather than a variable representing the entire
-request/response sequence). The second part says to take that big string and
-interpret it as a format that can represent all \textbf{Unicode} characters.
-Unicode and other character encodings are an interesting subject in their own
-right, but for now, just get in the habit of calling the
-\texttt{.content.decode(\textquotesingle utf-8\textquotesingle)} method on
-every packet of data you get from an API. 
+That ``\texttt{.text}'' on the end gives you the actual contents of the
+response -- the HTML code, in this case -- decoded into one big ordinary
+Python string. Character encodings (like \textbf{Unicode}) are an interesting
+subject in their own right, but happily, \texttt{requests} normally figures
+out the appropriate encoding for text responses from the information the
+server sends along with them.\footnote{If you want the response as raw bytes
+instead -- say, because you're downloading an image -- ask for
+\texttt{.content}. And when a response contains JSON, as most of the ones
+later in this chapter will, we'll normally use \texttt{.json()} instead.}
 
 Anyway, if you run the above code, you'll see the (gnarly) HTML code for the
 entire course web page on your screen as one big string. Seeing this emphasizes
-that \textit{when we execute RESTful API requests, we're really not doing much
-more than accessing ``web pages,'' where ``web page'' here means a set of
-results that the server puts together for us.} This similarity to how browsers
-work is what makes RESTful APIs so simple and powerful.
+that browsers and REST APIs are using much of the same underlying machinery:
+both send HTTP requests to servers and receive responses. A browser commonly
+asks for HTML that it can render as a Web page; an API client commonly asks for
+machine-readable data, such as JSON. This shared HTTP foundation is part of
+what makes REST APIs so straightforward to work with.
 
-% TODO: Apparently, the Star Wars API has been sold and made commercial. :(
-% There's a swapi.tech with ads, and a swapi.dev that my browser says has a
-% security problem.
-
-\section{The Star Wars API}
-\index{SWAPI (Star Wars API)}
-\index{Star Wars}
+\section{The NASA NeoWs API}
+\index{NeoWs (Near Earth Object Web Service)}
+\index{NASA}
+\index{asteroid}
 
 Most of the time we won't get HTML back, but rather a data format such as XML
-or JSON. Predictably, I'll start with a Star Wars example. The SWAPI (Star Wars
-API) is a neat little database that returns JSON data about entities in the
-Star Wars universe. Let's ask it for ``person with ID 13'' (whoever that turns
-out to be):
+or JSON. Our running example will be NASA's \textbf{NeoWs} (``Near Earth
+Object Web Service''), a genuinely live database of the asteroids that pass
+near our planet -- what they're named, how big they are, how close they'll
+come, and whether NASA has flagged them as \textit{potentially hazardous}. I
+submit that this beats any CSV file you've ever been handed.
 
-\index{Chewbacca}
+\index{Apophis (asteroid)}
+
+Let's start by asking it about a single asteroid: number 2099942, better known
+as \textbf{Apophis}, briefly famous in 2004 for having a scarier-than-usual
+chance of hitting us.\footnote{It won't. Astronomers have since ruled out an
+impact for at least a century. You can relax and learn APIs.} 
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-response = requests.get("https://swapi.co/api/people/13")
-print(response.content.decode('utf-8'))
+response = requests.get("https://api.nasa.gov/neo/rest/" +
+    "v1/neo/2099942?api_key=DEMO_KEY")
+print(response.text)
 \end{Verbatim}
 \vspace{-.2in}
 
+(More on that ``\texttt{api\_key}'' business in a moment.)
+
+
+The beginning of the response looks something like this (I've added line
+breaks and omitted some fields so that it fits on the page):
+
 \begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-{'name':'Chewbacca', 'height':'228', 'mass':'112', 'hair_color':'brown',
-'skin_color':'unknown', 'eye_color':'blue', 'birth_year':'200BBY',
-'gender':'male', 'homeworld':'https://swapi.co/api/planets/14/', 'films':
-['https://swapi.co/api/films/2/', 'https://swapi.co/api/films/6/',
-'https://swapi.co/api/films/3/', 'https://swapi.co/api/films/1/',
-'https://swapi.co/api/films/7/'],
-'species':['https://swapi.co/api/species/3/'],
-'vehicles':['https://swapi.co/api/vehicles/19/'], 'starships':
-['https://swapi.co/api/starships/10/',
-'https://swapi.co/api/starships/22/'], 'created':'2014-12-10T16:42:45',
-'edited':'2014-12-20T21:17:50', 'url':'https://swapi.co/api/people/13/'}
+{"links":{"self":"http://api.nasa.gov/neo/rest/v1/neo/2099942?
+api_key=DEMO_KEY"},
+ "id":"2099942",
+ "neo_reference_id":"2099942",
+ "name":"99942 Apophis (2004 MN4)",
+ "designation":"99942",
+ "nasa_jpl_url":"https://ssd.jpl.nasa.gov/tools/sbdb_lookup.html
+#/?sstr=2099942",
+ ...
+ "is_potentially_hazardous_asteroid":true,
+ "close_approach_data":[ ... ]}
 \end{Verbatim}
+
 
 \index{pretty printing@``pretty printing''}
 \index{pprint()@\texttt{pprint()} function}
+\index{json()@\texttt{.json()} (\texttt{requests} package)}
 
-Looks like we got Han Solo's wingman Chewbacca. That output is a little hard on
-the eyes, though. Let's call \texttt{json.loads()} on that string (see
-p.~\pageref{json.loads}) to get a Python dictionary with all Chewie's info, and
-then pretty-print it:
+That's the real thing, but it's awfully hard on the eyes as one giant string.
+Before we use the result, \texttt{raise\_for\_status()} checks whether the
+server reported an HTTP error. Since the response is JSON, we can then ask
+\texttt{requests} to convert it to ordinary Python objects with the
+\texttt{.json()} method,\footnote{\texttt{.json()} is essentially a
+convenience wrapper around JSON decoding; here the result happens to be a
+dictionary.} and pretty-print it:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 from pprint import pprint
-import json
-chewie = json.loads(response.content.decode('utf-8'))
-pprint(chewie)
+response.raise_for_status()
+apophis = response.json()
+pprint(apophis)
 \end{Verbatim}
-\vspace{-.2in}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-{'birth_year': '200BBY',
- 'created': '2014-12-10T16:42:45.066000Z',
- 'edited': '2014-12-20T21:17:50.332000Z',
- 'eye_color': 'blue',
- 'films': ['https://swapi.co/api/films/2/',
-           'https://swapi.co/api/films/6/',
-           'https://swapi.co/api/films/3/',
-           'https://swapi.co/api/films/1/',
-           'https://swapi.co/api/films/7/'],
- 'gender': 'male',
- 'hair_color': 'brown',
- 'height': '228',
- 'homeworld': 'https://swapi.co/api/planets/14/',
- 'mass': '112',
- 'name': 'Chewbacca',
- 'skin_color': 'unknown',
- 'species': ['https://swapi.co/api/species/3/'],
- 'starships': ['https://swapi.co/api/starships/10/',
-               'https://swapi.co/api/starships/22/'],
- 'url': 'https://swapi.co/api/people/13/',
- 'vehicles': ['https://swapi.co/api/vehicles/19/']}
+{'absolute_magnitude_h': 19.09,
+ 'close_approach_data': [ ...loads of stuff... ],
+ 'designation': '99942',
+ 'estimated_diameter': {'kilometers':
+      {'estimated_diameter_max': 0.6134,
+       'estimated_diameter_min': 0.2743},
+      ...more units... },
+ 'id': '2099942',
+ 'is_potentially_hazardous_asteroid': True,
+ 'links': {'self': 'http://api.nasa.gov/neo/rest/v1/neo/
+2099942?api_key=DEMO_KEY'},
+ 'name': '99942 Apophis (2004 MN4)',
+ 'nasa_jpl_url': 'https://ssd.jpl.nasa.gov/tools/
+sbdb_lookup.html#/?sstr=2099942',
+ 'neo_reference_id': '2099942',
+ 'orbital_data': { ...loads more stuff... }}
 \end{Verbatim}
 
 \index{dictionary}
 
-Better. You can see that the API gave us a well-structured chunk of data, in a
-dictionary, which we can explore and manipulate in all the usual ways. Notice
-Note that some of the data consists of \textit{other REST URLs}, which we could
-then choose to further query. This is a sign of a well-written API.
- 
+Better. (I've elided a couple of the giant inner structures so this fits on a
+page.) You can see that the API gave us a well-structured chunk of data, in a
+dictionary, which we can explore and manipulate in all the usual ways --
+including the nested drilling-down we practiced in the JSON chapters. 
+Do notice that the \\
+\texttt{is\_potentially\_hazardous\_asteroid} field is \texttt{True}.
+I told you this was more exciting than a CSV file.
+
 \index{URL}
-\medskip
 
-Let's use the URL we got for Chewie's home world and make another API call to
-retrieve that:
+Notice also that some of the data consists of URLs. The \texttt{links} entry
+points back to this API resource, while \texttt{nasa\_jpl\_url} points instead
+to a human-readable JPL Web page with further information about Apophis. These
+aren't quite the same thing: one is meant for programs like ours, while the
+other is mainly meant for people. We'll see in a moment that NeoWs also embeds
+API URLs that let us \textit{page} through large result sets.
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
-chewie = json.load(response.content.decode('utf-8'))
-pprint(json.loads(requests.get(
-    chewie['homeworld']).content.decode('utf-8')))
-\end{Verbatim}
-\vspace{-.2in}
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-{'climate': 'tropical',
- 'created': '2014-12-10T13:32:00.124000Z',
- 'diameter': '12765',
- 'edited': '2014-12-20T20:58:18.442000Z',
- 'films': ['https://swapi.co/api/films/6/'],
- 'gravity': '1 standard',
- 'name': 'Kashyyyk',
- 'orbital_period': '381',
- 'population': '45000000',
- 'residents': ['https://swapi.co/api/people/13/',
-               'https://swapi.co/api/people/80/'],
- 'rotation_period': '26',
- 'surface_water': '60',
- 'terrain': 'jungle, forests, lakes, rivers',
- 'url': 'https://swapi.co/api/planets/14/'}
-\end{Verbatim}
-
-\index{Kashyyyk}
-
-Cool: now we have information on the planet Kashyyyk, which we could then
-further explore aspects of. We could geek out all day with this.
-
-% TODO: And the Twitter API has of course become X.
-\section{The Twitter API}
-
-Twitter's API uses the same principle, although it's of course larger and more
-complicated. In addition, there's the hurdle of \textit{authenticating} your
-Python program with the API so you can access the data.
+\section{API keys and rate limits}
 
 \subsection{Authentication}
 
 \index{authentication}
+\index{API key}
 \index{rate limit}
-\index{OAuth}
 
-Many APIs require some form of \textbf{authentication}, which essentially
-means you need to provide some personal information to identify you to the
-site. Since we'll be dealing only with open APIs, this isn't a security thing
-as much as it's a ``control of information'' thing. By forcing you to register
-with the site and provide some contact info, the organization retains a
-measure of control and knowledge over how its information is used. Also, many
-sites impose \textbf{rate limits} which constrain how much information an
-account can suck from the site every hour.
+Many APIs require some form of \textbf{authentication}, which means that your
+request includes some credential identifying you, your application, or both.
+With an open-data API like NASA's, the key isn't there to protect secret
+asteroid data from you; among other things, it lets the service identify API
+usage and enforce \textbf{rate limits} that constrain how many requests one
+user can make in a given amount of time.
 
 Every site has a different procedure for this, and the documentation varies
-considerably in helpfulness. It's usually a matter of finding and connecting
-the dots. Twitter, like many sites, uses the \textbf{OAuth} authentication
-protocol (see \url{oauth.net}), an open standard that allows users to grant
-one website permission to access data from another. (You've probably used this
-without realizing it if you've ever enabled some third-party app which then
-caused a confirmation dialog box to pop up saying, ``application so-and-so is
-requesting access to the following information of yours...do you approve?'')
-
-For Twitter, here's the procedure that works as of this writing:
+considerably in helpfulness. NASA's, mercifully, is about the simplest one in
+existence:
 
 \begin{compactenum}
-\item If you're not actually a Twitter user, create a Twitter account.
-\item Sign on to \url{dev.twitter.com}.
-\item Go to \url{apps.twitter.com} and create an ``application.'' For our
-purposes, an application is sort of like a project, of which you can have
-several. It's mainly an organizational thing.
-\item Navigate to your application and choose ``Keys and Access Tokens.''
-Create an Access Token.
+\item Go to \url{https://api.nasa.gov}.
+\item Type in your name and email address.
+\item Your very own \textbf{API key} -- a string of gobbledygook like
+\texttt{6ZbY6...} (mine goes on for forty characters) -- arrives in your inbox
+moments later.
 \end{compactenum}
 
-You will now see, on the ``Keys and Access Tokens'' page, \textit{four} strings
-of gobbledygook, all four of which you'll need:
+\index{DEMO\_KEY@\texttt{DEMO\_KEY}}
 
-\vspace{.1in}
-\begin{compactitem}
-\item A ``consumer key.'' Mine is \texttt{9dFucBtR1P58pJICXGV2gaKhj}.
-\item A ``consumer secret.'' (I'll keep mine secret.)
-\item An ``access token.'' Mine is\\
-\texttt{1019144197-5dhD0p1VbE80kPnzZrhjq43G08iMbguggkn67q1}.
-\item An ``access token secret.'' (I'll keep mine secret.)
-\end{compactitem}
-\normalsize
-\vspace{.1in}
+You'll notice our Apophis request didn't even need your own key: NASA provides
+a communal training-wheels key, literally called \texttt{DEMO\_KEY}, that
+anyone can use without signing up. As of this writing, it's limited to 30
+requests per IP address per hour and 50 per day. That's fine for kicking the
+tires, but it's easy to exhaust -- especially in a classroom, where many
+computers may appear to NASA under the same public IP address. A registered
+NASA API key normally gets a much larger allowance, so get your own if you're
+going to do anything substantial.
 
-What do all these different things mean? Honestly, you don't need to know.
-Just realize they're all necessary components of the way Twitter
-authenticates, and if you just use them all in the right places, you'll be
-able to get to any Twitter data you want, programmatically.
+Unlike fancier schemes, this style of authentication couldn't be simpler to
+\textit{use}: you just pass your key as one more parameter (called
+\texttt{api\_key}) in each request, exactly as we did above. Your personal API
+key should nevertheless be treated like a password: don't post it publicly or
+commit it to a shared Git repository. We'll continue using
+\texttt{DEMO\_KEY} in the printed examples so that no real credential ever
+appears in the book.
 
-(Btw, the second and fourth of those items -- the ``secrets'' -- are not
-supposed to be shared with anyone, nor to appear in human-readable form in
-your source code. For one-off data analysis projects, I confess I don't think
-this is super important.)
+\subsection{Watching your rate limit}
 
-\subsection{Authenticating with the \texttt{requests\_oauthlib} package}
+\index{headers (HTTP)}
 
-\index{requests\_oauthlib@\texttt{requests\_oauthlib} package}
-\index{conda install@``\texttt{conda install}'' command}
-
-To authenticate with OAuth, we'll use Python's \texttt{requests\_oauthlib}
-package. You may have to install it first, by typing ``\texttt{conda install
-requests-oauthlib}'' at your operating system's command line. Then, this code
-should work:
+How do you know where you stand with your hourly allowance? The server tells
+you, in the \textbf{headers} it attaches to every response -- a little
+envelope of metadata that rides along with the actual data:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-from requests_oauthlib import OAuth1
-cons_key = "(your key)"
-cons_secret = "(your consumer secret)"
-access_token = "(your access token)"
-access_secret = "(your access secret)"
-oauth = OAuth1(cons_key, cons_secret, access_token,
-    access_secret)
+print(response.headers['X-RateLimit-Limit'])
+print(response.headers['X-RateLimit-Remaining'])
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+30
+27
 \end{Verbatim}
 
-We now have a variable called \texttt{oauth} which can be passed to functions
-in the \texttt{requests} package to get data.
+\index{caching}
 
-\subsection{HTTP GET parameters}
+Thirty an hour on \texttt{DEMO\_KEY}, and I've already burned three of mine
+writing this chapter. The professional habit that follows from this: make your
+API call \textit{once}, save the JSON you get back to a file, and develop your
+analysis against your saved copy rather than hammering the server on every
+run of your program. This is kinder to NASA, kinder to your rate limit, and --
+bonus -- your code still works when the WiFi doesn't.
+
+One wrinkle to watch for: NeoWs puts the API key back into some of the URLs
+inside its JSON response. If you're using your personal key, therefore, don't
+post the raw saved response publicly without checking it first.
+
+\index{OAuth}
+
+One last word on authentication and authorization: some APIs -- especially
+ones involving a user's private data -- use a fancier, multi-step system
+called \textbf{OAuth} (see \url{oauth.net}). OAuth is an open standard for
+\textit{authorization}: it lets you grant an application limited access to
+data or services on your behalf without simply handing that application your
+password. (You've probably used it without realizing it, whenever some
+third-party app popped up a dialog saying ``application so-and-so is
+requesting access to the following information of yours...do you approve?'')
+The good news is that when you eventually need OAuth, an API's official client
+library or another specialized package will often handle much of the ceremony
+for you.
+
+\section{HTTP GET parameters}
 \index{HTTP}
 \index{get@\texttt{GET} parameter (HTTP)}
 
-The Twitter API is documented at \url{https://dev.twitter.com/docs}, a page
-well worth perusing in detail. You'll see numerous endpoints documented there,
-each of which has its parameters listed when you click through.
+The NeoWs API is documented at \url{https://api.nasa.gov}, a page well worth
+perusing in detail. You'll see its endpoints documented there, each of which
+has its parameters listed.
 
 Conceptually, making an API request is like making a function call: you're
 triggering some operation, passing parameters, and getting a return value. The
@@ -379,11 +365,11 @@ syntax is a bit different though. In Python, you're used to making a function
 call like this:
 
 \begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=single,framesep=3mm]
-get_user_timeline('katyperry',4)     <-- (not real; I'm making this up)
+get_asteroids('2026-03-01','2026-03-07')<--(not real; I'm making this up)
 \end{Verbatim}
 
-to indicate something like ``get the latest four tweets from user
-\texttt{@katyperry}.'' Now in order to ``call'' a ``function'' from the
+to indicate something like ``get all the asteroids passing near Earth during
+the first week of March.'' Now in order to ``call'' this ``function'' from the
 \textit{API} and ``pass'' these ``parameters,'' you code up a URL with syntax
 like this:
 
@@ -393,139 +379,216 @@ like this:
 \normalsize
 \vspace{-.5in}
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=lines,framesep=3mm]
-https://api.twitter.com/1.1/statuses/user_timeline.json?scre
-en_name=katyperry&count=4
+https://api.nasa.gov/neo/rest/v1/feed?start_date=2026-03-01&
+end_date=2026-03-07&api_key=DEMO_KEY
 \end{Verbatim}
 
 Stare at all that nonsense. Note that our ``parameters'' are expressed as
 key/value pairs, with no spaces, at the end of the URL: after a ``\texttt{?}'',
-and each separated by ``\texttt{\&}'' signs. The following code, then:
+and each separated by ``\texttt{\&}'' signs.
+
+\index{params@\texttt{params} argument (\texttt{requests})}
+
+Now, you \textit{can} build such URLs by gluing strings together, and it's
+worth doing a couple times just to feel the machinery. But the
+\texttt{requests} package will happily do the punctuation for you: hand
+\texttt{.get()} a plain dictionary of your parameters via its \texttt{params}
+argument, and it assembles the URL itself:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-four_from_katy = json.loads(requests.get(
-   "https://api.twitter.com/1.1/statuses/" +
-      "user_timeline.json?screen_name=katyperry&count=4",
-         auth=oauth).content.decode('utf-8'))
-
-for tweet in four_from_katy:
-   print(tweet.text)
-\end{Verbatim}
-\normalsize
-
-produces this result (as of today):
-
-\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=single,framesep=3mm]
-Sending <3 out to all of you on this #ShoesdayTuesday! I will be
-donating 10% from the sale of every shoe and handb...
-https://t.co/TsyHuFquc6
-
-this is how you wash with styyylesss https://t.co/C7rlCUGv9Y
-
-OMGEE We're leaving it to you, America! We couldn't choose between
-@GraceLeermusic & @LaurenMascitti so we're leavi...
-https://t.co/OH2X3o9XAV
-
-It's the end of the #AmericanIdol journey for #DemiRae - but the
-beginning of a new journey for her. Keep being the...
-https://t.co/P5Fqx2Q7l5
+response = requests.get(
+    "https://api.nasa.gov/neo/rest/v1/feed",
+    params={ 'start_date': '2026-03-01',
+             'end_date': '2026-03-07',
+             'api_key': 'DEMO_KEY' },
+    timeout=10)
+response.raise_for_status()
+print(response.url)
+feed = response.json()
 \end{Verbatim}
 
-\section{URL encoding}
+The \texttt{timeout=10} is another good habit: it tells
+\texttt{requests} not to sit around forever if the server stops responding.
 
-Sometimes the parameters you want to put into a URL contain spaces or
-punctuation characters. You'll need to encode those properly in order for the
-URL to be valid and for the API to not get confused.
+\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+https://api.nasa.gov/neo/rest/v1/feed?start_date=2026-03-01&
+end_date=2026-03-07&api_key=DEMO_KEY
+\end{Verbatim}
 
-If a value you want to pass contains a space, you'll need to convert that space
-to a plus sign (``\texttt{+}''). The search endpoint for Twitter is
-\texttt{https://api.twitter.com/1.1/search/tweets.json}, for example, and
-requires a ``\texttt{q}'' parameter with your query string. I could search for
-Star Wars toys with:
+Same URL, zero chances to mistype an ampersand. Let's see what a week of
+asteroids looks like, structurally:
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-toys = json.loads(requests.get(
-   "https://api.twitter.com/1.1/search/tweets.json?q=" +
-      "star+wars+toys&count=5",auth=oauth).content.decode(
-          'utf-8'))
-\end{Verbatim}
-
-Note how instead of putting ``\texttt{star wars toys}'' in the URL, I put
-``\texttt{star+wars+toys}''. In case you're in a shopping mood, btw, this
-endpoint returns a dictionary of information:
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-print(toys.keys())
-\end{Verbatim}
-\vspace{-.4in}
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-['statuses', 'search_metadata']
-\end{Verbatim}
-
-\smallskip
-It looks like the tweets themselves (``statuses'') are in the \texttt{statuses}
-key, so:
-
-\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
-for tweet in toys['statuses']:
-    print(tweet['text'])
+print(feed['element_count'])
+print(list(feed['near_earth_objects'].keys()))
 \end{Verbatim}
 \vspace{-.2in}
 
-\begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=3mm,framerule=1mm]
-The #StarWars portfolio of #toys is about to get bigger. #Hasbro
-announced it’s going to make #JabbatheHutt's sail...
-https://t.co/FYC1DLftXX
+At the time this example was prepared, the result looked like this:
 
-RT @hottoysofficial: #HotToys 1/6th scale #ObiWanKenobi (Regular
-& Deluxe Version) collectible figures from #StarWars EP3 are
-available for...
-
-HotToys Old Luke Skywalker Star Wars Movie Series 12'' Man Figure
-Collection https://t.co/NbHgtpnDwi #Toys https://t.co/ejrGXjVT3F
-
-Star Wars Black Series  6" Rey (JEDI TRAINING )Toys R Us
-Exclusive https://t.co/ArxT9kPjZt https://t.co/lcLbp7pwjG
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+40
+['2026-03-01', '2026-03-02', '2026-03-03', '2026-03-04',
+ '2026-03-05', '2026-03-06', '2026-03-07']
 \end{Verbatim}
-\normalsize
 
-\bigskip
+Forty asteroids in one week, and note the API designers' interesting
+structural choice: \texttt{near\_earth\_objects} is a dictionary whose
+\textit{keys are the dates}, each mapped to a list of that day's asteroids.
+File that fact away; we'll need it when we flatten this thing at the end of
+the chapter.
+
+(A heads-up: when \textit{you} run this, don't expect exactly forty, even
+though these dates are fixed in the past. The catalog behind this API is
+alive: small asteroids are routinely discovered \textit{after} they've
+already flown past us, and each new discovery is filed retroactively into
+the date of its approach, so a ``historical'' week quietly grows over time.
+Your query is frozen; the database isn't. Which is one more argument for
+the habit from earlier in this chapter -- save the response to a file, and
+your analysis stands on data that holds still.)
+
+\section{URL encoding}
+
+Sometimes the parameters you want to put into a URL contain spaces,
+punctuation, or other characters that can't simply be dropped into a query
+string as-is. These values have to be \textbf{URL encoded}. Depending on the
+encoding being used, for instance, a space may appear as ``\texttt{+}'' or as
+``\texttt{\%20}'', and other special characters are commonly represented by
+a percent sign followed by two hexadecimal digits.
 
 \index{percent syntax}
 \index{urllib@\texttt{urllib} package}
 \index{quote\_plus@\texttt{quote\_plus()} function (\texttt{urllib})}
 
-If you have weird characters other than spaces, you have to convert them to a
-``percent syntax'' in which you encode each weird character as a percent sign
-followed by the proper two hexadecimal digits. This is a pain to do by hand,
-but don't worry: the \texttt{quote\_plus()} function from the
-\texttt{urllib.parse} package makes things easy:
+You normally won't need to do this by hand. Python's
+\texttt{quote\_plus()} function illustrates the idea:
 
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 import urllib.parse
 print(urllib.parse.quote_plus(
-    "http://cs.umw.edu/star wars toys! 20% off"))
+    "star wars toys! 20% off"))
 \end{Verbatim}
 \vspace{-.2in}
 
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
-'http%3A%2F%2Fcs.umw.edu%2Fstar+wars+toys%21+20%25+off'
+star+wars+toys%21+20%25+off
 \end{Verbatim}
 
-Now, instead of using the original URL that had the illegal characters (like
-``\texttt{!}'' and space and ``\texttt{\%}''), we can just use the
-\texttt{quote\_plus()}'d version in its place when we call the API.
+Here \texttt{quote\_plus()} encoded one \textit{parameter value}; we wouldn't
+run an entire API URL through it. And in ordinary \texttt{requests} code,
+there's an even easier answer: pass your parameter values through
+\texttt{params=} as above and let \texttt{requests} encode them for you.
+That's what it's for.
+
+\section{Paging through results}
+\index{pagination}
+
+A courteous API won't dump ten years of data on you in one response, no matter
+how nicely you ask. Instead it caps each response at a sane size and gives you
+a way to ask for the \textit{next} chunk. NeoWs, for instance, will hand over
+at most one week of asteroids per request -- and look what else was hiding in
+our feed:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+pprint(feed['links'])
+\end{Verbatim}
+\vspace{-.2in}
+
+\begin{Verbatim}[fontsize=\scriptsize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+{'next': 'http://api.nasa.gov/neo/rest/v1/feed?start_date=
+2026-03-07&end_date=2026-03-13&api_key=DEMO_KEY',
+ 'prev': 'http://api.nasa.gov/neo/rest/v1/feed?start_date=
+2026-02-23&end_date=2026-03-01&api_key=DEMO_KEY',
+ 'self': 'http://api.nasa.gov/neo/rest/v1/feed?start_date=
+2026-03-01&end_date=2026-03-07&api_key=DEMO_KEY'}
+\end{Verbatim}
+
+There are those embedded REST URLs again: the API has pre-built the requests
+for the \textit{following} week and the \textit{previous} week and handed them
+to us, ready to use. Collecting a longer stretch of data is therefore just a
+loop -- follow \texttt{next} until you've had enough:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+url = "https://api.nasa.gov/neo/rest/v1/feed?" + \
+    "start_date=2026-03-01&api_key=DEMO_KEY"
+weeks = []
+for i in range(4):                    # four weeks' worth
+    response = requests.get(url, timeout=10)
+    response.raise_for_status()
+    page = response.json()
+    weeks.append(page)
+    url = page['links']['next'].replace(
+        "http://", "https://", 1)
+\end{Verbatim}
+
+That last \texttt{replace()} is a NeoWs-specific wrinkle: at the time of this
+writing, the service puts \texttt{http://} rather than \texttt{https://} in
+its embedded paging links. We'll switch it back to HTTPS before making the
+next request.
+
+Other APIs do the same job with \texttt{limit} and \texttt{offset} parameters
+instead (``give me 50 results, starting at result 200''), but the idea is
+identical: keep asking, politely, until you have what you need. Do remember
+that every page is a fresh request as far as your rate limit is concerned --
+which is one more reason to fetch once and save your results to a file.
+
+\section{From JSON to \texttt{DataFrame}}
+\index{DataFrame@\texttt{DataFrame} (Pandas)}
+\index{flattening (JSON)}
+
+Time for the payoff. A nested dictionary is nice to poke around in, but our
+analysis tools want a good old flat \texttt{DataFrame}: one row per asteroid,
+one column per attribute. The date-keyed structure we noted earlier tells us
+exactly what to write -- an outer loop over the dates, an inner loop over each
+date's asteroids:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
+import pandas as pd
+rows = []
+for date, asts in feed['near_earth_objects'].items():
+    for a in asts:
+        rows.append({
+            'date': date,
+            'name': a['name'],
+            'hazardous':
+                a['is_potentially_hazardous_asteroid'],
+            'miss_km': float(a['close_approach_data'][0]
+                ['miss_distance']['kilometers']),
+        })
+asteroids = pd.DataFrame(rows)
+print(asteroids.sort_values('miss_km').head(3))
+\end{Verbatim}
+\vspace{-.2in}
+
+For this particular snapshot of the data, the three smallest distances were:
+
+\begin{Verbatim}[fontsize=\small,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
+          date            name  hazardous       miss_km
+41  2026-03-05    (2026 DQ2)        False  8.913411e+05
+7   2026-03-01    (2019 XQ1)        False  2.317744e+06
+55  2026-03-07    (2013 FA7)         True  4.960023e+06
+\end{Verbatim}
+
+\index{float()@\texttt{float()} function}
+
+One thing deserves a callout: that \texttt{float()}. NeoWs sends its
+miss-distances as \textit{strings} -- \texttt{"891341.1"}, quotes and all --
+so before you can sort or do arithmetic on them, you must convert them
+yourself. Welcome to real data. One \texttt{float()} and we're respectable
+again.
+
+And that's the whole trip: from a live NASA service on the open Internet to a
+sorted \texttt{DataFrame} of that week's closest approaches, in about a dozen
+lines of Python. This is the reason APIs earn their ``sort of the best''
+title.
 
 \section{Specialized packages}
 
-For many popular APIs, including Twitter, you may find Python packages written
-to streamline and hide some of the protocol idiosyncrasies. These may be
-easier to use, depending on how well written and maintained they are. For
-Twitter, there are numerous ones: \texttt{python-twitter},
-\texttt{TwitterAPI}, \texttt{tweepy}, \texttt{TweetPony}, \texttt{twython},
-and more. This is a testimony to how powerful (and common) it is to be able to
-access data through external APIs.
-
-% TODO: ADD SECTION FOR FOOD2FORK
-
-
+For many popular APIs, you may find Python packages written to streamline and
+hide some of the protocol idiosyncrasies -- wrappers exist for everything from
+Reddit to Spotify to, yes, NASA itself. These may be easier to use, depending
+on how well written and maintained they are. Underneath, though, wrappers for
+REST APIs are generally handling the same machinery you now understand:
+endpoints, parameters, authentication, HTTP requests, and structured responses
+such as JSON. That so many such packages exist is a testimony to how powerful
+(and common) it is to be able to access data through external APIs.
