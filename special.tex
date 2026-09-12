@@ -419,13 +419,16 @@ the edges run across the middle.
 \subsection{Representations}
 
 \index{igraph@\texttt{igraph} (package)}
+\index{networkx@\texttt{networkx} (package)}
 \index{Cs\'{a}rdi, G\'{a}bor}
+\index{Hagberg, Aric}
 
-When we use a graph package like \texttt{igraph}, by G\'{a}bor Cs\'{a}rdi, we
-can ignore details about \textit{how} the graph we're working with is
-represented under the hood. (Hint: it's not a bunch of circles and lines.)
-However, there will be times when we need to retrieve, modify, or manipulate
-one or more of these representations, so let's learn what they are.
+When we use a graph package like \texttt{igraph} by G\'{a}bor Cs\'{a}rdi, or
+\texttt{networkx} by Aric Hagberg, we can ignore details about \textit{how} the
+graph we're working with is represented under the hood. (Hint: it's not a bunch
+of circles and lines.) However, there will be times when we need to retrieve,
+modify, or manipulate one or more of these representations, so let's learn what
+they are.
 
 \subsubsection{Edge list}
 
@@ -437,7 +440,6 @@ is via an \textbf{edge list}, which is very much like a CSV file or
 \texttt{DataFrame}. Each line gives two vertex names or IDs, which are
 connected by an edge.
 
-\pagebreak
 \begin{multicols}{2}
 \begin{center}
 \includegraphics[width=0.48\textwidth]{second_example.pdf}
@@ -675,10 +677,11 @@ person is not so much one with a lot of friends, but rather one with a lot of
 \textit{popular} friends.)
 
 \index{igraph@\texttt{igraph} (package)}
+\index{networkx@\texttt{networkx} (package)}
 
 The math involved is beyond the scope of this course, but if you've had some
-matrix algebra it's not too hard, and of course \texttt{igraph} can do the
-heavy lifting for us.
+matrix algebra it's not too hard, and of course \texttt{igraph} or
+\texttt{networkx} can do the heavy lifting for us.
 
 % TODO: Star Wars graphs!
 
