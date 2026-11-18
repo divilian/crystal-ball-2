@@ -1,158 +1,180 @@
-% To compile:
-%   pdflatex crystal2.tex
-%   makeindex crystal2.idx
-%   pdflatex crystal2.tex
-
-% To add: (teach in spring 2019, and add to notes for 2020)
-% weighted averages
-% updating a Pandas DF
-% First lesson review: Scatterplot matrices (how to do in Python)
-% How to find API documentation and use it effectively
-% The data exploration checklist
-% "Recoding" (?)
-% Rescaling and z-scores (already in kNN chapter, but bust it out earlier)
-% Regular expressions (mentioned on p.77)
-% facets
-% heatmaps
-% basic text mining
-% logistic regression (?)
-% clustering algorithms
-\documentclass[11pt]{memoir}
-\usepackage[usenames,dvipsnames]{color}
-\usepackage{dingbat}
-\usepackage{bbding}  % for checkmark and X
-\usepackage{array}           % For double-column exercises.
-\usepackage{longtable}       % For double-column exercises.
-\usepackage[normalem]{ulem}  % For strikethrough.
-\usepackage{paralist}
-\usepackage{enumitem}        % To "resume" enumerated lists.
-\usepackage{epsfig}
-\usepackage[nokeyprefix]{refstyle}
-\usepackage{afterpage}
-\usepackage{changepage}
-\usepackage{aurical}
-\usepackage[T1]{fontenc}
-\usepackage{varwidth}
-\usepackage{multicol}
-\usepackage{vwcol}
-\usepackage{fancybox}
-\usepackage{makeidx}
-\usepackage{textcomp}
-\usepackage{fancyvrb}
-\usepackage{footnote}
-\usepackage{makecell}
-\usepackage{amsmath,amsthm,amsfonts,amssymb,latexsym}
-\usepackage{MnSymbol}
-\usepackage{wasysym}
-\usepackage{float}
-\usepackage{wrapfig}
-\usepackage{upquote}
-\usepackage{framed}
-\usepackage[svgnames]{xcolor}
-\usepackage[hidelinks]{hyperref}
-\usepackage[width=.8\textwidth,singlelinecheck=true,skip=1pt,font=small,labelfont=bf]{caption}
-\usepackage{graphicx}
-
-% Lulu.com
-%\setstocksize{23.389cm}{15.593cm}
-%\settrimmedsize{\stockheight}{\stockwidth}{*}
-%\settrims{0pt}{0pt}
-
-% Blurb.com
-% Blueprints is 312 pages
-% Crystal Ball 1 is 302 pages, pushed to 306
-
-\setstocksize{9.25in}{6.125in}
-\settrimmedsize{9in}{6in}{*}
-\settrims{.125in}{.125in}
-
-% Amazon.com
-%\setstocksize{9in}{6in}
-%\settrimmedsize{9in}{6in}{*}
-%\settrims{0pt}{0pt}
-
-\setlxvchars
-\settypeblocksize{*}{\lxvchars}{1.618}
-
-%\setlrmargins{*}{*}{.618}
-\setlrmargins{*}{1.2cm}{.618}
-
-% Lulu.com
-%\setulmargins{110pt}{*}{*}
-
-% Blurb.com
-\setulmargins{80pt}{*}{*}
-\setheaderspaces{50pt}{*}{1.618}
-
-\checkandfixthelayout
-
-\newcommand{\freakingtilde}{\raisebox{0.5ex}{\texttildelow}}
-%\captionsetup{width=.9\textwidth}
-
-\makesavenoteenv{tabular}  % to allow footnotes in tables
-\makesavenoteenv{figure}  % to allow footnotes in tables
-
-\definecolor{darkgreen}{rgb}{0,.55,0}
-\definecolor{darkred}{rgb}{.75,0,0}
-
-%\usepackage{enumerate}
-
-% Crazy macro from:
-% https://tex.stackexchange.com/questions/36401/drawing-boxes-around-words
-\def\bluebox#1{\leavevmode \setbox0=\hbox{#1}%
-   \dimen0=\wd0 \edef\posxA{\expandafter\ignorept\the\dimen0 \space}%
-   \hbox{\kern3pt\pdfliteral{q .8 .8 1 rg .8 .8 1 RG .9963 0 0 .9963 0 0 cm 1
-j 1 J 6 w
-                             0 0 m 0 5 l \posxA 5 l \posxA 0 l 0 0 l B Q}%
-         \box0 \kern3pt}%
+% crystal2-a11y.tex -- ACCESSIBILITY SMOKE TEST: front matter + ONE chapter (knn1).
+%
+% Build with pdfLaTeX on TeX Live 2026 (or LaTeX 2025-11-01+):
+%   pdflatex crystal2-a11y.tex
+%   makeindex crystal2-a11y.idx      (optional for the test)
+%   pdflatex crystal2-a11y.tex
+% or just:  latexmk -pdf crystal2-a11y.tex
+%
+% After compiling, grep the .log for "tagpdf" warnings before uploading to Canvas.
+%
+% \DocumentMetadata MUST be the very first thing in the file (before
+% \documentclass) and may only appear once.
+\DocumentMetadata{
+  lang        = en-US,
+  pdfstandard = ua-2,     % PDF 2.0 + PDF/UA-2: the tagging project's primary target
+  tagging     = on,
+  % If Ally reports the file as untagged / heading-less even though it isn't,
+  % swap the pdfstandard line above for these two (PDF 1.7 + PDF/UA-1):
+  % pdfversion  = 1.7,
+  % pdfstandard = ua-1,
 }
-{\lccode`\?=`\p \lccode`\!=`\t  \lowercase{\gdef\ignorept#1?!{#1}}}
+
+\documentclass[11pt]{book}   % was memoir, which is currently-incompatible with tagging
+
+% -----------------------------------------------------------------------------
+% Page layout -- replaces memoir's \setstocksize ... \checkandfixthelayout block.
+% These values were measured from memoir itself with the book's layout commands,
+% so the typeblock matches the print edition exactly (317pt x 514.2pt, spine
+% margin 82.47pt, fore-edge 1.2cm, upper margin 80pt, headsep 16.4pt).
+% The online build uses the trimmed 6in x 9in page; for a Blurb print build add
+% paperwidth=6.125in, paperheight=9.25in and geometry's layout* keys for the
+% .125in trims.
+% -----------------------------------------------------------------------------
+\usepackage[paperwidth=6in, paperheight=9in,
+            textwidth=317pt, textheight=514.2pt, outer=34.14pt, top=80pt,
+            headheight=13.6pt, headsep=16.4pt, footskip=27.46pt]{geometry}
+
+% -----------------------------------------------------------------------------
+% Packages kept -- all listed as compatible or partially-compatible with tagging.
+% -----------------------------------------------------------------------------
+\usepackage[svgnames,dvipsnames]{xcolor}   % replaces color + xcolor; AliceBlue is from svgnames
+\usepackage{array}
+\usepackage{multicol}
+\usepackage[T1]{fontenc}
+\usepackage{makeidx}
+\usepackage{fancyvrb}
+\usepackage{dingbat}     % \leftthumbsup / \leftthumbsdown item labels (spyder, datesTimes, longWideTidy).
+                         % MUST come before amssymb/MnSymbol: dingbat \newcommand's \checkmark,
+                         % amsfonts only defines it if undefined, MnSymbol overrides silently.
+                         % Partially compatible: the glyphs lack ToUnicode, which Ally doesn't check.
+\usepackage{amsmath,amsthm,amsfonts,amssymb,latexsym}
+\usepackage{MnSymbol}    % OK under pdfLaTeX. Drop it if you ever move to LuaLaTeX + MathML (no luamml support).
+\usepackage{upquote}
+\usepackage{graphicx}    % \includegraphics[alt={...}] / [artifact] is the alt-text interface
+\usepackage[hidelinks]{hyperref}
+\hypersetup{
+  pdftitle  = {The Crystal Ball Instruction Manual, Volume Two: Foundations for Data Science},
+  pdfauthor = {Stephen Davies and Evan Coleman},
+  pdfdisplaydoctitle = true,   % viewers show the title instead of the file name
+}
+
+% -----------------------------------------------------------------------------
+% Removed from the original preamble
+%   Incompatible with tagging and used nowhere in the book:
+%     ulem wrapfig float fancybox varwidth vwcol changepage afterpage footnote
+%     (+ \makesavenoteenv) epsfig refstyle makecell longtable textcomp enumitem
+%   Partially compatible (missing ToUnicode) but used nowhere in the book:
+%     bbding wasysym aurical
+%   Incompatible and dropped -- captions revert to the class default look:
+%     caption
+%   Replaced below: paralist (compactitem/compactenum), the \FV@BeginVBox
+%     "bgcolor" hack (ShadedCode), framed's shaded (commented tcolorbox shim)
+%   \VerbatimFootnotes: exactly one footnote in the book (synthetic2.tex) has
+%     verbatim material in it -- rewrite that one instead.
+%   \bluebox / \ignorept / custommargins: unused.
+% -----------------------------------------------------------------------------
+
+% ---- paralist replacement: 40 compactitem + 13 compactenum, none with optional args.
+% The tight spacing is lost for now: the kernel's new list code documents start=
+% and resume= but not (yet) enumitem's nosep/itemsep keys. Restore compactness
+% later with the classic \itemsep/\parsep/\topsep lengths.
+\NewDocumentEnvironment{compactitem}{}{\begin{itemize}}{\end{itemize}}
+\NewDocumentEnvironment{compactenum}{}{\begin{enumerate}}{\end{enumerate}}
+
+% ---- Table helpers. Macros rather than raw \tagpdfsetup so the same chapter
+% source also compiles under the old memoir/print preamble -- add there:
+%   \providecommand{\HeaderRows}[1]{} \providecommand{\HeaderCols}[1]{}
+%   \providecommand{\HeaderRowsCols}[2]{} \providecommand{\LayoutTable}{}
+%   and the ShadedCode / ShadedCodeFn environments defined further down
+% The tagging code's table settings are STICKY (they apply to every later table
+% until changed), so each macro sets all three keys explicitly and every table
+% gets exactly one of these immediately before it.
+\newcommand{\HeaderRows}[1]{\tagpdfsetup{table/tagging=true, table/header-rows={#1}, table/header-columns={}}}
+\newcommand{\HeaderCols}[1]{\tagpdfsetup{table/tagging=true, table/header-rows={}, table/header-columns={#1}}}
+\newcommand{\HeaderRowsCols}[2]{\tagpdfsetup{table/tagging=true, table/header-rows={#1}, table/header-columns={#2}}}
+\newcommand{\LayoutTable}{\tagpdfsetup{table/tagging=false}}             % alignment-only table:
+%   no table structure at all, content tagged as running text. (Not
+%   'presentation': that keeps a Table structure with an ARIA role, and math
+%   cells then open their Formula before the cell's TD -> invalid nesting.)
+
+% ---- Replacement for the BVerbatim "bgcolor=AliceBlue" blocks (10, all in
+% databases.tex). bgcolor= is NOT a fancyvrb key: the print preamble creates it
+% by redefining fancyvrb's box internals (\FV@BeginVBox / \FV@EndVBox) to wrap
+% the finished box in a \colorbox. That patch would silently override whatever
+% the tagging code does to the same internals, so here the same picture is
+% built from public API only: BVerbatim in an lrbox, then \colorbox. (frame=
+% and framesep= on the originals never did anything -- fancyvrb draws frames
+% for Verbatim only -- so the look is identical: blue fill, no rule.)
+% Two argument-free environments: an optional argument would swallow the line
+% end that BVerbatim needs, so the font size is baked into the name.
+% Print preamble: the same two definitions work there unchanged (they need
+% only fancyvrb and xcolor's svgnames), so add them alongside the bgcolor hack.
+\newsavebox{\CBcodebox}
+\newenvironment{ShadedCode}
+  {\VerbatimEnvironment\begin{lrbox}{\CBcodebox}\begin{BVerbatim}[fontsize=\small]}
+  {\end{BVerbatim}\end{lrbox}\noindent\colorbox{AliceBlue}{\usebox{\CBcodebox}}}
+\newenvironment{ShadedCodeFn}
+  {\VerbatimEnvironment\begin{lrbox}{\CBcodebox}\begin{BVerbatim}[fontsize=\footnotesize]}
+  {\end{BVerbatim}\end{lrbox}\noindent\colorbox{AliceBlue}{\usebox{\CBcodebox}}}
+
+% ---- framed's "shaded" (3 uses: longWideTidy.tex, featureSelection.tex).
+% framed is incompatible with tagging, so the box is drawn with tcolorbox.
+% tcolorbox >= 6.9.0 tags basic boxes itself (6.10.0 also fixed
+% \newtcolorbox-defined boxes, tagging-project #1114); Overleaf's TeX Live 2026
+% image has 6.10.0, so a plain wrapper is all that is needed. Two rules for the
+% chapters: each use must be preceded and followed by a blank line, and a list
+% inside the box should be a native enumerate/itemize, not compactenum/
+% compactitem -- the wrapper environments below add a group boundary that
+% interferes with the kernel's end-of-list handling when the list is the last
+% thing in a box.
+\usepackage{tcolorbox}
+\providecolor{shadecolor}{rgb}{.84,.84,1}
+\NewDocumentEnvironment{shaded}{}
+  {\begin{tcolorbox}[colback=shadecolor, colframe=shadecolor, boxrule=0pt,
+                     sharp corners, left=2pt, right=2pt, top=2pt, bottom=2pt]}
+  {\end{tcolorbox}}
+% For a tcolorbox older than 6.9.0 (TeX Live 2025 images), replace the
+% definition above with this one, which does by hand what 6.9.0+ does itself:
+% neutralise the kernel's minipage plugs around the box and mark the
+% background drawing as an artifact. Never switch paragraph tagging off inside
+% the environment: the content's closing \par must run with tagging on.
+%\ExplSyntaxOn
+%\NewDocumentEnvironment{shaded}{}
+%  {
+%    \cs_if_exist:NT \socket_if_exist:nT
+%      { \socket_if_exist:nT { tagsupport/minipage/before }
+%          { \AssignTaggingSocketPlug{minipage/before}{noop}
+%            \AssignTaggingSocketPlug{minipage/after}{noop} } }
+%    \pgfkeysifdefined{/tikz/artifact/.@cmd}
+%      { \tikzset{every~picture/.append~style={artifact}} } {}
+%    \begin{tcolorbox}[colback=shadecolor, colframe=shadecolor, boxrule=0pt,
+%                      sharp~corners, left=2pt, right=2pt, top=2pt, bottom=2pt]
+%  }
+%  { \end{tcolorbox} }
+%\ExplSyntaxOff
+% FALLBACK if the Parent-Child warnings still appear at the box: no tcolorbox
+% at all -- the kernel's own \colorbox + \parbox, used the way the minipage
+% tagging expects them (inside a paragraph). Comment out the definition above
+% and uncomment this one. (Body is grabbed as an argument: fine for these three
+% boxes, which contain only text and lists.)
+%\NewDocumentEnvironment{shaded}{+b}
+%  {\par\noindent\colorbox{shadecolor}{\parbox{\dimexpr\linewidth-2\fboxsep\relax}{#1}}\par}
+%  {}
+
+\definecolor{darkgreen}{rgb}{0,.55,0}   % defined but unused in the chapters; harmless
+\definecolor{darkred}{rgb}{.75,0,0}
 
 \makeindex
 
-\newenvironment{custommargins}[2]%
-  {\addtolength{\leftskip}{#1}\addtolength{\rightskip}{#2}}{\par}
-
-%% Set left margin - The default is 1 inch, so the following
-%% command sets a 2-inch left margin.
-%\setlength{\oddsidemargin}{1in}
-%\setlength{\evensidemargin}{0in}
-%% Set width of the text - What is left will be the right margin.
-%% In this case, right margin is 8.5in - 1.25in - 6in = 1.25in.
-%\setlength{\textwidth}{5.5in}
-%
-%% Set top margin - The default is 1 inch, so the following
-%% command sets a 0.75-inch top margin.
-%\setlength{\topmargin}{.75in}
-%
-%% Set height of the text - What is left will be the bottom margin.
-%% In this case, bottom margin is 11in - 0.75in - 9.5in = 0.75in
-%\setlength{\textheight}{7.25in}
-
 \setlength{\parindent}{0pt}
-\setlength{\baselineskip}{1.5pt}
 \setlength{\parskip}{6pt}
-
-\makeatletter
-\newif\ifFV@bgcolor
-\newbox\FV@bgbox
-\define@key{FV}{bgcolor}{\FV@bgcolortrue\def\FV@bgcolor{#1}}
-
-\def\FV@BeginVBox{%
-  \leavevmode\ifFV@bgcolor\setbox\FV@bgbox=\fi
-  \hbox\ifx\FV@boxwidth\relax\else to\FV@boxwidth\fi\bgroup
-  \ifcase\FV@baseline\vbox\or\vtop\or$\vcenter\fi\bgroup}
-\def\FV@EndVBox{\egroup\ifmmode$\fi\hfil\egroup
-  \ifFV@bgcolor\colorbox{\FV@bgcolor}{\box\FV@bgbox}\fi}
-\makeatother
-
-\VerbatimFootnotes
 
 \begin{document}
 
 \title{{\huge The Crystal Ball Instruction Manual}\\{\large Volume Two:
 Foundations for Data Science}\\
-{\small version 1.5}}
+{\small version 1.5 -- accessibility test build}}
 \author{Stephen Davies, Ph.D., and Evan Coleman, Ph.D.\\Computer Science Department\\University of Mary Washington}
 \date{}
 \maketitle
@@ -161,65 +183,45 @@ Foundations for Data Science}\\
 \frontmatter
 
 \renewcommand{\contentsname}{Contents}
-
 \setcounter{tocdepth}{0}
 \tableofcontents
 
-%\include{preface}
-
-\setcounter{chapter}{0}
-
 \mainmatter
-\include{intro}
-\include{spyder}
-\include{edaExtensions}
-\include{kde}
-\include{synthetic1}
-\include{synthetic2}
-\include{json1}
-\include{json2}
-\include{lowess}
-\include{fusion}
-\include{longWideTidy}
-\include{datesTimes}
-\include{logs}
-\include{databases}
-\include{screenScrape1}
-\include{screenScrape2}
-\include{prob}
-\include{causality}
-\include{nb1}
-\include{nb2}
-\include{nb3}
-\include{api}
-\include{knn1}
-\include{knn2}
-\include{twoKeyPrinciples}
-\include{featureSelection}
-\include{association}
-\include{special}
 
-% Add empty page to get to a multiple of 12 (324 total pages).
-\begingroup
-  \null
-  \newpage
-\endgroup
+\include{intro}           
+\include{spyder}          
+\include{edaExtensions}   
+\include{kde}             
+\include{synthetic1}      
+\include{synthetic2}      
+\include{json1}           
+\include{json2}           
+\include{lowess}          
+\include{covariance}      
+\include{fusion}          
+\include{longWideTidy}    
+\include{datesTimes}      
+\include{logs}            
+\include{databases}       
+\include{screenScrape1}   
+\include{screenScrape2}   
+\include{prob}            
+\include{causality}      
+\include{nb1}             
+\include{nb2}             
+\include{nb3}             
+\include{api}             
+\include{knn1}            
+\include{knn2}            
+\include{twoKeyPrinciples} 
+\include{featureSelection} 
+\include{association}    
+\include{special}         
+
 \backmatter
 \printindex
 
-% Add empty (number-less) pages to get to a multiple of 12 (324 total pages).
-% (Blurb only.)
-\shipout\null
-\shipout\null
-\shipout\null
-\shipout\null
-\shipout\null
-\shipout\null
-\shipout\null
-\shipout\null
-\shipout\null
-\shipout\null
-\shipout\null
+% The Blurb-only \shipout\null padding pages are deliberately omitted here:
+% they produce untagged blank pages. Keep them in the print build only.
 
 \end{document}
-

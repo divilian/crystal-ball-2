@@ -1,4 +1,3 @@
-
 \chapter{Accessing databases}
 
 \index{database}
@@ -232,36 +231,36 @@ returning the entire result, use \texttt{COUNT(*)}, \texttt{MAX()},
 \index{MAX@\texttt{MAX()} (SQL)}
 \index{MIN@\texttt{MIN()} (SQL)}
 \index{FROM clause@``\texttt{FROM}'' clause (SQL)}
-\begin{BVerbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm,bgcolor=AliceBlue]
+\begin{ShadedCode}
 SELECT COUNT(*) FROM table_name
 SELECT MAX(col1) FROM table_name
-\end{BVerbatim}
+\end{ShadedCode}
 
 \index{LIMIT clause@``\texttt{LIMIT}'' clause (SQL)}
 \item To get only the first few rows (similar to Pandas' \texttt{.head()}
 operation) tack on a ``\texttt{LIMIT}'' expression:
 
-\begin{BVerbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm,bgcolor=AliceBlue]
+\begin{ShadedCode}
 SELECT * FROM table_name LIMIT 10
-\end{BVerbatim}
+\end{ShadedCode}
 
 \item To get only certain columns, change the ``\texttt{*}'' to a
 comma-separated list of column names:
 
-\begin{BVerbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm,bgcolor=AliceBlue]
+\begin{ShadedCode}
 SELECT col1 FROM table_name
 SELECT col1,col2,col3 FROM table_name LIMIT 10
-\end{BVerbatim}
+\end{ShadedCode}
 
 \index{WHERE clause@``\texttt{WHERE}'' clause (SQL)}
 \item To get only certain rows, add a ``\texttt{WHERE} clause'' after the table
 name:
 
-\begin{BVerbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm,bgcolor=AliceBlue]
+\begin{ShadedCodeFn}
 SELECT * FROM table_name WHERE col1==val1
 SELECT col2 FROM table_name WHERE col1==val1 AND col2>val2
 SELECT c1,c2 FROM t WHERE c1==val1 AND NOT c2>val2 LIMIT 10
-\end{BVerbatim}
+\end{ShadedCodeFn}
 
 (The usual boolean operations work with keywords \texttt{AND}, \texttt{OR},
 and \texttt{NOT}, and parentheses for grouping.)
@@ -270,40 +269,40 @@ and \texttt{NOT}, and parentheses for grouping.)
 \item The ``\texttt{IN}'' keyword can be useful in a \texttt{WHERE} clause
 for querying membership in a set:
 
-\begin{BVerbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm,bgcolor=AliceBlue]
+\begin{ShadedCode}
 SELECT * FROM table_name WHERE col1 IN (val1,val2)
 SELECT col1,col2 FROM table_name WHERE col1==val1 AND
             NOT col2 IN (val1,val2,val3) LIMIT 10
-\end{BVerbatim}
+\end{ShadedCode}
 
 \index{unique@unique rows (with \texttt{DISTINCT})}
 \index{DISTINCT@\texttt{DISTINCT} (SQL)}
 \item To get only unique rows (like Pandas' \texttt{.drop\_duplicates()}
 gives) use the word \texttt{DISTINCT} before the column names:
 
-\begin{BVerbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm,bgcolor=AliceBlue]
+\begin{ShadedCode}
 SELECT DISTINCT * FROM table_name
 SELECT col1,col2 FROM table_name WHERE NOT col1 IN
             (val1,val2,val3) OR col2!=val4 LIMIT 5
-\end{BVerbatim}
+\end{ShadedCode}
 
 \index{DISTINCT@\texttt{DISTINCT} (SQL)}
 \index{COUNT@\texttt{COUNT()} (SQL)}
 The \texttt{DISTINCT} option is useful in conjunction with \texttt{COUNT()}:
 
-\begin{BVerbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm,bgcolor=AliceBlue]
+\begin{ShadedCode}
 SELECT COUNT(DISTINCT col1) FROM table_name
-\end{BVerbatim}
+\end{ShadedCode}
 
 \index{ORDER BY@\texttt{ORDER BY} (SQL)}
 \item You can have SQLite do sorting with ``\texttt{ORDER BY}'':
 
 \index{DESC@\texttt{DESC} (``descending'') (SQL)}
-\begin{BVerbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm,bgcolor=AliceBlue]
+\begin{ShadedCode}
 SELECT * FROM table_name ORDER BY col1
 SELECT DISTINCT c1,c2 FROM table_name WHERE c1==val1
             ORDER BY c2,c1 DESC LIMIT 5
-\end{BVerbatim}
+\end{ShadedCode}
 
 As you can see, you can sort on multiple columns, and sort in reverse order
 with the \texttt{DESC} keyword.
@@ -313,20 +312,20 @@ with the \texttt{DESC} keyword.
 \item SQL supports a ``GROUP BY'' operation very much like Pandas'
 \texttt{.groupby()} method:
 
-\begin{BVerbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm,bgcolor=AliceBlue]
+\begin{ShadedCode}
 SELECT col1,count(*) FROM table_name GROUP BY col1
 SELECT col1,max(col2) FROM table_name WHERE col3==val1
             GROUP BY col2 ORDER BY col1 DESC LIMIT 5
-\end{BVerbatim}
+\end{ShadedCode}
 
 \index{join!JOIN@\texttt{JOIN} (SQL)}
 \item Finally, to do a merge/join operation, use the \texttt{JOIN} keyword:
 
-\begin{BVerbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm,bgcolor=AliceBlue]
+\begin{ShadedCode}
 SELECT * FROM table_1 join table_2 ON col1==col2
 SELECT c1,c2 FROM t1 join t2 ON t1.x==t2.q
             WHERE c2>val1 LIMIT 5
-\end{BVerbatim}
+\end{ShadedCode}
 
 The \texttt{JOIN} keyword supports \texttt{LEFT}, \texttt{RIGHT}, and
 \texttt{OUTER} options.
@@ -348,4 +347,3 @@ all table names (p.~\pageref{sqlite_master}), \textit{all relational databases
 use essentially identical syntax.} So if you ever need to query an Oracle,
 Sybase, Informix, MySQL, PostgreSQL, or SQL Server database, you'll discover
 that everything in this section applies nearly identically.
-

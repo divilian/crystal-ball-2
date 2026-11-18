@@ -1,4 +1,3 @@
-
 \chapter{Two key ML principles}
 \index{bias-variance trade-off}
 
@@ -62,6 +61,7 @@ lightsaber colors for my original 714 training points were:
 \label{simpleClassifierTable}
 \Large
 \begin{center}
+\HeaderRowsCols{1}{1}   % Jedi/Sith header row; lightsaber colors are row headers
 \begin{tabular}{|l|rr|}
 \hline
 & Jedi & Sith \\
@@ -169,7 +169,14 @@ facet.map(plt.hist, 'accuracy', bins=20)
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.9\textwidth]{nb_knn_comparison.png}
+\includegraphics[width=0.9\textwidth,
+  alt={Two side-by-side histograms of classifier accuracy over 200 training
+  sets, both with accuracy from 70 to 92 on the horizontal axis. Left, Naive
+  Bayes (blue): a roughly bell-shaped pile between 73 and 85 percent, peaking
+  around 80 to 81 with about 30 training sets there. Right, 3-NN (red): a
+  taller, more skewed pile mostly between 84 and 92 percent, peaking near 88 to
+  89 with almost 40 training sets, and a long thin tail down to about
+  71.}]{nb_knn_comparison.png}
 \caption{The accuracies of Na\"{i}ve Bayes and 3-NN classifiers, on 200
 different training sets.}
 \label{nb_knn_comparison}
@@ -265,7 +272,12 @@ $k=3$ do we see the too-high-variance problem come into play.
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.9\textwidth]{varying_k.png}
+\includegraphics[width=0.9\textwidth,
+  alt={Line plot titled Performance vs. k: percent accuracy (vertical axis, 70
+  to 100) against k for odd values 1 through 29 (horizontal axis, with dotted
+  vertical guide lines). The red line starts at 82 percent for k = 1, rises to
+  about 87 at k = 3 and 89 at k = 5, then stays essentially flat between 88.5
+  and 89.5 for every larger k.}]{varying_k.png}
 \caption{The accuracy of a kNN classifier on the Sith/Jedi data, as we fiddle
 with the number of nearest neighbors used.}
 \label{fig:varyingK}
@@ -414,5 +426,3 @@ values for the other features, this would imply a training set of at least $(3
 than instance-based methods (like kNN) because they suffer less from the curse.
 
 \end{enumerate}
-
-

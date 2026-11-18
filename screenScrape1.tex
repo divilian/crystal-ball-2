@@ -1,4 +1,3 @@
-
 \chapter{Screen scraping (1 of 2)}
 \label{ch:screenScraping1}
 
@@ -239,7 +238,14 @@ The whole thing, once rendered, looks something like this:
 
 \begin{center}
 \label{stephenpage}
-\includegraphics[width=0.9\textwidth]{stephenpage.png}
+\includegraphics[width=0.9\textwidth,
+  alt={Screenshot of the sample page rendered in Firefox, titled All About
+  Stephen. A large heading reads Stephen Davies, Esquire, above two short
+  paragraphs containing a link on James Farmer Hall plus bold and underlined
+  words. Below the heading Areas of operation, a table begins: each row holds
+  a clip-art picture, a role (College professor, then Dad), a sentence
+  describing it, a bulleted list of adjectives, and a bold share of total
+  time (50 percent, 30 percent).}]{stephenpage.png}
 \end{center}
 
 \section{The easy case: reading from \texttt{<table>}s}
@@ -674,7 +680,11 @@ which is represented in Figure~\ref{fig:adjectives}.
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.7\textwidth]{adjectives.png}
+\includegraphics[width=0.7\textwidth,
+  alt={Bar chart of minutes per adjective, sixteen adjectives along the
+  horizontal axis from All-encompassing to Thrilling. Important is tallest at
+  about 95, then Fun at 80, Cool at 60, and All-encompassing, Empowering, and
+  Ever-changing tied at 50; the rest range from 5 to 35.}]{adjectives.png}
 \caption{Good news: Stephen spends a lot of time doing important stuff!}
 \label{fig:adjectives}
 \end{figure}
@@ -686,4 +696,3 @@ that as far as scraping the actual \textit{page}, all we needed was one
 command: \texttt{pd.read\_html()}. If the data you want from a page isn't in
 \texttt{<table>}s, though, you're in for the tougher case in
 Chapter~\ref{ch:screenScraping2}. Stay tuned!
-

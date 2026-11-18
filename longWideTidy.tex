@@ -1,4 +1,3 @@
-
 \chapter{Long, wide, and ``tidy'' data}
 
 \section{Wide form data}
@@ -300,6 +299,10 @@ Our two remaining (tidy!) \texttt{DataFrames} are now:
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=single,framesep=3mm]
 print(student_years)               print(grades)
 \end{Verbatim}
+% blank line above the \vspace is REQUIRED in the tagged build: two Verbatim
+% blocks with no paragraph break between them leave an unclosed text-unit
+% structure (the deferred end-of-block close only happens at a \par)
+
 \vspace{-.3in}
 \begin{Verbatim}[fontsize=\footnotesize,samepage=true,frame=leftline,framesep=5mm,framerule=1mm]
       name year                           name  quiz  score
@@ -431,4 +434,4 @@ and get back your original wide form \texttt{DataFrame}.
 % 3) df.col.str   to perform string operations as ufunc
 %  (to set up: "gpa.year = gpa.year.str[3:]")
 %
-% 
+%

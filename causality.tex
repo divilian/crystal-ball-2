@@ -1,4 +1,3 @@
-
 % TODO: gotta be more clear about Judea Pearl's "blocking" (d-separation). See
 %   quiz #6 in Canvas, and how question #6 is pretty much impossible to answer
 %   without being able to reason about that.
@@ -27,8 +26,10 @@ about?
 \vspace{-.1in}
 \begin{figure}[ht]
 \hspace{-.15in}\begin{minipage}{4.7in}
-\raisebox{-.5\height}{\includegraphics[width=0.45\textwidth]{causalDiagram.png}}
-\raisebox{-.5\height}{\includegraphics[width=0.45\textwidth]{causalDiagram2.png}}
+\raisebox{-.5\height}{\includegraphics[width=0.45\textwidth,
+  alt={Causal diagram: an oval labeled eating barbecue with an arrow pointing to an oval labeled getting cancer.}]{causalDiagram.png}}
+\raisebox{-.5\height}{\includegraphics[width=0.45\textwidth,
+  alt={Causal diagram: an oval labeled having a high-fat diet at the top, with arrows pointing down to two ovals, eating barbecue and getting cancer, which have no arrow between them.}]{causalDiagram2.png}}
 \vspace{-.15in}
 \caption{Causal diagrams, each expressing a hypotheses about the causality
 among variables.}
@@ -82,8 +83,10 @@ depression-causes-smoking hypothesis is on the right side.
 
 \begin{figure}[ht]
 \hspace{-.1in}\begin{minipage}{4.7in}
-\raisebox{-.5\height}{\includegraphics[width=0.45\textwidth]{smokingDepression.png}}
-\raisebox{-.5\height}{\includegraphics[width=0.45\textwidth]{depressionSmoking.png}}
+\raisebox{-.5\height}{\includegraphics[width=0.45\textwidth,
+  alt={Causal diagram: smoking with an arrow pointing to depression.}]{smokingDepression.png}}
+\raisebox{-.5\height}{\includegraphics[width=0.45\textwidth,
+  alt={Causal diagram: depression with an arrow pointing to smoking.}]{depressionSmoking.png}}
 \vspace{-.15in}
 \caption{Does smoking cause depression...or does depression lead to smoking?}
 \label{smokingDepression}
@@ -100,7 +103,8 @@ page.
 \vspace{-.1in}
 \begin{figure}[ht]
 \begin{center}
-\includegraphics[width=0.8\textwidth]{smokingDepressionSkeleton.png}
+\includegraphics[width=0.8\textwidth,
+  alt={Skeleton shared by both diagrams: smoking and depression joined by a plain line with no arrowhead.}]{smokingDepressionSkeleton.png}
 \vspace{-.1in}
 \caption{The bad case: both causal diagrams have the \textit{same} skeleton.}
 \label{smokingDepressionSkeleton}
@@ -148,9 +152,11 @@ gamers \textit{regardless} of whether those players used forks or chopsticks.
 \vspace{-.15in}
 \begin{figure}[ht]
 \begin{center}
-\raisebox{-.5\height}{\includegraphics[width=0.4\textwidth]{chopsticksVG.png}}
+\raisebox{-.5\height}{\includegraphics[width=0.4\textwidth,
+  alt={Causal diagram: region of the world with an arrow to chopsticks, and chopsticks with an arrow to VG skill; nothing joins region of the world to VG skill directly.}]{chopsticksVG.png}}
 \quad
-\raisebox{-.5\height}{\includegraphics[width=0.4\textwidth]{regionVG.png}}
+\raisebox{-.5\height}{\includegraphics[width=0.4\textwidth,
+  alt={Causal diagram: region of the world at the top with arrows down to both chopsticks and VG skill; no arrow between chopsticks and VG skill.}]{regionVG.png}}
 \vspace{-.05in}
 \caption{Two competing causal models about why many great video game
 players are from Asian countries.}
@@ -206,9 +212,11 @@ to the same bubbles.
 \begin{figure}[ht]
 \begin{center}
 \hspace{-.25in}\begin{minipage}{4.7in}
-\raisebox{-.5\height}{\includegraphics[width=0.45\textwidth]{chopsticksVGskeleton.png}}
+\raisebox{-.5\height}{\includegraphics[width=0.45\textwidth,
+  alt={Skeleton of the chain diagram: region of the world, chopsticks, and VG skill in a row, joined by plain lines from region to chopsticks and from chopsticks to VG skill.}]{chopsticksVGskeleton.png}}
 \quad
-\raisebox{-.5\height}{\includegraphics[width=0.45\textwidth]{regionVGskeleton.png}}
+\raisebox{-.5\height}{\includegraphics[width=0.45\textwidth,
+  alt={Skeleton of the fork diagram: chopsticks, region of the world, and VG skill in a row, with region of the world in the middle joined by plain lines to each of the other two.}]{regionVGskeleton.png}}
 \vspace{-.05in}
 \caption{The good case: the causal diagrams have \textit{different}
 skeletons.}
@@ -612,4 +620,3 @@ theories are different, then you don't have to throw up your hands and say
 ``correlation doesn't equal causation! So I guess I know nothing!'' The data
 often has a lot to say, and even in observational studies, a careful analysis
 can reveal deep truths.
-
