@@ -1,4 +1,3 @@
-
 % TODO!!! Applications from Page's "The Model Thinker" chapter 10!
 
 \chapter{``Special'' data types}
@@ -69,7 +68,8 @@ Rather than rows in a table, a graph, or \textbf{network}, consists of
 
 \begin{center}
 \label{first_example}
-\includegraphics[width=0.6\textwidth]{first_example.pdf}
+\includegraphics[width=0.6\textwidth,
+  alt={An undirected graph drawn as 20 red circles joined by black lines: a loosely connected central cluster of about 15 vertices, several with 3 to 6 edges each, plus a pair of vertices at the top joined only to each other, and one vertex at the right with no edges at all.}]{first_example.pdf}
 \end{center}
 
 \index{node (graph)}
@@ -201,7 +201,8 @@ properties and structure of a large graph. Here's the one for our example:
 \begin{center}
 \index{degree distribution}
 \label{degreeDistro}
-\includegraphics[width=0.7\textwidth]{degreeDistro.pdf}
+\includegraphics[width=0.7\textwidth,
+  alt={Histogram titled degree distribution, degree 0 through 8 on the horizontal axis and number of vertices 0 to 5 on the vertical, with red bars: one vertex of degree 0, five each of degrees 1 and 2, four of degree 3, three of degree 4, one each of degrees 5 and 6, and none of degree 7 or 8.}]{degreeDistro.pdf}
 \end{center}
 
 \index{dyad}
@@ -379,7 +380,14 @@ there...no one could ever graduate! These kinds of graphs are called
 workflows in projects.
 
 \begin{center}
-\includegraphics[width=0.7\textwidth]{courses.png}
+\includegraphics[width=0.7\textwidth,
+  alt={Directed acyclic graph of computer science course prerequisites, drawn
+  as numbered ovals with arrows pointing from prerequisite to course. 110 and
+  219 at the top feed 220, which feeds 225 and 240, which in turn feed 350,
+  340, 305, 326, and others, down to 400-level courses at the bottom. Shaded
+  ovals are electives and white ones required; dashed arrows mean only one of
+  the courses is required; red arrows mean a C or better is
+  needed.}]{courses.png}
 \end{center}
 
 \index{regular graph}
@@ -389,7 +397,8 @@ of its nodes have degree $d$. The graph below, for instance, is 3-regular
 (check it out!)
 
 \begin{center}
-\includegraphics[width=0.5\textwidth]{regular.pdf}
+\includegraphics[width=0.5\textwidth,
+  alt={An undirected graph of 20 green circles joined by black lines, arranged roughly as a ring with an inner cluster, in which every vertex has exactly three edges.}]{regular.pdf}
 \end{center}
 
 \item \textbf{bipartite graph} -- A graph is \textbf{bipartite} if its vertices
@@ -410,7 +419,10 @@ Bipartite graphs can be drawn with two rows of vertices, one of each type. All
 the edges run across the middle.
 
 \begin{center}
-\includegraphics[width=0.4\textwidth]{bipartite.png}
+\includegraphics[width=0.4\textwidth,
+  alt={A bipartite graph drawn as two rows of eight dots each, top and bottom,
+  with every edge a straight line running from a dot in the top row to a dot
+  in the bottom row and no edges within a row.}]{bipartite.png}
 \end{center}
 
 \end{itemize}
@@ -419,16 +431,13 @@ the edges run across the middle.
 \subsection{Representations}
 
 \index{igraph@\texttt{igraph} (package)}
-\index{networkx@\texttt{networkx} (package)}
 \index{Cs\'{a}rdi, G\'{a}bor}
-\index{Hagberg, Aric}
 
-When we use a graph package like \texttt{igraph} by G\'{a}bor Cs\'{a}rdi, or
-\texttt{networkx} by Aric Hagberg, we can ignore details about \textit{how} the
-graph we're working with is represented under the hood. (Hint: it's not a bunch
-of circles and lines.) However, there will be times when we need to retrieve,
-modify, or manipulate one or more of these representations, so let's learn what
-they are.
+When we use a graph package like \texttt{igraph}, by G\'{a}bor Cs\'{a}rdi, we
+can ignore details about \textit{how} the graph we're working with is
+represented under the hood. (Hint: it's not a bunch of circles and lines.)
+However, there will be times when we need to retrieve, modify, or manipulate
+one or more of these representations, so let's learn what they are.
 
 \subsubsection{Edge list}
 
@@ -440,9 +449,11 @@ is via an \textbf{edge list}, which is very much like a CSV file or
 \texttt{DataFrame}. Each line gives two vertex names or IDs, which are
 connected by an edge.
 
+\pagebreak
 \begin{multicols}{2}
 \begin{center}
-\includegraphics[width=0.48\textwidth]{second_example.pdf}
+\includegraphics[width=0.48\textwidth,
+  alt={An undirected graph of nine vertices numbered 0 through 8, drawn as light blue circles. Vertex 0 connects to 2, 4, 5, and 7; vertex 7 connects to 0, 4, 5, 6, and 8; vertex 4 connects to 0, 1, and 7; vertex 5 connects to 0, 1, and 7; vertex 6 connects to 7 and 8; vertex 3 stands alone with no edges.}]{second_example.pdf}
 \end{center}
 \columnbreak
   
@@ -482,7 +493,8 @@ vertex $i$ and vertex $j$ are connected.'' Otherwise, they're not.
 
 \begin{multicols}{2}
 \begin{center}
-\includegraphics[width=0.48\textwidth]{second_example.pdf}
+\includegraphics[width=0.48\textwidth,
+  alt={The same nine-vertex graph, repeated beside its adjacency-list representation.}]{second_example.pdf}
 \end{center}
 \columnbreak
 Adjacency matrix:
@@ -525,7 +537,8 @@ matrix with mostly zeroes, the adjacency list only gives us, for each vertex,
 \begin{multicols}{2}
 \begin{center}
 \label{lightblueGraph}
-\includegraphics[width=0.48\textwidth]{second_example.pdf}
+\includegraphics[width=0.48\textwidth,
+  alt={The same nine-vertex graph, repeated beside its edge-list representation.}]{second_example.pdf}
 \end{center}
 \columnbreak
 Adjacency list:
@@ -677,11 +690,10 @@ person is not so much one with a lot of friends, but rather one with a lot of
 \textit{popular} friends.)
 
 \index{igraph@\texttt{igraph} (package)}
-\index{networkx@\texttt{networkx} (package)}
 
 The math involved is beyond the scope of this course, but if you've had some
-matrix algebra it's not too hard, and of course \texttt{igraph} or
-\texttt{networkx} can do the heavy lifting for us.
+matrix algebra it's not too hard, and of course \texttt{igraph} can do the
+heavy lifting for us.
 
 % TODO: Star Wars graphs!
 

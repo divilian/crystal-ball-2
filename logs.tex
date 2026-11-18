@@ -1,4 +1,3 @@
-
 % TODO: 
 
 % five figure vs. six figure salary (compare with $5 vs $6 average tip)
@@ -37,6 +36,7 @@ and 10 ($\log_{10}$ is often just plain ``$\log$''.))
 The role of the logarithm is to mercilessly crush numbers down to size.
 
 \begin{center}
+\HeaderRows{1}   % x / log x header row
 \begin{tabular}{c|c}
 $x$ & $\log x$ \\
 \hline
@@ -115,7 +115,8 @@ plt.show()
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=1\textwidth]{rein1.pdf}
+\includegraphics[width=1\textwidth,
+  alt={Scatter plot of total Instagram likes for 100 celebrities, red dots for UK and green for US, on a linear vertical axis up to 4.4 billion. Nearly every point sits on the zero line; one US celebrity at the far left reaches 4.4 billion, two US points sit near 1 billion, and a handful of UK and US points lie between 0.1 and 0.5 billion.}]{rein1.pdf}
 \caption{A regular (non-logarithmic) plot of celebrity ``likes.''}
 \label{fig:rein1}
 \end{figure}
@@ -140,7 +141,8 @@ but log-number-of-likes.
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=1\textwidth]{rein2.pdf}
+\includegraphics[width=1\textwidth,
+  alt={The same celebrity likes on a logarithmic vertical axis from ten thousand to ten billion. The points now spread into a wide band mostly between ten thousand and a few hundred thousand likes, with about a dozen UK and US outliers between ten million and one billion, and the single US celebrity at about 4 billion at the top.}]{rein2.pdf}
 \caption{A logarithmic plot of the same data from Figure~\ref{fig:rein1}.}
 \label{fig:rein2}
 \end{figure}
@@ -161,7 +163,8 @@ before/after B?
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.8\textwidth]{stock1.pdf}
+\includegraphics[width=0.8\textwidth,
+  alt={Line plot titled Stephen Enterprises stock value, December 2014 to June 2017, price on a linear axis from 0 to 120. The line rises from about 5 to a plateau near 113. Two labeled jumps: Event A in early 2015 lifts the price from about 5 to 15, and Event B in early 2017 lifts it from about 92 to 113; between them the price climbs steadily through 2016.}]{stock1.pdf}
 \caption{A regular (non-logarithmic) plot of a company's stock price.}
 \label{fig:stock1}
 \end{figure}
@@ -198,7 +201,8 @@ bigger windfall for investors than event B.
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.8\textwidth]{stock2.pdf}
+\includegraphics[width=0.8\textwidth,
+  alt={The same stock price on a logarithmic vertical axis from about 5 to 120. The Event A jump in early 2015 now shows as the taller step, roughly tripling the price, while the Event B jump in early 2017 is a small step; the 2016 climb is a gentle upward curve.}]{stock2.pdf}
 \caption{A semi-logarithmic plot of a company's stock price.}
 \label{fig:stock2}
 \end{figure}
@@ -280,9 +284,12 @@ exponential, and the green points are power-law (with an exponent of 6).
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.6\textwidth]{logplots1.pdf}
-\includegraphics[width=0.6\textwidth]{logplots2.pdf}
-\includegraphics[width=0.6\textwidth]{logplots3.pdf}
+\includegraphics[width=0.6\textwidth,
+  alt={Scatter plot titled Linear plot of three synthetic data sets over x from 5 to 18.5, linear vertical axis up to 4 million. Blue points rise slowly along a straight line from about 250,000 to 1 million; green points hug zero until x = 12 and then shoot up past 4 million; red points stay near zero the whole way, reaching only about 600,000 at the far right.}]{logplots1.pdf}
+\includegraphics[width=0.6\textwidth,
+  alt={Scatter plot titled Semi-log plot of the same three data sets, vertical axis logarithmic from 10 to 10 million, with a legend naming blue y = mx + b, green y = a times x to the sixth plus b, and red y = p times e to the qx. The red exponential points now form a straight line rising from about 10 to 600,000; the green power-law points form a concave-down curve; the blue linear points form a nearly flat, slightly rising curve.}]{logplots2.pdf}
+\includegraphics[width=0.6\textwidth,
+  alt={Scatter plot titled Log-log plot of the same three data sets, both axes logarithmic. The green power-law points now form a straight line rising from about 1,500 to 5 million; the red exponential points curve upward ever more steeply; the blue linear points form a gently rising curve near the top.}]{logplots3.pdf}
 \caption{A linear, semi-log, and log-log plot of the same three data sets:
 blue (linear), red (exponential), and green (power-law).}
 \label{fig:straightLines}
@@ -293,4 +300,3 @@ semi-log plot, the red points are. In the log-log plot, the green points are.
 This is a powerful tool for recognizing these important kinds of relationships
 at a glance.
 \end{enumerate}
-

@@ -1,4 +1,3 @@
-
 % TODO: talk about "percentage of variance explained," and point out that they
 % don't add up to 100%.
 
@@ -232,7 +231,9 @@ second}, here's how long it would take:
 
 \vspace{-.2in}
 \scriptsize
-\begin{center}
+% the center environment that used to wrap this align* is gone: align* is a
+% full-width centred display anyway, and in the tagged build a center block
+% containing only display math leaves an unclosed text-unit structure
 \begin{align*}
 1,099,511,627,776 \times 
     \frac{1\ \textrm{second}}{1000\ \textrm{classifiers}} \times
@@ -242,7 +243,6 @@ second}, here's how long it would take:
     \frac{1\ \textrm{year}}{365\ \textrm{days}}\\
 {\normalsize \textrm{\textbf{= 34.9\ years}\ !}}
 \end{align*}
-\end{center}
 \normalsize
 \smallskip
 
@@ -292,6 +292,9 @@ The most common greedy algorithm used for feature selection is called
 \begin{center}
 \textbf{Forward selection algorithm}
 \end{center}
+% blank line below is REQUIRED in the tagged build: a display block (center)
+% directly followed by another (the list) leaves an unclosed text-unit structure
+
 \begin{compactenum}
 \small
 \item Train $p$ different one-feature classifiers, where $p$ is the number of
@@ -358,6 +361,9 @@ which is appropriately called \textbf{backward selection}:
 \begin{center}
 \textbf{Backward selection algorithm}
 \end{center}
+% blank line below is REQUIRED in the tagged build: a display block (center)
+% directly followed by another (the list) leaves an unclosed text-unit structure
+
 \begin{compactenum}
 \small
 \item Start by including \textit{every} feature (instead of none of them).
@@ -468,5 +474,3 @@ original features, not just in pairs as in this example.) The general term
 \textbf{dimensionality reduction} is what to look for in this area, together
 with specific techniques like \textbf{principal components analysis} (PCA) and
 \textbf{singular value decomposition} (SVD).
-
-

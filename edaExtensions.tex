@@ -1,4 +1,3 @@
-
 \chapter{EDA: review and extensions}
 
 % Extra things beyond Crystal Ball Volume One:
@@ -107,7 +106,10 @@ books['lang'].value_counts().plot(kind="bar")
 \end{Verbatim}
 
 \begin{center}
-\includegraphics[width=0.6\textwidth]{barplot.png}
+\includegraphics[width=0.6\textwidth,
+  alt={Bar chart of the number of books in each language, tallest to shortest:
+  French about 265, Spanish about 260, English about 255, Russian about 125,
+  and Italian about 100.}]{barplot.png}
 \end{center}
 
 \section{Case 2 -- univariate data: numeric}
@@ -161,7 +163,11 @@ can get very different pictures of how the data is distributed depending on
 your bin size (more on that in Chapter~\ref{ch:KDEs}).
 
 \begin{center}
-\includegraphics[width=.7\textwidth]{histogram.png}
+\includegraphics[width=.7\textwidth,
+  alt={Histogram of words per book in 30 bins from 0 to 1.2 million words. The
+  shape is roughly bell shaped with a slight right skew: a few books under
+  100,000 words, a peak of about 67 books near 470,000 words, then a gradual
+  taper to almost none above 1.1 million.}]{histogram.png}
 \end{center}
 
 \section{Case 3 -- bivariate data: cat--cat}
@@ -454,7 +460,13 @@ argument to \texttt{heatmap()}.}
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.8\textwidth]{heatmap.png}
+\includegraphics[width=0.8\textwidth,
+  alt={Heat map of the gender by language contingency table. Rows are gender,
+  F above M; columns are English, French, Italian, Russian, Spanish. A color
+  bar on the right runs from black for counts near 20, through purple and red,
+  to light tan for counts near 200. The entire F row is dark, French being the
+  lightest of it (purple). In the M row, English, French, and Spanish are
+  light tan, Russian is red-orange, and Italian is purple.}]{heatmap.png}
 \caption{A heatmap of two categorical variables.}
 \label{heatmap}
 \end{figure}
@@ -513,7 +525,13 @@ books.boxplot(column='words', by='lang')
 \end{Verbatim}
 
 \begin{center}
-\includegraphics[width=0.8\textwidth]{boxplot.png}
+\includegraphics[width=0.8\textwidth,
+  alt={Box plot of words per book grouped by language, with one box each for
+  English, French, Italian, Russian, and Spanish. Most boxes span roughly
+  350,000 to 780,000 words with a green median line near 520,000 to 570,000.
+  Italian sits lowest, its box spanning about 280,000 to 670,000 with a median
+  near 440,000. Whiskers reach from below 100,000 up to about 1.2
+  million.}]{boxplot.png}
 \end{center}
 
 \index{t-test@$t$-test}
@@ -548,7 +566,12 @@ longer than French ones. However, the English and Italian notches do
 declaring that on average, English works are longer than Italian ones.
 
 \begin{center}
-\includegraphics[width=0.8\textwidth]{notchedboxplot.png}
+\includegraphics[width=0.8\textwidth,
+  alt={The same box plot with a notch cut into each box around its median. The
+  notches for English, French, Russian, and Spanish all overlap in roughly the
+  500,000 to 600,000 word range, while the Italian notch sits lower, around
+  400,000 to 480,000, and does not overlap the English
+  notch.}]{notchedboxplot.png}
 \end{center}
 
 \section{Case 5 -- bivariate data: num--num}
@@ -574,7 +597,13 @@ by taking a look at the Pearson's correlation coefficient.
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.9\textwidth]{scatterplot.png}
+\includegraphics[width=0.9\textwidth,
+  alt={Scatter plot of words per book (vertical axis, 0 to 1.2 million)
+  against year (horizontal axis, 1600 to 2000), about a thousand purple dots.
+  The cloud slopes steadily downward: books from around 1600 cluster near
+  900,000 to 1 million words, books from around 2000 near 200,000 to 300,000.
+  A sparse band of points stays high, around 800,000 to 1.1 million words,
+  across all years.}]{scatterplot.png}
 \caption{A scatter plot of two numerical variables.}
 \label{scatterplot}
 \end{figure}
@@ -746,7 +775,14 @@ here.
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.95\textwidth]{groupedscatter.png}
+\includegraphics[width=0.95\textwidth,
+  alt={The same scatter plot of words against year with the dots colored by
+  language: blue for English, orange for Russian, green for Spanish, red for
+  French, purple for Italian (legend at lower left). The English, Spanish,
+  French, and Italian dots all follow the downward trend from about 1 million
+  words in 1600 to about 200,000 in 2000, while the orange Russian dots stay
+  scattered between roughly 400,000 and 1.2 million words in every
+  century.}]{groupedscatter.png}
 \caption{A grouped scatter plot.}
 \label{groupedscatter}
 \end{figure}
@@ -791,7 +827,13 @@ separate subplot, which in each case is a plot of the \texttt{words} vs.~the
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=1.05\textwidth]{scatterplotfacets.png}
+\includegraphics[width=1.05\textwidth,
+  alt={A row of five small scatter plots of words against year, one per
+  language, titled lang = English, lang = Russian, lang = Spanish, lang =
+  French, and lang = Italian. English, Spanish, French, and Italian each show
+  a clear downward trend from about 1 million words in 1600 to about 200,000
+  in 2000. Russian shows no trend: a flat cloud between roughly 400,000 and
+  1.2 million words.}]{scatterplotfacets.png}
 \caption{A faceted scatter plot.}
 \label{scatterplotfacets}
 \end{figure}
@@ -811,7 +853,13 @@ all nicely labeled, too!
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=1.05\textwidth]{scatterplotfacets2d.png}
+\includegraphics[width=1.05\textwidth,
+  alt={A grid of ten small scatter plots of words against year: two rows,
+  gender = F above and gender = M below, by five columns for lang = English,
+  Russian, Spanish, French, and Italian. The M row repeats the pattern of the
+  one-row facet plot, with many points per panel. The F row has far fewer
+  points, and they begin only around 1800; the F Russian panel holds just five
+  points.}]{scatterplotfacets2d.png}
 \caption{A faceted scatter plot with two faceted variables.}
 \label{scatterplotfacets2d}
 \end{figure}
@@ -829,9 +877,14 @@ that has particular value(s) for the faceted variable(s).
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.8\textwidth]{scatterplotmatrix.png}
+\includegraphics[width=0.8\textwidth,
+  alt={A 3 by 3 scatter plot matrix of year, words, and chaps. The diagonal
+  holds histograms: year is skewed toward recent years, words is roughly bell
+  shaped, chaps is right skewed. Off the diagonal, year against words forms a
+  tight downward band, chaps against year a loose downward cloud, and chaps
+  against words a loose upward cloud. Each pairing appears twice with the
+  axes swapped.}]{scatterplotmatrix.png}
 \caption{A scatter plot matrix of the \texttt{books} \texttt{DataFrame}
 (restricted to only numeric variables).}
 \label{scatterplotmatrix}
 \end{figure}
-

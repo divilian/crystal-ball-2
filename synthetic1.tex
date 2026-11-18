@@ -1,4 +1,3 @@
-
 % TODO: You know, we never really defined the term "random variable" anywhere.
 % :\ Not sure if here or synthetic2.tex is the best place.
 
@@ -89,7 +88,12 @@ were born) is shown on the bottom of the same figure.
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=1.0\textwidth]{distributions.png}
+\includegraphics[width=1.0\textwidth,
+  alt={Two curves stacked vertically, each over a horizontal axis from -10 to
+  80. The top curve is a normal distribution: flat at zero until about 50,
+  rising to a bell-shaped peak at 65, and back to zero by about 80. The
+  bottom curve is a uniform distribution: zero below 0, a flat plateau from 0
+  to 60, and zero again above 60.}]{distributions.png}
 \caption{A normal, and uniform, distributions, shown as KDE-like curves.}
 \label{distributions}
 \end{figure}
@@ -364,4 +368,3 @@ dtype: int64
 
 Our friend the \texttt{.value\_counts()} method confirms that it pretty much
 checks out.
-

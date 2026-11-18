@@ -1,4 +1,3 @@
-
 \chapter[kNN (2 of 2)]
 {\LARGE ML classifiers: kNN (2 of 2)}
 \label{ch:kNN2}
@@ -70,7 +69,14 @@ to get the grouped scatter plot in Figure~\ref{synthesized_bank}.
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.85\textwidth]{synthesized_bank.png}
+\includegraphics[width=0.85\textwidth,
+  alt={Scatter plot of credit card debt in dollars (vertical axis, 0 to about
+  22,000) against number of years at present job (horizontal axis, 0 to 12)
+  for 1,000 synthesized customers, marked as red x for defaulted and green plus
+  for repaid. Red defaults dominate the upper left, mostly under 4 years and
+  above 10,000 dollars of debt; green repayments spread across all years,
+  mostly below 12,000 dollars. The two groups overlap heavily in the
+  middle.}]{synthesized_bank.png}
 \caption{Synthesized bank data.}
 \label{synthesized_bank}
 \end{figure}
@@ -435,4 +441,3 @@ nb_predictions = naive_bayes.predict(
 Na\"{i}ve Bayes was the loser with this training set: only 81\% accuracy as
 opposed to 5-NN's 85+\%. However, that turns out to be far from the whole
 story. The full story will require another chapter.
-

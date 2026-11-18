@@ -1,4 +1,3 @@
-
 \chapter{Dates and times}
 
 \index{time@``time''}
@@ -434,7 +433,12 @@ contribs.Date.hist(bins=50)
 \end{Verbatim}
 
 \begin{center}
-\includegraphics[width=0.9\textwidth]{datehist.png}
+\includegraphics[width=0.9\textwidth,
+  alt={Histogram of the number of contributions per date bin, 50 bins,
+  spanning mid-2015 to early 2018. From 2015 through October 2016 the bars
+  hover between about 95 and 130 per bin. Right after November 2016 they jump
+  to about 185 and stay between roughly 150 and 195 through the end of the
+  data in early 2018.}]{datehist.png}
 \end{center}
 
 Looks like donations spiked sharply immediately following the 2016 election,
@@ -522,7 +526,10 @@ shows some common ones (others are in the docs).
 
 \begin{figure}[ht]
 \centering
+\HeaderRowsCols{1}{1}   % header row added for accessibility; the code column doubles as row headers
 \begin{tabular}{|c|l|}
+\hline
+\textbf{Code} & \textbf{Meaning} \\
 \hline
 \texttt{\%a} & Weekday (abbreviated): Sun, Mon, \textit{etc.} \\
 \texttt{\%A} & Weekday (full): Sunday, Monday, \textit{etc.} \\
@@ -588,4 +595,3 @@ argument:
 \begin{Verbatim}[fontsize=\small,samepage=true,frame=single,framesep=3mm]
 a_string = my_birthday_datetime.strftime("%m/%d/%Y %H:%M")
 \end{Verbatim}
-
